@@ -240,45 +240,66 @@ export type Database = {
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
+          current_period_start: string | null
           customer_type: string
+          environment: string
           id: string
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
           plan: string
+          price_id: string | null
+          product_id: string | null
           profile_id: string
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           trial_ends_at: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           billing_interval?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
+          current_period_start?: string | null
           customer_type: string
+          environment?: string
           id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           plan: string
+          price_id?: string | null
+          product_id?: string | null
           profile_id: string
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           billing_interval?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
+          current_period_start?: string | null
           customer_type?: string
+          environment?: string
           id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           plan?: string
+          price_id?: string | null
+          product_id?: string | null
           profile_id?: string
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -551,6 +572,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_active_subscription: {
+        Args: { check_env?: string; user_uuid: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

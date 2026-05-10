@@ -1,7 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Check, X } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
+import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useAuth } from "@/contexts/auth-context";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -17,7 +20,7 @@ export const Route = createFileRoute("/pricing")({
 
 const PLANS = [
   {
-    name: "Free", price: "£0", period: "forever",
+    name: "Free", price: "£0", period: "forever", priceId: null as string | null,
     desc: "Browse the full catalog and try out the AI.",
     features: [
       [true, "5 try-ons per month"],
@@ -29,7 +32,7 @@ const PLANS = [
     ] as const,
   },
   {
-    name: "Plus", price: "£4.99", period: "per month",
+    name: "Plus", price: "£4.99", period: "per month", priceId: "consumer_plus_monthly" as string | null,
     desc: "Unlimited try-ons and personalised picks.",
     badge: "Most popular",
     features: [
@@ -42,7 +45,7 @@ const PLANS = [
     ] as const,
   },
   {
-    name: "Pro", price: "£9.99", period: "per month",
+    name: "Pro", price: "£9.99", period: "per month", priceId: "consumer_pro_monthly" as string | null,
     desc: "Everything, plus first-look at new arrivals.",
     features: [
       [true, "Everything in Plus"],
@@ -55,6 +58,31 @@ const PLANS = [
 ];
 
 function Pricing() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { openCheckout, loading } = usePaddleCheckout();
+
+  const onChoose = async (priceId: string | null, planName: string) => {
+    if (!priceId) {
+      navigate({ to: "/auth/signup" });
+      return;
+    }
+    if (!user) {
+      navigate({ to: "/auth/login" });
+      return;
+    }
+    try {
+      await openCheckout({
+        priceId,
+        customerEmail: user.email ?? undefined,
+        customData: { userId: user.id, plan: planName },
+        successUrl: `${window.location.origin}/checkout/success`,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start checkout");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-cream">
       <Header />
@@ -92,16 +120,17 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <Link
-                to="/try-on"
-                className={`mt-7 block rounded-md py-2.5 text-center text-sm font-medium transition-all ${
+              <button
+                onClick={() => onChoose(p.priceId, p.name)}
+                disabled={loading}
+                className={`mt-7 block w-full rounded-md py-2.5 text-center text-sm font-medium transition-all disabled:opacity-50 ${
                   p.badge
                     ? "bg-mahogany text-cream hover:bg-mahogany-soft"
                     : "border border-mahogany text-mahogany hover:bg-mahogany hover:text-cream"
                 }`}
               >
                 {p.name === "Free" ? "Start free" : `Choose ${p.name}`}
-              </Link>
+              </button>
             </div>
           ))}
         </div>
