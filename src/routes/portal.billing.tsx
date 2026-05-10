@@ -4,7 +4,9 @@ import { useAuth } from "@/contexts/auth-context";
 import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { getPaddleEnvironment } from "@/lib/paddle";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { changeSubscriptionPlan, createPortalSession } from "@/lib/subscription.functions";
+import { CheckCircle2, Sparkles, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/billing")({
@@ -42,43 +44,93 @@ const RETAILER_PLANS = [
   },
 ];
 
+interface CurrentSub {
+  plan: string;
+  status: string;
+  paddle_subscription_id: string | null;
+  current_period_end: string | null;
+}
+
 function BillingPage() {
   const { user } = useAuth();
-  const { openCheckout, loading } = usePaddleCheckout();
-  const [currentPlan, setCurrentPlan] = useState<string>("starter");
-  const [status, setStatus] = useState<string>("trialing");
+  const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
+  const changePlan = useServerFn(changeSubscriptionPlan);
+  const portal = useServerFn(createPortalSession);
+  const [sub, setSub] = useState<CurrentSub | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
 
-  useEffect(() => {
+  const refetch = () => {
     if (!user) return;
     const env = getPaddleEnvironment();
     supabase
       .from("subscriptions")
-      .select("plan, status, current_period_end")
+      .select("plan, status, paddle_subscription_id, current_period_end")
       .eq("user_id", user.id)
       .eq("customer_type", "retailer")
       .eq("environment", env)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle()
-      .then(({ data }) => {
-        if (data) {
-          setCurrentPlan(data.plan);
-          setStatus(data.status);
-        }
-      });
+      .then(({ data }) => setSub((data as CurrentSub | null) ?? null));
+  };
+
+  useEffect(() => {
+    refetch();
+    if (!user) return;
+    const channel = supabase
+      .channel(`retailer-subs-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "subscriptions", filter: `user_id=eq.${user.id}` },
+        () => refetch(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const onUpgrade = async (priceId: string | null, planId: string) => {
+  const isPaidActive =
+    !!sub &&
+    ["active", "trialing", "past_due"].includes(sub.status) &&
+    (sub.plan === "growth" || sub.plan === "scale");
+
+  const currentPlanId = isPaidActive ? sub!.plan : "starter";
+
+  const onChoose = async (priceId: string | null, planId: string) => {
     if (!priceId || !user) return;
+    setBusy(planId);
     try {
+      if (isPaidActive && sub?.paddle_subscription_id) {
+        await changePlan({
+          data: { newPriceId: priceId, environment: getPaddleEnvironment() },
+        });
+        toast.success("Plan updated.");
+        return;
+      }
       await openCheckout({
         priceId,
         customerEmail: user.email ?? undefined,
         customData: { userId: user.id, plan: planId },
-        successUrl: `${window.location.origin}/portal/billing?success=1`,
+        successUrl: `${window.location.origin}/portal/billing`,
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not start checkout");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const onManage = async () => {
+    setBusy("portal");
+    try {
+      const { url } = await portal({ data: { environment: getPaddleEnvironment() } });
+      window.open(url, "_blank", "noopener");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't open portal");
+    } finally {
+      setBusy(null);
     }
   };
 
@@ -88,14 +140,34 @@ function BillingPage() {
         <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Billing</p>
         <h1 className="mt-1 font-display text-3xl text-mahogany">Your plan</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Current plan: <span className="font-medium text-foreground capitalize">{currentPlan}</span> · Status:{" "}
-          <span className="capitalize">{status}</span>
+          Current plan: <span className="font-medium capitalize text-foreground">{currentPlanId}</span>
+          {sub?.status && (
+            <>
+              {" "}· Status: <span className="capitalize">{sub.status}</span>
+            </>
+          )}
         </p>
+        {sub?.status === "past_due" && (
+          <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+            Your last payment failed. Please update your card to keep your account active.
+          </div>
+        )}
+        {isPaidActive && (
+          <button
+            onClick={onManage}
+            disabled={busy === "portal"}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-mahogany px-3 py-1.5 text-xs text-mahogany hover:bg-mahogany hover:text-cream disabled:opacity-50"
+          >
+            {busy === "portal" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
+            Manage subscription
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {RETAILER_PLANS.map((p) => {
-          const isCurrent = p.id === currentPlan;
+          const isCurrent = p.id === currentPlanId;
+          const busyHere = busy === p.id || (busy === null && checkoutLoading);
           return (
             <div
               key={p.id}
@@ -126,12 +198,12 @@ function BillingPage() {
                 </div>
               ) : p.priceId ? (
                 <button
-                  onClick={() => onUpgrade(p.priceId, p.id)}
-                  disabled={loading}
-                  className="mt-6 w-full rounded-md bg-mahogany py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
+                  onClick={() => onChoose(p.priceId, p.id)}
+                  disabled={busyHere}
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-mahogany py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
                 >
-                  <Sparkles className="mr-1 inline h-3.5 w-3.5" />
-                  Upgrade
+                  {busyHere ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                  {isPaidActive ? `Switch to ${p.name}` : "Upgrade"}
                 </button>
               ) : (
                 <div className="mt-6 text-center text-xs text-muted-foreground">
