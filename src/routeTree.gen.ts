@@ -22,6 +22,7 @@ import { Route as RetailerSignupRouteImport } from './routes/retailer_.signup'
 import { Route as RetailerLoginRouteImport } from './routes/retailer_.login'
 import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
@@ -101,6 +102,11 @@ const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => PortalRoute,
+} as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/checkout/success',
+  path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/retailer/login': typeof RetailerLoginRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/retailer/login': typeof RetailerLoginRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/retailer_/login': typeof RetailerLoginRoute
@@ -283,6 +292,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/checkout/success'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/retailer/login'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/checkout/success'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/retailer/login'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/checkout/success'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/retailer_/login'
@@ -372,6 +384,7 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   RetailerLoginRoute: typeof RetailerLoginRoute
   RetailerSignupRoute: typeof RetailerSignupRoute
   WigIdRoute: typeof WigIdRoute
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/onboarding'
       preLoaderRoute: typeof PortalOnboardingRouteImport
       parentRoute: typeof PortalRoute
+    }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/checkout/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
       id: '/auth/signup'
@@ -635,6 +655,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
   RetailerLoginRoute: RetailerLoginRoute,
   RetailerSignupRoute: RetailerSignupRoute,
   WigIdRoute: WigIdRoute,
