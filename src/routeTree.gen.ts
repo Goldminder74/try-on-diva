@@ -9,38 +9,129 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TryOnRouteImport } from './routes/try-on'
+import { Route as RetailerRouteImport } from './routes/retailer'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WigIdRouteImport } from './routes/wig.$id'
 
+const TryOnRoute = TryOnRouteImport.update({
+  id: '/try-on',
+  path: '/try-on',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetailerRoute = RetailerRouteImport.update({
+  id: '/retailer',
+  path: '/retailer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogRoute = CatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WigIdRoute = WigIdRouteImport.update({
+  id: '/wig/$id',
+  path: '/wig/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/catalog': typeof CatalogRoute
+  '/pricing': typeof PricingRoute
+  '/retailer': typeof RetailerRoute
+  '/try-on': typeof TryOnRoute
+  '/wig/$id': typeof WigIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/catalog': typeof CatalogRoute
+  '/pricing': typeof PricingRoute
+  '/retailer': typeof RetailerRoute
+  '/try-on': typeof TryOnRoute
+  '/wig/$id': typeof WigIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/catalog': typeof CatalogRoute
+  '/pricing': typeof PricingRoute
+  '/retailer': typeof RetailerRoute
+  '/try-on': typeof TryOnRoute
+  '/wig/$id': typeof WigIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/catalog'
+    | '/pricing'
+    | '/retailer'
+    | '/try-on'
+    | '/wig/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/catalog' | '/pricing' | '/retailer' | '/try-on' | '/wig/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/catalog'
+    | '/pricing'
+    | '/retailer'
+    | '/try-on'
+    | '/wig/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CatalogRoute: typeof CatalogRoute
+  PricingRoute: typeof PricingRoute
+  RetailerRoute: typeof RetailerRoute
+  TryOnRoute: typeof TryOnRoute
+  WigIdRoute: typeof WigIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/try-on': {
+      id: '/try-on'
+      path: '/try-on'
+      fullPath: '/try-on'
+      preLoaderRoute: typeof TryOnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retailer': {
+      id: '/retailer'
+      path: '/retailer'
+      fullPath: '/retailer'
+      preLoaderRoute: typeof RetailerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalog': {
+      id: '/catalog'
+      path: '/catalog'
+      fullPath: '/catalog'
+      preLoaderRoute: typeof CatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +139,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wig/$id': {
+      id: '/wig/$id'
+      path: '/wig/$id'
+      fullPath: '/wig/$id'
+      preLoaderRoute: typeof WigIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CatalogRoute: CatalogRoute,
+  PricingRoute: PricingRoute,
+  RetailerRoute: RetailerRoute,
+  TryOnRoute: TryOnRoute,
+  WigIdRoute: WigIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
