@@ -74,11 +74,63 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
     );
 
   // Mirror retailer plan onto retailers row so portal UI reflects it.
+  // On successful subscription: re-activate the retailer, republish any wigs
+  // that were auto-unpublished when the trial expired, and send the
+  // "you're live" email.
   if (ctype === "retailer") {
-    await getSupabase()
+    const sb = getSupabase();
+    await sb
       .from("retailers")
-      .update({ plan, updated_at: new Date().toISOString() })
+      .update({ plan, is_active: true, updated_at: new Date().toISOString() })
       .eq("owner_id", userId);
+
+    // Find the retailer row + republish auto-unpublished wigs.
+    const { data: retailer } = await sb
+      .from("retailers")
+      .select("id, business_name, display_name")
+      .eq("owner_id", userId)
+      .maybeSingle();
+
+    if (retailer?.id) {
+      await sb
+        .from("wigs")
+        .update({
+          is_published: true,
+          auto_unpublished_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("retailer_id", retailer.id)
+        .not("auto_unpublished_at", "is", null);
+
+      // Clear the "trial_ended" lifecycle marker so a future expiry can
+      // re-send the email if they ever lapse again.
+      await sb
+        .from("retailer_lifecycle_events")
+        .delete()
+        .eq("retailer_id", retailer.id)
+        .in("event_type", ["trial_ended", "trial_ending_3d"]);
+
+      // Send "you're live" email (idempotent by subscription id).
+      const { data: profile } = await sb
+        .from("profiles")
+        .select("email, display_name")
+        .eq("id", userId)
+        .maybeSingle();
+      if (profile?.email) {
+        await serverSendTransactionalEmail({
+          baseUrl: "https://wigsmi.com",
+          templateName: "retailer-subscribed",
+          recipientEmail: profile.email,
+          idempotencyKey: `subscribed-${id}`,
+          templateData: {
+            name: profile.display_name ?? retailer.display_name,
+            businessName: retailer.business_name,
+            plan,
+            portalUrl: "https://wigsmi.com/portal",
+          },
+        });
+      }
+    }
   }
 }
 
