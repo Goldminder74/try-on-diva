@@ -15,6 +15,7 @@ export interface SubscriptionRow {
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   environment: string;
+  billing_interval: string | null;
 }
 
 export function useSubscription() {

@@ -5,9 +5,27 @@ import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { getPaddleEnvironment } from "@/lib/paddle";
 import { useServerFn } from "@tanstack/react-start";
-import { changeSubscriptionPlan, createPortalSession } from "@/lib/subscription.functions";
-import { CheckCircle2, Sparkles, Loader2, ExternalLink } from "lucide-react";
+import {
+  changeSubscriptionPlan,
+  createPortalSession,
+  listInvoices,
+} from "@/lib/subscription.functions";
+import { CheckCircle2, Sparkles, Loader2, ExternalLink, FileText } from "lucide-react";
 import { toast } from "sonner";
+
+interface Invoice {
+  id: string;
+  number: string | null;
+  status: string;
+  currency: string;
+  total: number;
+  billedAt: string | null;
+  invoiceUrl: string | null;
+}
+
+function formatMoney(amountMinor: number, currency: string) {
+  return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(amountMinor / 100);
+}
 
 export const Route = createFileRoute("/portal/billing")({
   component: BillingPage,
@@ -56,6 +74,7 @@ interface CurrentSub {
   status: string;
   paddle_subscription_id: string | null;
   current_period_end: string | null;
+  billing_interval: string | null;
 }
 
 function BillingPage() {
@@ -63,16 +82,18 @@ function BillingPage() {
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
   const changePlan = useServerFn(changeSubscriptionPlan);
   const portal = useServerFn(createPortalSession);
+  const invoicesFn = useServerFn(listInvoices);
   const [sub, setSub] = useState<CurrentSub | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [interval, setBillingInterval] = useState<Interval>("monthly");
+  const [invoices, setInvoices] = useState<Invoice[] | null>(null);
 
   const refetch = () => {
     if (!user) return;
     const env = getPaddleEnvironment();
     supabase
       .from("subscriptions")
-      .select("plan, status, paddle_subscription_id, current_period_end")
+      .select("plan, status, paddle_subscription_id, current_period_end, billing_interval")
       .eq("user_id", user.id)
       .eq("customer_type", "retailer")
       .eq("environment", env)
@@ -98,6 +119,14 @@ function BillingPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    invoicesFn({ data: { environment: getPaddleEnvironment() } })
+      .then(setInvoices)
+      .catch(() => setInvoices([]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, sub?.paddle_subscription_id]);
 
   const isPaidActive =
     !!sub &&
@@ -149,6 +178,8 @@ function BillingPage() {
         <h1 className="mt-1 font-display text-3xl text-mahogany">Your plan</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Current plan: <span className="font-medium capitalize text-foreground">{currentPlanId}</span>
+          {sub?.billing_interval === "year" && <span className="capitalize text-foreground"> · Yearly</span>}
+          {sub?.billing_interval === "month" && <span className="capitalize text-foreground"> · Monthly</span>}
           {sub?.status && (
             <>
               {" "}· Status: <span className="capitalize">{sub.status}</span>
@@ -243,6 +274,45 @@ function BillingPage() {
           );
         })}
       </div>
+
+      {invoices && invoices.length > 0 && (
+        <div className="mt-10">
+          <h2 className="mb-3 font-display text-xl text-mahogany">Invoices</h2>
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-2 font-medium">Date</th>
+                  <th className="px-4 py-2 font-medium">Amount</th>
+                  <th className="px-4 py-2 font-medium">Status</th>
+                  <th className="px-4 py-2 font-medium text-right">Invoice</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoices.map((inv) => (
+                  <tr key={inv.id} className="border-t border-border">
+                    <td className="px-4 py-2">
+                      {inv.billedAt ? new Date(inv.billedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—"}
+                    </td>
+                    <td className="px-4 py-2 font-mono">{formatMoney(inv.total, inv.currency)}</td>
+                    <td className="px-4 py-2 capitalize text-muted-foreground">{inv.status}</td>
+                    <td className="px-4 py-2 text-right">
+                      {inv.invoiceUrl ? (
+                        <a href={inv.invoiceUrl} target="_blank" rel="noopener" className="inline-flex items-center gap-1 text-mahogany underline">
+                          <FileText className="h-3.5 w-3.5" /> PDF
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">VAT included where applicable.</p>
+        </div>
+      )}
 
       <p className="mt-8 text-xs text-muted-foreground">
         Need a custom plan?{" "}
