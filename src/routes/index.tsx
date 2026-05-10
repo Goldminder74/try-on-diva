@@ -169,3 +169,19 @@ function Landing() {
     </div>
   );
 }
+
+function FeaturedRow() {
+  const { data, loading } = useAsync<Wig[]>(() => fetchFeaturedWigs(5), []);
+  if (loading) {
+    return (
+      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+        {Array.from({ length: 5 }).map((_, i) => <WigCardSkeleton key={i} />)}
+      </div>
+    );
+  }
+  return (
+    <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+      {(data ?? []).map((w) => <WigCard key={w.id} wig={w} />)}
+    </div>
+  );
+}

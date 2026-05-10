@@ -4,7 +4,9 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
-import { WIGS, STYLE_TYPES, HAIR_TEXTURES } from "@/lib/wigs";
+import { WigCardSkeleton } from "@/components/wigsmi/WigCardSkeleton";
+import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig } from "@/lib/wigs";
+import { useAsync } from "@/lib/use-async";
 
 export const Route = createFileRoute("/catalog")({
   head: () => ({
