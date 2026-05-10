@@ -114,6 +114,8 @@ async function handleSubscriptionUpdated(data: any, env: PaddleEnv) {
     update.plan = planFromProduct(productId);
     update.customer_type = customerType(productId);
   }
+  const interval = intervalFromItem(item);
+  if (interval) update.billing_interval = interval;
   await getSupabase()
     .from("subscriptions")
     .update(update)
