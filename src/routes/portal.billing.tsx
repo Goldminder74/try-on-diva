@@ -74,6 +74,7 @@ interface CurrentSub {
   status: string;
   paddle_subscription_id: string | null;
   current_period_end: string | null;
+  billing_interval: string | null;
 }
 
 function BillingPage() {
@@ -81,16 +82,18 @@ function BillingPage() {
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
   const changePlan = useServerFn(changeSubscriptionPlan);
   const portal = useServerFn(createPortalSession);
+  const invoicesFn = useServerFn(listInvoices);
   const [sub, setSub] = useState<CurrentSub | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [interval, setBillingInterval] = useState<Interval>("monthly");
+  const [invoices, setInvoices] = useState<Invoice[] | null>(null);
 
   const refetch = () => {
     if (!user) return;
     const env = getPaddleEnvironment();
     supabase
       .from("subscriptions")
-      .select("plan, status, paddle_subscription_id, current_period_end")
+      .select("plan, status, paddle_subscription_id, current_period_end, billing_interval")
       .eq("user_id", user.id)
       .eq("customer_type", "retailer")
       .eq("environment", env)
