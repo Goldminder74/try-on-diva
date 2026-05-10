@@ -11,6 +11,7 @@ import { LayoutDashboard, Package, Settings, LogOut, ExternalLink, CreditCard } 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { Wordmark } from "@/components/wigsmi/Wordmark";
+import { PastDueBanner } from "@/components/PastDueBanner";
 
 export const Route = createFileRoute("/portal")({
   beforeLoad: async ({ location }) => {
