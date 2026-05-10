@@ -38,6 +38,8 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
     console.warn("Skipping subscription: missing importMeta.externalId");
     return;
   }
+  const plan = planFromProduct(productId);
+  const ctype = customerType(productId);
   await getSupabase()
     .from("subscriptions")
     .upsert(
@@ -48,8 +50,8 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
         paddle_customer_id: customerId,
         product_id: productId,
         price_id: priceId,
-        plan: planFromProduct(productId),
-        customer_type: customerType(productId),
+        plan,
+        customer_type: ctype,
         status,
         current_period_start: currentBillingPeriod?.startsAt,
         current_period_end: currentBillingPeriod?.endsAt,
@@ -58,6 +60,29 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
       },
       { onConflict: "paddle_subscription_id" },
     );
+
+  // Mirror retailer plan onto retailers row so portal UI reflects it.
+  if (ctype === "retailer") {
+    await getSupabase()
+      .from("retailers")
+      .update({ plan, updated_at: new Date().toISOString() })
+      .eq("owner_id", userId);
+  }
+}
+
+async function syncRetailerPlanFromSub(subId: string, env: PaddleEnv) {
+  const { data: row } = await getSupabase()
+    .from("subscriptions")
+    .select("user_id, plan, status, customer_type")
+    .eq("paddle_subscription_id", subId)
+    .eq("environment", env)
+    .maybeSingle();
+  if (!row || row.customer_type !== "retailer" || !row.user_id) return;
+  const newPlan = row.status === "canceled" ? "starter" : row.plan;
+  await getSupabase()
+    .from("retailers")
+    .update({ plan: newPlan, updated_at: new Date().toISOString() })
+    .eq("owner_id", row.user_id);
 }
 
 async function handleSubscriptionUpdated(data: any, env: PaddleEnv) {
