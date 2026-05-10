@@ -73,7 +73,7 @@ function WigDetail() {
             </div>
             {wig.images.length > 1 && (
               <div className="mt-3 flex gap-2">
-                {wig.images.map((src, i) => (
+                {wig.images.map((src: string, i: number) => (
                   <button
                     key={i}
                     onClick={() => setActive(i)}
