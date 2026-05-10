@@ -376,7 +376,7 @@ function WidgetPage() {
             </div>
 
             <div className="mt-5 border-t border-border pt-4">
-              <p className="mb-1.5 font-mono the-[11px] text-[11px] uppercase tracking-wider text-gold-dark">
+              <p className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-gold-dark">
                 Embed token
               </p>
               <div className="flex items-center gap-2">
