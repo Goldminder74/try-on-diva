@@ -34,6 +34,7 @@ import { Route as PortalCatalogIndexRouteImport } from './routes/portal.catalog.
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
 import { Route as PortalCatalogNewRouteImport } from './routes/portal.catalog.new'
 import { Route as PortalCatalogWigIdRouteImport } from './routes/portal.catalog.$wigId'
+import { Route as EmbedWidgetTokenRouteImport } from './routes/embed.widget.$token'
 import { Route as AuthenticatedAppWishlistRouteImport } from './routes/_authenticated.app.wishlist'
 import { Route as AuthenticatedAppTryOnRouteImport } from './routes/_authenticated.app.try-on'
 import { Route as AuthenticatedAppStyleQuizRouteImport } from './routes/_authenticated.app.style-quiz'
@@ -165,6 +166,11 @@ const PortalCatalogWigIdRoute = PortalCatalogWigIdRouteImport.update({
   path: '/catalog/$wigId',
   getParentRoute: () => PortalRoute,
 } as any)
+const EmbedWidgetTokenRoute = EmbedWidgetTokenRouteImport.update({
+  id: '/embed/widget/$token',
+  path: '/embed/widget/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAppWishlistRoute =
   AuthenticatedAppWishlistRouteImport.update({
     id: '/app/wishlist',
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
   '/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/embed/widget/$token': typeof EmbedWidgetTokenRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -256,6 +263,7 @@ export interface FileRoutesByTo {
   '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
   '/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/embed/widget/$token': typeof EmbedWidgetTokenRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -290,6 +298,7 @@ export interface FileRoutesById {
   '/_authenticated/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
   '/_authenticated/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/_authenticated/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/embed/widget/$token': typeof EmbedWidgetTokenRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/app/style-quiz'
     | '/app/try-on'
     | '/app/wishlist'
+    | '/embed/widget/$token'
     | '/portal/catalog/$wigId'
     | '/portal/catalog/new'
     | '/app/'
@@ -355,6 +365,7 @@ export interface FileRouteTypes {
     | '/app/style-quiz'
     | '/app/try-on'
     | '/app/wishlist'
+    | '/embed/widget/$token'
     | '/portal/catalog/$wigId'
     | '/portal/catalog/new'
     | '/app'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/style-quiz'
     | '/_authenticated/app/try-on'
     | '/_authenticated/app/wishlist'
+    | '/embed/widget/$token'
     | '/portal/catalog/$wigId'
     | '/portal/catalog/new'
     | '/_authenticated/app/'
@@ -412,6 +424,7 @@ export interface RootRouteChildren {
   RetailerLoginRoute: typeof RetailerLoginRoute
   RetailerSignupRoute: typeof RetailerSignupRoute
   WigIdRoute: typeof WigIdRoute
+  EmbedWidgetTokenRoute: typeof EmbedWidgetTokenRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -592,6 +605,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalCatalogWigIdRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/embed/widget/$token': {
+      id: '/embed/widget/$token'
+      path: '/embed/widget/$token'
+      fullPath: '/embed/widget/$token'
+      preLoaderRoute: typeof EmbedWidgetTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/app/wishlist': {
       id: '/_authenticated/app/wishlist'
       path: '/app/wishlist'
@@ -701,8 +721,19 @@ const rootRouteChildren: RootRouteChildren = {
   RetailerLoginRoute: RetailerLoginRoute,
   RetailerSignupRoute: RetailerSignupRoute,
   WigIdRoute: WigIdRoute,
+  EmbedWidgetTokenRoute: EmbedWidgetTokenRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
