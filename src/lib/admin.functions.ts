@@ -119,9 +119,9 @@ export const listRetailers = createServerFn({ method: "GET" })
       supabaseAdmin.from("try_on_events").select("retailer_id").in("retailer_id", ids).gte("created_at", since),
     ]);
     const wigCount = new Map<string, number>();
-    for (const w of wigsAgg.data ?? []) wigCount.set(w.retailer_id, (wigCount.get(w.retailer_id) ?? 0) + 1);
+    for (const w of wigsAgg.data ?? []) { if (w.retailer_id) wigCount.set(w.retailer_id, (wigCount.get(w.retailer_id) ?? 0) + 1); }
     const tryCount = new Map<string, number>();
-    for (const t of tryAgg.data ?? []) tryCount.set(t.retailer_id, (tryCount.get(t.retailer_id) ?? 0) + 1);
+    for (const t of tryAgg.data ?? []) { if (t.retailer_id) tryCount.set(t.retailer_id, (tryCount.get(t.retailer_id) ?? 0) + 1); }
 
     return rows.map((r: any) => ({
       ...r,
