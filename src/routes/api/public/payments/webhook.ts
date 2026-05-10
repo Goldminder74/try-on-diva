@@ -49,6 +49,7 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
   }
   const plan = planFromProduct(productId);
   const ctype = customerType(productId);
+  const billing_interval = intervalFromItem(item);
   await getSupabase()
     .from("subscriptions")
     .upsert(
@@ -62,6 +63,7 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
         plan,
         customer_type: ctype,
         status,
+        billing_interval,
         current_period_start: currentBillingPeriod?.startsAt,
         current_period_end: currentBillingPeriod?.endsAt,
         environment: env,
