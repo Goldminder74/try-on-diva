@@ -20,7 +20,9 @@ export const Route = createFileRoute("/pricing")({
 
 const PLANS = [
   {
-    name: "Free", price: "£0", period: "forever",
+const PLANS = [
+  {
+    name: "Free", price: "£0", period: "forever", priceId: null,
     desc: "Browse the full catalog and try out the AI.",
     features: [
       [true, "5 try-ons per month"],
@@ -32,7 +34,7 @@ const PLANS = [
     ] as const,
   },
   {
-    name: "Plus", price: "£4.99", period: "per month",
+    name: "Plus", price: "£4.99", period: "per month", priceId: "consumer_plus_monthly",
     desc: "Unlimited try-ons and personalised picks.",
     badge: "Most popular",
     features: [
@@ -45,7 +47,7 @@ const PLANS = [
     ] as const,
   },
   {
-    name: "Pro", price: "£9.99", period: "per month",
+    name: "Pro", price: "£9.99", period: "per month", priceId: "consumer_pro_monthly",
     desc: "Everything, plus first-look at new arrivals.",
     features: [
       [true, "Everything in Plus"],
@@ -58,6 +60,31 @@ const PLANS = [
 ];
 
 function Pricing() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { openCheckout, loading } = usePaddleCheckout();
+
+  const onChoose = async (priceId: string | null, planName: string) => {
+    if (!priceId) {
+      navigate({ to: "/auth/signup" });
+      return;
+    }
+    if (!user) {
+      navigate({ to: "/auth/login", search: { redirect: "/pricing" } as any });
+      return;
+    }
+    try {
+      await openCheckout({
+        priceId,
+        customerEmail: user.email ?? undefined,
+        customData: { userId: user.id, plan: planName },
+        successUrl: `${window.location.origin}/checkout/success`,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start checkout");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-cream">
       <Header />
