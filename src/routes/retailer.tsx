@@ -34,8 +34,11 @@ function RetailerLanding() {
               Add Wigsmi's virtual try-on to your store in minutes. Built for Black wig buyers.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link to="/retailer" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft">
+              <Link to="/retailer/signup" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft">
                 Start 3-month free trial
+              </Link>
+              <Link to="/retailer/login" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">
+                Retailer login →
               </Link>
               <a href="#pricing" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">See pricing →</a>
             </div>
@@ -142,7 +145,7 @@ function RetailerLanding() {
           <h2 className="mt-4 font-display text-4xl md:text-5xl">
             Join the first virtual try-on built for Black wig buyers.
           </h2>
-          <Link to="/retailer" className="mt-8 inline-flex rounded-md bg-gold px-7 py-3 text-sm font-medium text-mahogany hover:bg-cream">
+          <Link to="/retailer/signup" className="mt-8 inline-flex rounded-md bg-gold px-7 py-3 text-sm font-medium text-mahogany hover:bg-cream">
             Create retailer account
           </Link>
         </div>
