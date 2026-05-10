@@ -1,8 +1,31 @@
 import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { type Wig, formatPrice } from "@/lib/wigs";
+import { useAuth } from "@/contexts/auth-context";
+import { toggleWishlist } from "@/lib/wishlist.functions";
 
-export function WigCard({ wig }: { wig: Wig }) {
+export function WigCard({ wig, savedInitial = false }: { wig: Wig; savedInitial?: boolean }) {
+  const { user } = useAuth();
+  const toggle = useServerFn(toggleWishlist);
+  const [saved, setSaved] = useState(savedInitial);
+
+  const onHeart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      window.location.href = "/auth/login";
+      return;
+    }
+    setSaved((s) => !s);
+    try {
+      const res = await toggle({ data: { wigId: wig.id } });
+      setSaved(res.saved);
+    } catch {
+      setSaved((s) => !s);
+    }
+  };
+
   return (
     <Link
       to="/wig/$id"
@@ -18,11 +41,11 @@ export function WigCard({ wig }: { wig: Wig }) {
         />
         <button
           type="button"
-          aria-label="Save to wishlist"
-          onClick={(e) => { e.preventDefault(); }}
+          aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+          onClick={onHeart}
           className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-cream/90 text-mahogany shadow-sm hover:bg-cream"
         >
-          <Heart className="h-4 w-4" />
+          <Heart className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
         </button>
         <div className="absolute inset-x-2 bottom-2 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <span className="block w-full rounded-md bg-mahogany py-2 text-center text-xs font-medium text-cream">

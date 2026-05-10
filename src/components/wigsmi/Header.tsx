@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Wordmark } from "./Wordmark";
+import { useAuth } from "@/contexts/auth-context";
 
 export function Header() {
+  const { user, loading } = useAuth();
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-cream/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5">
@@ -15,18 +17,29 @@ export function Header() {
           <Link to="/retailer" className="text-sm text-foreground/80 hover:text-mahogany">For retailers</Link>
         </nav>
         <div className="flex items-center gap-3">
-          <Link
-            to="/try-on"
-            className="hidden rounded-md border border-mahogany px-4 py-2 text-sm font-medium text-mahogany transition-colors hover:bg-mahogany hover:text-cream sm:inline-flex"
-          >
-            Sign in
-          </Link>
-          <Link
-            to="/try-on"
-            className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm transition-all hover:bg-mahogany-soft hover:shadow-md"
-          >
-            Try free
-          </Link>
+          {loading ? null : user ? (
+            <Link
+              to="/app"
+              className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
+            >
+              My Wigsmi
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/auth/login"
+                className="hidden rounded-md border border-mahogany px-4 py-2 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream sm:inline-flex"
+              >
+                Log in
+              </Link>
+              <Link
+                to="/auth/signup"
+                className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
+              >
+                Try free
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
