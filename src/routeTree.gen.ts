@@ -12,12 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TryOnRouteImport } from './routes/try-on'
 import { Route as RetailerRouteImport } from './routes/retailer'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PortalRouteImport } from './routes/portal'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as WigIdRouteImport } from './routes/wig.$id'
 import { Route as RetailerSignupRouteImport } from './routes/retailer_.signup'
 import { Route as RetailerLoginRouteImport } from './routes/retailer_.login'
+import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
@@ -45,6 +48,11 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogRoute = CatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
@@ -58,6 +66,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRoute,
 } as any)
 const WigIdRoute = WigIdRouteImport.update({
   id: '/wig/$id',
@@ -73,6 +86,11 @@ const RetailerLoginRoute = RetailerLoginRouteImport.update({
   id: '/retailer_/login',
   path: '/retailer/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => PortalRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
@@ -135,6 +153,7 @@ const AuthenticatedAppCatalogRoute = AuthenticatedAppCatalogRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/catalog': typeof CatalogRoute
+  '/portal': typeof PortalRouteWithChildren
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
@@ -143,9 +162,11 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/portal/onboarding': typeof PortalOnboardingRoute
   '/retailer/login': typeof RetailerLoginRoute
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/portal/': typeof PortalIndexRoute
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
@@ -164,9 +185,11 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/portal/onboarding': typeof PortalOnboardingRoute
   '/retailer/login': typeof RetailerLoginRoute
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/portal': typeof PortalIndexRoute
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
@@ -179,6 +202,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/catalog': typeof CatalogRoute
+  '/portal': typeof PortalRouteWithChildren
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
@@ -187,9 +211,11 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/portal/onboarding': typeof PortalOnboardingRoute
   '/retailer_/login': typeof RetailerLoginRoute
   '/retailer_/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/portal/': typeof PortalIndexRoute
   '/_authenticated/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
@@ -202,6 +228,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/catalog'
+    | '/portal'
     | '/pricing'
     | '/retailer'
     | '/try-on'
@@ -210,9 +237,11 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/portal/onboarding'
     | '/retailer/login'
     | '/retailer/signup'
     | '/wig/$id'
+    | '/portal/'
     | '/app/catalog'
     | '/app/profile'
     | '/app/style-quiz'
@@ -231,9 +260,11 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/portal/onboarding'
     | '/retailer/login'
     | '/retailer/signup'
     | '/wig/$id'
+    | '/portal'
     | '/app/catalog'
     | '/app/profile'
     | '/app/style-quiz'
@@ -245,6 +276,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/catalog'
+    | '/portal'
     | '/pricing'
     | '/retailer'
     | '/try-on'
@@ -253,9 +285,11 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/portal/onboarding'
     | '/retailer_/login'
     | '/retailer_/signup'
     | '/wig/$id'
+    | '/portal/'
     | '/_authenticated/app/catalog'
     | '/_authenticated/app/profile'
     | '/_authenticated/app/style-quiz'
@@ -268,6 +302,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CatalogRoute: typeof CatalogRoute
+  PortalRoute: typeof PortalRouteWithChildren
   PricingRoute: typeof PricingRoute
   RetailerRoute: typeof RetailerRoute
   TryOnRoute: typeof TryOnRoute
@@ -304,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalog': {
       id: '/catalog'
       path: '/catalog'
@@ -325,6 +367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/wig/$id': {
       id: '/wig/$id'
       path: '/wig/$id'
@@ -345,6 +394,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/retailer/login'
       preLoaderRoute: typeof RetailerLoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/portal/onboarding': {
+      id: '/portal/onboarding'
+      path: '/onboarding'
+      fullPath: '/portal/onboarding'
+      preLoaderRoute: typeof PortalOnboardingRouteImport
+      parentRoute: typeof PortalRoute
     }
     '/auth/signup': {
       id: '/auth/signup'
@@ -448,10 +504,24 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface PortalRouteChildren {
+  PortalOnboardingRoute: typeof PortalOnboardingRoute
+  PortalIndexRoute: typeof PortalIndexRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalOnboardingRoute: PortalOnboardingRoute,
+  PortalIndexRoute: PortalIndexRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CatalogRoute: CatalogRoute,
+  PortalRoute: PortalRouteWithChildren,
   PricingRoute: PricingRoute,
   RetailerRoute: RetailerRoute,
   TryOnRoute: TryOnRoute,
@@ -467,3 +537,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
