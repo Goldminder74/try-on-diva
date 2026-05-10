@@ -46,7 +46,7 @@ export const recordTryOn = createServerFn({ method: "POST" })
         (subRow.status === "canceled" &&
           subRow.current_period_end &&
           new Date(subRow.current_period_end) > new Date()));
-    const isPaid = stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro");
+    const isPaid = Boolean(stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro"));
 
     if (!isPaid && count >= FREE_QUOTA) {
       return { allowed: false as const, reason: "quota", remaining: 0 };
@@ -112,7 +112,7 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
         (subRow.status === "canceled" &&
           subRow.current_period_end &&
           new Date(subRow.current_period_end) > new Date()));
-    const isPaid = stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro");
+    const isPaid = Boolean(stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro"));
 
     return {
       isPaid,
