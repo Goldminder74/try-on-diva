@@ -65,6 +65,7 @@ function BillingPage() {
   const portal = useServerFn(createPortalSession);
   const [sub, setSub] = useState<CurrentSub | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [interval, setBillingInterval] = useState<Interval>("monthly");
 
   const refetch = () => {
     if (!user) return;
