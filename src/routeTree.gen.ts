@@ -26,6 +26,7 @@ import { Route as PortalWidgetRouteImport } from './routes/portal.widget'
 import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
 import { Route as PortalBillingRouteImport } from './routes/portal.billing'
+import { Route as PortalApiKeysRouteImport } from './routes/portal.api-keys'
 import { Route as PortalAnalyticsRouteImport } from './routes/portal.analytics'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
@@ -44,6 +45,7 @@ import { Route as PortalCatalogWigIdRouteImport } from './routes/portal.catalog.
 import { Route as EmbedWidgetTokenRouteImport } from './routes/embed.widget.$token'
 import { Route as AuthenticatedAppWishlistRouteImport } from './routes/_authenticated.app.wishlist'
 import { Route as AuthenticatedAppTryOnRouteImport } from './routes/_authenticated.app.try-on'
+import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_authenticated.app.subscription'
 import { Route as AuthenticatedAppStyleQuizRouteImport } from './routes/_authenticated.app.style-quiz'
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated.app.profile'
 import { Route as AuthenticatedAppCatalogRouteImport } from './routes/_authenticated.app.catalog'
@@ -133,6 +135,11 @@ const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
 const PortalBillingRoute = PortalBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalApiKeysRoute = PortalApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalAnalyticsRoute = PortalAnalyticsRouteImport.update({
@@ -226,6 +233,12 @@ const AuthenticatedAppTryOnRoute = AuthenticatedAppTryOnRouteImport.update({
   path: '/app/try-on',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAppSubscriptionRoute =
+  AuthenticatedAppSubscriptionRouteImport.update({
+    id: '/app/subscription',
+    path: '/app/subscription',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAppStyleQuizRoute =
   AuthenticatedAppStyleQuizRouteImport.update({
     id: '/app/style-quiz',
@@ -280,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
+  '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
@@ -292,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
+  '/app/subscription': typeof AuthenticatedAppSubscriptionRoute
   '/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/app/wishlist': typeof AuthenticatedAppWishlistRoute
   '/embed/widget/$token': typeof EmbedWidgetTokenRoute
@@ -320,6 +335,7 @@ export interface FileRoutesByTo {
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
+  '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
@@ -332,6 +348,7 @@ export interface FileRoutesByTo {
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
+  '/app/subscription': typeof AuthenticatedAppSubscriptionRoute
   '/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/app/wishlist': typeof AuthenticatedAppWishlistRoute
   '/embed/widget/$token': typeof EmbedWidgetTokenRoute
@@ -364,6 +381,7 @@ export interface FileRoutesById {
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
+  '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
@@ -376,6 +394,7 @@ export interface FileRoutesById {
   '/_authenticated/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
+  '/_authenticated/app/subscription': typeof AuthenticatedAppSubscriptionRoute
   '/_authenticated/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/_authenticated/app/wishlist': typeof AuthenticatedAppWishlistRoute
   '/embed/widget/$token': typeof EmbedWidgetTokenRoute
@@ -408,6 +427,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/checkout/success'
     | '/portal/analytics'
+    | '/portal/api-keys'
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
@@ -420,6 +440,7 @@ export interface FileRouteTypes {
     | '/app/catalog'
     | '/app/profile'
     | '/app/style-quiz'
+    | '/app/subscription'
     | '/app/try-on'
     | '/app/wishlist'
     | '/embed/widget/$token'
@@ -448,6 +469,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/checkout/success'
     | '/portal/analytics'
+    | '/portal/api-keys'
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
@@ -460,6 +482,7 @@ export interface FileRouteTypes {
     | '/app/catalog'
     | '/app/profile'
     | '/app/style-quiz'
+    | '/app/subscription'
     | '/app/try-on'
     | '/app/wishlist'
     | '/embed/widget/$token'
@@ -491,6 +514,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/checkout/success'
     | '/portal/analytics'
+    | '/portal/api-keys'
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
@@ -503,6 +527,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/catalog'
     | '/_authenticated/app/profile'
     | '/_authenticated/app/style-quiz'
+    | '/_authenticated/app/subscription'
     | '/_authenticated/app/try-on'
     | '/_authenticated/app/wishlist'
     | '/embed/widget/$token'
@@ -660,6 +685,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalBillingRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/api-keys': {
+      id: '/portal/api-keys'
+      path: '/api-keys'
+      fullPath: '/portal/api-keys'
+      preLoaderRoute: typeof PortalApiKeysRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/analytics': {
       id: '/portal/analytics'
       path: '/analytics'
@@ -786,6 +818,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppTryOnRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/app/subscription': {
+      id: '/_authenticated/app/subscription'
+      path: '/app/subscription'
+      fullPath: '/app/subscription'
+      preLoaderRoute: typeof AuthenticatedAppSubscriptionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/app/style-quiz': {
       id: '/_authenticated/app/style-quiz'
       path: '/app/style-quiz'
@@ -835,6 +874,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAppCatalogRoute: typeof AuthenticatedAppCatalogRoute
   AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
   AuthenticatedAppStyleQuizRoute: typeof AuthenticatedAppStyleQuizRoute
+  AuthenticatedAppSubscriptionRoute: typeof AuthenticatedAppSubscriptionRoute
   AuthenticatedAppTryOnRoute: typeof AuthenticatedAppTryOnRoute
   AuthenticatedAppWishlistRoute: typeof AuthenticatedAppWishlistRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
@@ -844,6 +884,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppCatalogRoute: AuthenticatedAppCatalogRoute,
   AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
   AuthenticatedAppStyleQuizRoute: AuthenticatedAppStyleQuizRoute,
+  AuthenticatedAppSubscriptionRoute: AuthenticatedAppSubscriptionRoute,
   AuthenticatedAppTryOnRoute: AuthenticatedAppTryOnRoute,
   AuthenticatedAppWishlistRoute: AuthenticatedAppWishlistRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
@@ -873,6 +914,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface PortalRouteChildren {
   PortalAnalyticsRoute: typeof PortalAnalyticsRoute
+  PortalApiKeysRoute: typeof PortalApiKeysRoute
   PortalBillingRoute: typeof PortalBillingRoute
   PortalOnboardingRoute: typeof PortalOnboardingRoute
   PortalSettingsRoute: typeof PortalSettingsRoute
@@ -885,6 +927,7 @@ interface PortalRouteChildren {
 
 const PortalRouteChildren: PortalRouteChildren = {
   PortalAnalyticsRoute: PortalAnalyticsRoute,
+  PortalApiKeysRoute: PortalApiKeysRoute,
   PortalBillingRoute: PortalBillingRoute,
   PortalOnboardingRoute: PortalOnboardingRoute,
   PortalSettingsRoute: PortalSettingsRoute,

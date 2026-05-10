@@ -7,7 +7,7 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Settings, LogOut, ExternalLink, CreditCard, Code2, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Package, Settings, LogOut, ExternalLink, CreditCard, Code2, BarChart3, Key } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { Wordmark } from "@/components/wigsmi/Wordmark";
@@ -105,6 +105,12 @@ function PortalLayout() {
               icon={<Code2 className="h-4 w-4" />}
               label="Widget"
               active={pathname.startsWith("/portal/widget")}
+            />
+            <SideLink
+              to="/portal/api-keys"
+              icon={<Key className="h-4 w-4" />}
+              label="API keys"
+              active={pathname.startsWith("/portal/api-keys")}
             />
             <SideLink
               to="/portal/analytics"
