@@ -24,6 +24,7 @@ import { Route as PortalWidgetRouteImport } from './routes/portal.widget'
 import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
 import { Route as PortalBillingRouteImport } from './routes/portal.billing'
+import { Route as PortalAnalyticsRouteImport } from './routes/portal.analytics'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
@@ -114,6 +115,11 @@ const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
 const PortalBillingRoute = PortalBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalAnalyticsRoute = PortalAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => PortalRoute,
 } as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
@@ -285,6 +293,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/portal/analytics'
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/portal/analytics'
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/portal/analytics'
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
@@ -535,6 +547,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalBillingRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/analytics': {
+      id: '/portal/analytics'
+      path: '/analytics'
+      fullPath: '/portal/analytics'
+      preLoaderRoute: typeof PortalAnalyticsRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/checkout/success': {
       id: '/checkout/success'
       path: '/checkout/success'
@@ -680,6 +699,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface PortalRouteChildren {
+  PortalAnalyticsRoute: typeof PortalAnalyticsRoute
   PortalBillingRoute: typeof PortalBillingRoute
   PortalOnboardingRoute: typeof PortalOnboardingRoute
   PortalSettingsRoute: typeof PortalSettingsRoute
@@ -691,6 +711,7 @@ interface PortalRouteChildren {
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
+  PortalAnalyticsRoute: PortalAnalyticsRoute,
   PortalBillingRoute: PortalBillingRoute,
   PortalOnboardingRoute: PortalOnboardingRoute,
   PortalSettingsRoute: PortalSettingsRoute,
