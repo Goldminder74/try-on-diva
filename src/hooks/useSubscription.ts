@@ -10,6 +10,8 @@ export interface SubscriptionRow {
   customer_type: string;
   product_id: string | null;
   price_id: string | null;
+  paddle_subscription_id: string | null;
+  paddle_customer_id: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   environment: string;

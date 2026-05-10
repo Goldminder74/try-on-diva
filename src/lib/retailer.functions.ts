@@ -189,20 +189,94 @@ const wigSchema = z.object({
   is_featured: z.boolean().default(false),
 });
 
+const PLAN_WIG_CAPS: Record<string, number> = {
+  starter: 30,
+  growth: 150,
+  scale: Number.POSITIVE_INFINITY,
+};
+
+async function getRetailerEntitlement(
+  supabase: any,
+  userId: string,
+): Promise<{ retailerId: string; effectivePlan: string; cap: number; trialActive: boolean; hasPaidSub: boolean }> {
+  const { data: retailer } = await supabase
+    .from("retailers")
+    .select("id, plan, trial_ends_at")
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (!retailer) throw new Error("Finish onboarding first.");
+
+  const { data: subRows } = await supabase
+    .from("subscriptions")
+    .select("plan, status, current_period_end")
+    .eq("user_id", userId)
+    .eq("customer_type", "retailer")
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const sub = subRows?.[0];
+  const subValid =
+    !!sub &&
+    ((["active", "trialing", "past_due"].includes(sub.status) &&
+      (!sub.current_period_end || new Date(sub.current_period_end) > new Date())) ||
+      (sub.status === "canceled" &&
+        sub.current_period_end &&
+        new Date(sub.current_period_end) > new Date()));
+  const hasPaidSub = !!subValid && (sub!.plan === "growth" || sub!.plan === "scale");
+  const trialActive =
+    !!retailer.trial_ends_at && new Date(retailer.trial_ends_at) > new Date();
+  const effectivePlan = hasPaidSub ? sub!.plan : trialActive ? "starter" : "expired";
+  const cap = PLAN_WIG_CAPS[effectivePlan] ?? 0;
+  return { retailerId: retailer.id, effectivePlan, cap, trialActive, hasPaidSub };
+}
+
+export const getMyEntitlement = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    try {
+      const ent = await getRetailerEntitlement(supabase, userId);
+      const { count } = await supabase
+        .from("wigs")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", ent.retailerId);
+      return {
+        plan: ent.effectivePlan,
+        cap: Number.isFinite(ent.cap) ? ent.cap : null,
+        used: count ?? 0,
+        trialActive: ent.trialActive,
+        hasPaidSub: ent.hasPaidSub,
+      };
+    } catch {
+      return { plan: "none", cap: 0, used: 0, trialActive: false, hasPaidSub: false };
+    }
+  });
+
 export const saveMyWig = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: z.infer<typeof wigSchema>) => wigSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: retailer } = await supabase
-      .from("retailers")
-      .select("id, currency")
-      .eq("owner_id", userId)
-      .maybeSingle();
-    if (!retailer) throw new Error("Finish onboarding first.");
+    const ent = await getRetailerEntitlement(supabase, userId);
+
+    if (ent.effectivePlan === "expired") {
+      throw new Error("Your trial has ended. Upgrade to a paid plan to manage your catalog.");
+    }
+
+    // For new wigs, enforce the cap.
+    if (!data.id) {
+      const { count } = await supabase
+        .from("wigs")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", ent.retailerId);
+      if ((count ?? 0) >= ent.cap) {
+        throw new Error(
+          `You've reached the ${ent.effectivePlan} plan limit of ${ent.cap} wigs. Upgrade to add more.`,
+        );
+      }
+    }
 
     const row = {
-      retailer_id: retailer.id,
+      retailer_id: ent.retailerId,
       name: data.name,
       description: data.description || null,
       price: data.price,
@@ -224,7 +298,7 @@ export const saveMyWig = createServerFn({ method: "POST" })
         .from("wigs")
         .update(row)
         .eq("id", data.id)
-        .eq("retailer_id", retailer.id);
+        .eq("retailer_id", ent.retailerId);
       if (error) throw error;
       return { id: data.id };
     }

@@ -11,6 +11,7 @@ import { LayoutDashboard, Package, Settings, LogOut, ExternalLink, CreditCard } 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { Wordmark } from "@/components/wigsmi/Wordmark";
+import { PastDueBanner } from "@/components/PastDueBanner";
 
 export const Route = createFileRoute("/portal")({
   beforeLoad: async ({ location }) => {
@@ -42,6 +43,7 @@ function PortalLayout() {
 
   return (
     <div className="min-h-screen bg-cream">
+      <PastDueBanner />
       <header className="sticky top-0 z-40 border-b border-border bg-cream/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5">
           <Link to="/portal" className="flex items-center gap-3">
