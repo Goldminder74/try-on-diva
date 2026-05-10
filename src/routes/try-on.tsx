@@ -26,9 +26,11 @@ export const Route = createFileRoute("/try-on")({
 
 function TryOn() {
   const search = Route.useSearch();
-  const initialWig = (search.wig && WIGS.find(w => w.id === search.wig)) || FEATURED_WIGS[0];
+  const { data: featured } = useAsync<Wig[]>(() => fetchFeaturedWigs(9), []);
+  const list: Wig[] = featured ?? [];
+  const initialWig = (search.wig && list.find((w: Wig) => w.id === search.wig)) || list[0];
   const [photo, setPhoto] = useState<File | null>(null);
-  const [wig, setWig] = useState<Wig | null>(initialWig ?? null);
+  const [wig, setWig] = useState<Wig | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
 
