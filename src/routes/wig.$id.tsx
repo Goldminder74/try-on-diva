@@ -54,9 +54,8 @@ export const Route = createFileRoute("/wig/$id")({
 });
 
 function WigDetail() {
-  const { wig } = Route.useLoaderData();
+  const { wig, related } = Route.useLoaderData();
   const [active, setActive] = useState(0);
-  const related = WIGS.filter(w => w.style_type === wig.style_type && w.id !== wig.id).slice(0, 4);
 
   return (
     <div className="min-h-screen bg-cream">
