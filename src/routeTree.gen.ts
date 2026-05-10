@@ -22,6 +22,7 @@ import { Route as RetailerSignupRouteImport } from './routes/retailer_.signup'
 import { Route as RetailerLoginRouteImport } from './routes/retailer_.login'
 import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
+import { Route as PortalBillingRouteImport } from './routes/portal.billing'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
@@ -101,6 +102,11 @@ const PortalSettingsRoute = PortalSettingsRouteImport.update({
 const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalBillingRoute = PortalBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => PortalRoute,
 } as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
@@ -200,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/retailer/login': typeof RetailerLoginRoute
@@ -229,6 +236,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/retailer/login': typeof RetailerLoginRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/retailer_/login': typeof RetailerLoginRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/retailer/login'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/retailer/login'
@@ -353,6 +364,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/retailer_/login'
@@ -482,6 +494,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/portal/onboarding'
       preLoaderRoute: typeof PortalOnboardingRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/billing': {
+      id: '/portal/billing'
+      path: '/billing'
+      fullPath: '/portal/billing'
+      preLoaderRoute: typeof PortalBillingRouteImport
       parentRoute: typeof PortalRoute
     }
     '/checkout/success': {
@@ -622,6 +641,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface PortalRouteChildren {
+  PortalBillingRoute: typeof PortalBillingRoute
   PortalOnboardingRoute: typeof PortalOnboardingRoute
   PortalSettingsRoute: typeof PortalSettingsRoute
   PortalIndexRoute: typeof PortalIndexRoute
@@ -631,6 +651,7 @@ interface PortalRouteChildren {
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
+  PortalBillingRoute: PortalBillingRoute,
   PortalOnboardingRoute: PortalOnboardingRoute,
   PortalSettingsRoute: PortalSettingsRoute,
   PortalIndexRoute: PortalIndexRoute,
@@ -664,3 +685,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
