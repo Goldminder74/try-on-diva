@@ -20,6 +20,7 @@ import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as WigIdRouteImport } from './routes/wig.$id'
 import { Route as RetailerSignupRouteImport } from './routes/retailer_.signup'
 import { Route as RetailerLoginRouteImport } from './routes/retailer_.login'
+import { Route as PortalWidgetRouteImport } from './routes/portal.widget'
 import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
 import { Route as PortalBillingRouteImport } from './routes/portal.billing'
@@ -33,6 +34,7 @@ import { Route as PortalCatalogIndexRouteImport } from './routes/portal.catalog.
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
 import { Route as PortalCatalogNewRouteImport } from './routes/portal.catalog.new'
 import { Route as PortalCatalogWigIdRouteImport } from './routes/portal.catalog.$wigId'
+import { Route as EmbedWidgetTokenRouteImport } from './routes/embed.widget.$token'
 import { Route as AuthenticatedAppWishlistRouteImport } from './routes/_authenticated.app.wishlist'
 import { Route as AuthenticatedAppTryOnRouteImport } from './routes/_authenticated.app.try-on'
 import { Route as AuthenticatedAppStyleQuizRouteImport } from './routes/_authenticated.app.style-quiz'
@@ -93,6 +95,11 @@ const RetailerLoginRoute = RetailerLoginRouteImport.update({
   id: '/retailer_/login',
   path: '/retailer/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PortalWidgetRoute = PortalWidgetRouteImport.update({
+  id: '/widget',
+  path: '/widget',
+  getParentRoute: () => PortalRoute,
 } as any)
 const PortalSettingsRoute = PortalSettingsRouteImport.update({
   id: '/settings',
@@ -159,6 +166,11 @@ const PortalCatalogWigIdRoute = PortalCatalogWigIdRouteImport.update({
   path: '/catalog/$wigId',
   getParentRoute: () => PortalRoute,
 } as any)
+const EmbedWidgetTokenRoute = EmbedWidgetTokenRouteImport.update({
+  id: '/embed/widget/$token',
+  path: '/embed/widget/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAppWishlistRoute =
   AuthenticatedAppWishlistRouteImport.update({
     id: '/app/wishlist',
@@ -209,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
+  '/portal/widget': typeof PortalWidgetRoute
   '/retailer/login': typeof RetailerLoginRoute
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
@@ -218,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
   '/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/embed/widget/$token': typeof EmbedWidgetTokenRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -239,6 +253,7 @@ export interface FileRoutesByTo {
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
+  '/portal/widget': typeof PortalWidgetRoute
   '/retailer/login': typeof RetailerLoginRoute
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
@@ -248,6 +263,7 @@ export interface FileRoutesByTo {
   '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
   '/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/embed/widget/$token': typeof EmbedWidgetTokenRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -272,6 +288,7 @@ export interface FileRoutesById {
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
+  '/portal/widget': typeof PortalWidgetRoute
   '/retailer_/login': typeof RetailerLoginRoute
   '/retailer_/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
@@ -281,6 +298,7 @@ export interface FileRoutesById {
   '/_authenticated/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
   '/_authenticated/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/_authenticated/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/embed/widget/$token': typeof EmbedWidgetTokenRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -305,6 +323,7 @@ export interface FileRouteTypes {
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
+    | '/portal/widget'
     | '/retailer/login'
     | '/retailer/signup'
     | '/wig/$id'
@@ -314,6 +333,7 @@ export interface FileRouteTypes {
     | '/app/style-quiz'
     | '/app/try-on'
     | '/app/wishlist'
+    | '/embed/widget/$token'
     | '/portal/catalog/$wigId'
     | '/portal/catalog/new'
     | '/app/'
@@ -335,6 +355,7 @@ export interface FileRouteTypes {
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
+    | '/portal/widget'
     | '/retailer/login'
     | '/retailer/signup'
     | '/wig/$id'
@@ -344,6 +365,7 @@ export interface FileRouteTypes {
     | '/app/style-quiz'
     | '/app/try-on'
     | '/app/wishlist'
+    | '/embed/widget/$token'
     | '/portal/catalog/$wigId'
     | '/portal/catalog/new'
     | '/app'
@@ -367,6 +389,7 @@ export interface FileRouteTypes {
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
+    | '/portal/widget'
     | '/retailer_/login'
     | '/retailer_/signup'
     | '/wig/$id'
@@ -376,6 +399,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/style-quiz'
     | '/_authenticated/app/try-on'
     | '/_authenticated/app/wishlist'
+    | '/embed/widget/$token'
     | '/portal/catalog/$wigId'
     | '/portal/catalog/new'
     | '/_authenticated/app/'
@@ -400,6 +424,7 @@ export interface RootRouteChildren {
   RetailerLoginRoute: typeof RetailerLoginRoute
   RetailerSignupRoute: typeof RetailerSignupRoute
   WigIdRoute: typeof WigIdRoute
+  EmbedWidgetTokenRoute: typeof EmbedWidgetTokenRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -481,6 +506,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/retailer/login'
       preLoaderRoute: typeof RetailerLoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/portal/widget': {
+      id: '/portal/widget'
+      path: '/widget'
+      fullPath: '/portal/widget'
+      preLoaderRoute: typeof PortalWidgetRouteImport
+      parentRoute: typeof PortalRoute
     }
     '/portal/settings': {
       id: '/portal/settings'
@@ -573,6 +605,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalCatalogWigIdRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/embed/widget/$token': {
+      id: '/embed/widget/$token'
+      path: '/embed/widget/$token'
+      fullPath: '/embed/widget/$token'
+      preLoaderRoute: typeof EmbedWidgetTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/app/wishlist': {
       id: '/_authenticated/app/wishlist'
       path: '/app/wishlist'
@@ -644,6 +683,7 @@ interface PortalRouteChildren {
   PortalBillingRoute: typeof PortalBillingRoute
   PortalOnboardingRoute: typeof PortalOnboardingRoute
   PortalSettingsRoute: typeof PortalSettingsRoute
+  PortalWidgetRoute: typeof PortalWidgetRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalCatalogWigIdRoute: typeof PortalCatalogWigIdRoute
   PortalCatalogNewRoute: typeof PortalCatalogNewRoute
@@ -654,6 +694,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalBillingRoute: PortalBillingRoute,
   PortalOnboardingRoute: PortalOnboardingRoute,
   PortalSettingsRoute: PortalSettingsRoute,
+  PortalWidgetRoute: PortalWidgetRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalCatalogWigIdRoute: PortalCatalogWigIdRoute,
   PortalCatalogNewRoute: PortalCatalogNewRoute,
@@ -680,6 +721,7 @@ const rootRouteChildren: RootRouteChildren = {
   RetailerLoginRoute: RetailerLoginRoute,
   RetailerSignupRoute: RetailerSignupRoute,
   WigIdRoute: WigIdRoute,
+  EmbedWidgetTokenRoute: EmbedWidgetTokenRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport

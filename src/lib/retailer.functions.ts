@@ -331,6 +331,168 @@ export const deleteMyWig = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---------------- Activation ----------------
+
+export const getActivationStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: retailer } = await supabase
+      .from("retailers")
+      .select("id, onboarding_completed")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!retailer) {
+      return {
+        profileDone: false,
+        hasWig: false,
+        hasPublished: false,
+        hasWidget: false,
+        hasFirstTryOn: false,
+      };
+    }
+    const [wigs, published, widget, tryOn] = await Promise.all([
+      supabase.from("wigs").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id),
+      supabase.from("wigs").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id).eq("is_published", true),
+      supabase.from("widget_embeds").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id),
+      supabase.from("try_on_events").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id),
+    ]);
+    return {
+      profileDone: !!retailer.onboarding_completed,
+      hasWig: (wigs.count ?? 0) > 0,
+      hasPublished: (published.count ?? 0) > 0,
+      hasWidget: (widget.count ?? 0) > 0,
+      hasFirstTryOn: (tryOn.count ?? 0) > 0,
+    };
+  });
+
+// ---------------- Widget ----------------
+
+export const getMyWidget = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: retailer } = await supabase
+      .from("retailers")
+      .select("id, brand_primary, widget_cta_text, display_name")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!retailer) return { widget: null, retailer: null };
+    const { data: widget } = await supabase
+      .from("widget_embeds")
+      .select("*")
+      .eq("retailer_id", retailer.id)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    return { widget, retailer };
+  });
+
+export const createMyWidget = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: retailer } = await supabase
+      .from("retailers")
+      .select("id, brand_primary")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!retailer) throw new Error("Finish onboarding first.");
+    const { data: existing } = await supabase
+      .from("widget_embeds")
+      .select("id")
+      .eq("retailer_id", retailer.id)
+      .maybeSingle();
+    if (existing) return { id: existing.id };
+    const { data, error } = await supabase
+      .from("widget_embeds")
+      .insert({
+        retailer_id: retailer.id,
+        widget_type: "full",
+        is_active: true,
+        allowed_domains: [],
+        config: { accent_color: retailer.brand_primary || "#3D1C02" },
+      })
+      .select("id")
+      .single();
+    if (error) throw error;
+    return { id: data.id };
+  });
+
+const widgetUpdateSchema = z.object({
+  widget_type: z.enum(["full", "button"]).optional(),
+  is_active: z.boolean().optional(),
+  allowed_domains: z.array(z.string().min(1).max(253)).max(20).optional(),
+  accent_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  cta_text: z.string().min(1).max(60).optional(),
+});
+
+export const updateMyWidget = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: z.infer<typeof widgetUpdateSchema>) => widgetUpdateSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: retailer } = await supabase
+      .from("retailers")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!retailer) throw new Error("No retailer found.");
+    const { data: widget } = await supabase
+      .from("widget_embeds")
+      .select("id, config")
+      .eq("retailer_id", retailer.id)
+      .maybeSingle();
+    if (!widget) throw new Error("No widget found. Create one first.");
+
+    const patch: Record<string, unknown> = {};
+    if (data.widget_type !== undefined) patch.widget_type = data.widget_type;
+    if (data.is_active !== undefined) patch.is_active = data.is_active;
+    if (data.allowed_domains !== undefined) {
+      patch.allowed_domains = data.allowed_domains.map((d) =>
+        d.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, ""),
+      );
+    }
+    if (data.accent_color !== undefined) {
+      const cfg = (widget.config as Record<string, unknown>) || {};
+      patch.config = { ...cfg, accent_color: data.accent_color };
+    }
+
+    const { error } = await supabase
+      .from("widget_embeds")
+      .update(patch as never)
+      .eq("id", widget.id);
+    if (error) throw error;
+
+    if (data.cta_text !== undefined) {
+      await supabase
+        .from("retailers")
+        .update({ widget_cta_text: data.cta_text })
+        .eq("id", retailer.id);
+    }
+    return { ok: true };
+  });
+
+export const rotateMyWidgetToken = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: retailer } = await supabase
+      .from("retailers")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!retailer) throw new Error("No retailer found.");
+    // Generate a new uuid client-side; uuid v4 via crypto.
+    const newToken = crypto.randomUUID();
+    const { error } = await supabase
+      .from("widget_embeds")
+      .update({ embed_token: newToken })
+      .eq("retailer_id", retailer.id);
+    if (error) throw error;
+    return { embed_token: newToken };
+  });
+
 // ---------------- Metrics ----------------
 
 export const getRetailerMetrics = createServerFn({ method: "GET" })
