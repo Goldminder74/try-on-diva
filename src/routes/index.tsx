@@ -122,7 +122,6 @@ function Landing() {
             </Link>
           </div>
           <FeaturedRow />
-          </div>
         </div>
       </section>
 
