@@ -3,6 +3,7 @@ import { Heart, Home, Sparkles, User as UserIcon, Wand2, LogOut } from "lucide-r
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { Wordmark } from "@/components/wigsmi/Wordmark";
+import { PastDueBanner } from "@/components/PastDueBanner";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ location }) => {
