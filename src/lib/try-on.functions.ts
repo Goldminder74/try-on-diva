@@ -31,14 +31,22 @@ export const recordTryOn = createServerFn({ method: "POST" })
         : 0;
     }
 
-    const { data: subRow } = await supabase
+    const { data: subRows } = await supabase
       .from("subscriptions")
-      .select("plan, status")
+      .select("plan, status, current_period_end")
       .eq("profile_id", userId)
       .eq("customer_type", "consumer")
-      .in("status", ["active", "trialing"])
-      .maybeSingle();
-    const isPaid = !!subRow && (subRow.plan === "plus" || subRow.plan === "pro");
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const subRow = subRows?.[0];
+    const stillValid =
+      !!subRow &&
+      ((["active", "trialing", "past_due"].includes(subRow.status) &&
+        (!subRow.current_period_end || new Date(subRow.current_period_end) > new Date())) ||
+        (subRow.status === "canceled" &&
+          subRow.current_period_end &&
+          new Date(subRow.current_period_end) > new Date()));
+    const isPaid = stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro");
 
     if (!isPaid && count >= FREE_QUOTA) {
       return { allowed: false as const, reason: "quota", remaining: 0 };
