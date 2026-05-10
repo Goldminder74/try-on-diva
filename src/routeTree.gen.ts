@@ -48,6 +48,8 @@ import { Route as AuthenticatedAppStyleQuizRouteImport } from './routes/_authent
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated.app.profile'
 import { Route as AuthenticatedAppCatalogRouteImport } from './routes/_authenticated.app.catalog'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicHooksTrialsTickRouteImport } from './routes/api/public/hooks/trials-tick'
+import { Route as ApiPublicHooksQuotaResetRouteImport } from './routes/api/public/hooks/quota-reset'
 
 const TryOnRoute = TryOnRouteImport.update({
   id: '/try-on',
@@ -246,6 +248,18 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksTrialsTickRoute =
+  ApiPublicHooksTrialsTickRouteImport.update({
+    id: '/api/public/hooks/trials-tick',
+    path: '/api/public/hooks/trials-tick',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksQuotaResetRoute =
+  ApiPublicHooksQuotaResetRouteImport.update({
+    id: '/api/public/hooks/quota-reset',
+    path: '/api/public/hooks/quota-reset',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -285,6 +299,8 @@ export interface FileRoutesByFullPath {
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/portal/catalog/': typeof PortalCatalogIndexRoute
+  '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
+  '/api/public/hooks/trials-tick': typeof ApiPublicHooksTrialsTickRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -323,6 +339,8 @@ export interface FileRoutesByTo {
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/portal/catalog': typeof PortalCatalogIndexRoute
+  '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
+  '/api/public/hooks/trials-tick': typeof ApiPublicHooksTrialsTickRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -365,6 +383,8 @@ export interface FileRoutesById {
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/portal/catalog/': typeof PortalCatalogIndexRoute
+  '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
+  '/api/public/hooks/trials-tick': typeof ApiPublicHooksTrialsTickRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -407,6 +427,8 @@ export interface FileRouteTypes {
     | '/portal/catalog/new'
     | '/app/'
     | '/portal/catalog/'
+    | '/api/public/hooks/quota-reset'
+    | '/api/public/hooks/trials-tick'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -445,6 +467,8 @@ export interface FileRouteTypes {
     | '/portal/catalog/new'
     | '/app'
     | '/portal/catalog'
+    | '/api/public/hooks/quota-reset'
+    | '/api/public/hooks/trials-tick'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -486,6 +510,8 @@ export interface FileRouteTypes {
     | '/portal/catalog/new'
     | '/_authenticated/app/'
     | '/portal/catalog/'
+    | '/api/public/hooks/quota-reset'
+    | '/api/public/hooks/trials-tick'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -508,6 +534,8 @@ export interface RootRouteChildren {
   RetailerSignupRoute: typeof RetailerSignupRoute
   WigIdRoute: typeof WigIdRoute
   EmbedWidgetTokenRoute: typeof EmbedWidgetTokenRoute
+  ApiPublicHooksQuotaResetRoute: typeof ApiPublicHooksQuotaResetRoute
+  ApiPublicHooksTrialsTickRoute: typeof ApiPublicHooksTrialsTickRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -786,6 +814,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/trials-tick': {
+      id: '/api/public/hooks/trials-tick'
+      path: '/api/public/hooks/trials-tick'
+      fullPath: '/api/public/hooks/trials-tick'
+      preLoaderRoute: typeof ApiPublicHooksTrialsTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/quota-reset': {
+      id: '/api/public/hooks/quota-reset'
+      path: '/api/public/hooks/quota-reset'
+      fullPath: '/api/public/hooks/quota-reset'
+      preLoaderRoute: typeof ApiPublicHooksQuotaResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -875,6 +917,8 @@ const rootRouteChildren: RootRouteChildren = {
   RetailerSignupRoute: RetailerSignupRoute,
   WigIdRoute: WigIdRoute,
   EmbedWidgetTokenRoute: EmbedWidgetTokenRoute,
+  ApiPublicHooksQuotaResetRoute: ApiPublicHooksQuotaResetRoute,
+  ApiPublicHooksTrialsTickRoute: ApiPublicHooksTrialsTickRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport

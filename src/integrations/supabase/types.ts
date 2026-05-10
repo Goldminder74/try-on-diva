@@ -168,6 +168,30 @@ export type Database = {
         }
         Relationships: []
       }
+      retailer_lifecycle_events: {
+        Row: {
+          event_type: string
+          id: string
+          metadata: Json
+          retailer_id: string
+          sent_at: string
+        }
+        Insert: {
+          event_type: string
+          id?: string
+          metadata?: Json
+          retailer_id: string
+          sent_at?: string
+        }
+        Update: {
+          event_type?: string
+          id?: string
+          metadata?: Json
+          retailer_id?: string
+          sent_at?: string
+        }
+        Relationships: []
+      }
       retailers: {
         Row: {
           brand_primary: string | null
@@ -461,6 +485,7 @@ export type Database = {
       wigs: {
         Row: {
           ar_asset_url: string | null
+          auto_unpublished_at: string | null
           click_count: number
           colors: string[]
           created_at: string
@@ -485,6 +510,7 @@ export type Database = {
         }
         Insert: {
           ar_asset_url?: string | null
+          auto_unpublished_at?: string | null
           click_count?: number
           colors?: string[]
           created_at?: string
@@ -509,6 +535,7 @@ export type Database = {
         }
         Update: {
           ar_asset_url?: string | null
+          auto_unpublished_at?: string | null
           click_count?: number
           colors?: string[]
           created_at?: string

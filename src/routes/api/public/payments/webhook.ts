@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { verifyWebhook, EventName, type PaddleEnv } from "@/lib/paddle.server";
+import { serverSendTransactionalEmail } from "@/lib/email/server-send";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase(): any {
@@ -73,11 +74,63 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
     );
 
   // Mirror retailer plan onto retailers row so portal UI reflects it.
+  // On successful subscription: re-activate the retailer, republish any wigs
+  // that were auto-unpublished when the trial expired, and send the
+  // "you're live" email.
   if (ctype === "retailer") {
-    await getSupabase()
+    const sb = getSupabase();
+    await sb
       .from("retailers")
-      .update({ plan, updated_at: new Date().toISOString() })
+      .update({ plan, is_active: true, updated_at: new Date().toISOString() })
       .eq("owner_id", userId);
+
+    // Find the retailer row + republish auto-unpublished wigs.
+    const { data: retailer } = await sb
+      .from("retailers")
+      .select("id, business_name, display_name")
+      .eq("owner_id", userId)
+      .maybeSingle();
+
+    if (retailer?.id) {
+      await sb
+        .from("wigs")
+        .update({
+          is_published: true,
+          auto_unpublished_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("retailer_id", retailer.id)
+        .not("auto_unpublished_at", "is", null);
+
+      // Clear the "trial_ended" lifecycle marker so a future expiry can
+      // re-send the email if they ever lapse again.
+      await sb
+        .from("retailer_lifecycle_events")
+        .delete()
+        .eq("retailer_id", retailer.id)
+        .in("event_type", ["trial_ended", "trial_ending_3d"]);
+
+      // Send "you're live" email (idempotent by subscription id).
+      const { data: profile } = await sb
+        .from("profiles")
+        .select("email, display_name")
+        .eq("id", userId)
+        .maybeSingle();
+      if (profile?.email) {
+        await serverSendTransactionalEmail({
+          baseUrl: "https://wigsmi.com",
+          templateName: "retailer-subscribed",
+          recipientEmail: profile.email,
+          idempotencyKey: `subscribed-${id}`,
+          templateData: {
+            name: profile.display_name ?? retailer.display_name,
+            businessName: retailer.business_name,
+            plan,
+            portalUrl: "https://wigsmi.com/portal",
+          },
+        });
+      }
+    }
   }
 }
 
@@ -136,6 +189,46 @@ async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
   await syncRetailerPlanFromSub(data.id, env);
 }
 
+
+async function handlePaymentFailed(data: any, env: PaddleEnv) {
+  // Map back to a user via subscription id, then send payment-failed email.
+  const subId = data?.subscriptionId;
+  if (!subId) return;
+  const sb = getSupabase();
+  const { data: row } = await sb
+    .from("subscriptions")
+    .select("user_id, customer_type")
+    .eq("paddle_subscription_id", subId)
+    .eq("environment", env)
+    .maybeSingle();
+  if (!row?.user_id || row.customer_type !== "retailer") return;
+
+  const { data: retailer } = await sb
+    .from("retailers")
+    .select("id, business_name, display_name")
+    .eq("owner_id", row.user_id)
+    .maybeSingle();
+  const { data: profile } = await sb
+    .from("profiles")
+    .select("email, display_name")
+    .eq("id", row.user_id)
+    .maybeSingle();
+  if (!profile?.email) return;
+
+  await serverSendTransactionalEmail({
+    baseUrl: "https://wigsmi.com",
+    templateName: "retailer-payment-failed",
+    recipientEmail: profile.email,
+    // Use the transaction id so each failed attempt is its own send.
+    idempotencyKey: `payment-failed-${data?.id ?? subId}-${Date.now().toString(36)}`,
+    templateData: {
+      name: profile.display_name ?? retailer?.display_name,
+      businessName: retailer?.business_name,
+      billingUrl: "https://wigsmi.com/portal/billing",
+    },
+  });
+}
+
 async function handleWebhook(req: Request, env: PaddleEnv) {
   const event = await verifyWebhook(req, env);
   switch (event.eventType) {
@@ -147,6 +240,9 @@ async function handleWebhook(req: Request, env: PaddleEnv) {
       break;
     case EventName.SubscriptionCanceled:
       await handleSubscriptionCanceled(event.data, env);
+      break;
+    case EventName.TransactionPaymentFailed:
+      await handlePaymentFailed(event.data, env);
       break;
     default:
       console.log("Unhandled Paddle event:", event.eventType);

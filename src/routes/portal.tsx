@@ -12,6 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { Wordmark } from "@/components/wigsmi/Wordmark";
 import { PastDueBanner } from "@/components/PastDueBanner";
+import { TrialEndingBanner, TrialExpiredPaywall } from "@/components/retailer/TrialGate";
+import { useRetailerStatus } from "@/hooks/use-retailer-status";
+
 
 export const Route = createFileRoute("/portal")({
   beforeLoad: async ({ location }) => {
@@ -30,11 +33,20 @@ function PortalLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isPaywalled } = useRetailerStatus();
 
   const onSignOut = async () => {
     await signOut();
     navigate({ to: "/" });
   };
+
+  // Allow billing + settings + onboarding through even when paywalled — the
+  // retailer needs to be able to subscribe, sign out, or finish onboarding.
+  const paywallExempt =
+    pathname.startsWith("/portal/billing") ||
+    pathname.startsWith("/portal/settings") ||
+    pathname.startsWith("/portal/onboarding");
+  const showPaywall = isPaywalled && !paywallExempt;
 
   const initial = (user?.user_metadata?.display_name || user?.email || "?")
     .toString()
@@ -44,6 +56,7 @@ function PortalLayout() {
   return (
     <div className="min-h-screen bg-cream">
       <PastDueBanner />
+      <TrialEndingBanner />
       <header className="sticky top-0 z-40 border-b border-border bg-cream/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5">
           <Link to="/portal" className="flex items-center gap-3">
@@ -115,7 +128,7 @@ function PortalLayout() {
         </aside>
 
         <main className="flex-1 min-w-0">
-          <Outlet />
+          {showPaywall ? <TrialExpiredPaywall /> : <Outlet />}
         </main>
       </div>
     </div>
