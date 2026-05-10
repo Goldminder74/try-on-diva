@@ -47,7 +47,9 @@ function Catalog() {
       case "featured": out = [...out].sort((a, b) => Number(b.is_featured) - Number(a.is_featured)); break;
     }
     return out;
-  }, [query, styles, textures, sort]);
+  }, [query, styles, textures, sort, wigs]);
+
+  void loading; void error;
 
   return (
     <div className="min-h-screen bg-cream">
