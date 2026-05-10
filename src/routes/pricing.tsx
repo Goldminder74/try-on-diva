@@ -7,9 +7,28 @@ import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 import { useAuth } from "@/contexts/auth-context";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useServerFn } from "@tanstack/react-start";
-import { changeSubscriptionPlan, createPortalSession } from "@/lib/subscription.functions";
+import {
+  cancelSubscription,
+  changeSubscriptionPlan,
+  createPortalSession,
+  previewPlanChange,
+} from "@/lib/subscription.functions";
 import { getPaddleEnvironment } from "@/lib/paddle";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+function formatGBP(pence: number) {
+  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
+}
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
