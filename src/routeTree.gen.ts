@@ -20,6 +20,7 @@ import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as WigIdRouteImport } from './routes/wig.$id'
 import { Route as RetailerSignupRouteImport } from './routes/retailer_.signup'
 import { Route as RetailerLoginRouteImport } from './routes/retailer_.login'
+import { Route as PortalWidgetRouteImport } from './routes/portal.widget'
 import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
 import { Route as PortalBillingRouteImport } from './routes/portal.billing'
@@ -93,6 +94,11 @@ const RetailerLoginRoute = RetailerLoginRouteImport.update({
   id: '/retailer_/login',
   path: '/retailer/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PortalWidgetRoute = PortalWidgetRouteImport.update({
+  id: '/widget',
+  path: '/widget',
+  getParentRoute: () => PortalRoute,
 } as any)
 const PortalSettingsRoute = PortalSettingsRouteImport.update({
   id: '/settings',
@@ -209,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
+  '/portal/widget': typeof PortalWidgetRoute
   '/retailer/login': typeof RetailerLoginRoute
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
@@ -239,6 +246,7 @@ export interface FileRoutesByTo {
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
+  '/portal/widget': typeof PortalWidgetRoute
   '/retailer/login': typeof RetailerLoginRoute
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
@@ -272,6 +280,7 @@ export interface FileRoutesById {
   '/portal/billing': typeof PortalBillingRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
+  '/portal/widget': typeof PortalWidgetRoute
   '/retailer_/login': typeof RetailerLoginRoute
   '/retailer_/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
@@ -305,6 +314,7 @@ export interface FileRouteTypes {
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
+    | '/portal/widget'
     | '/retailer/login'
     | '/retailer/signup'
     | '/wig/$id'
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
+    | '/portal/widget'
     | '/retailer/login'
     | '/retailer/signup'
     | '/wig/$id'
@@ -367,6 +378,7 @@ export interface FileRouteTypes {
     | '/portal/billing'
     | '/portal/onboarding'
     | '/portal/settings'
+    | '/portal/widget'
     | '/retailer_/login'
     | '/retailer_/signup'
     | '/wig/$id'
@@ -481,6 +493,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/retailer/login'
       preLoaderRoute: typeof RetailerLoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/portal/widget': {
+      id: '/portal/widget'
+      path: '/widget'
+      fullPath: '/portal/widget'
+      preLoaderRoute: typeof PortalWidgetRouteImport
+      parentRoute: typeof PortalRoute
     }
     '/portal/settings': {
       id: '/portal/settings'
@@ -644,6 +663,7 @@ interface PortalRouteChildren {
   PortalBillingRoute: typeof PortalBillingRoute
   PortalOnboardingRoute: typeof PortalOnboardingRoute
   PortalSettingsRoute: typeof PortalSettingsRoute
+  PortalWidgetRoute: typeof PortalWidgetRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalCatalogWigIdRoute: typeof PortalCatalogWigIdRoute
   PortalCatalogNewRoute: typeof PortalCatalogNewRoute
@@ -654,6 +674,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalBillingRoute: PortalBillingRoute,
   PortalOnboardingRoute: PortalOnboardingRoute,
   PortalSettingsRoute: PortalSettingsRoute,
+  PortalWidgetRoute: PortalWidgetRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalCatalogWigIdRoute: PortalCatalogWigIdRoute,
   PortalCatalogNewRoute: PortalCatalogNewRoute,
