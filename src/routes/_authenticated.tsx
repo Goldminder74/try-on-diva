@@ -30,6 +30,7 @@ function AuthenticatedLayout() {
 
   return (
     <div className="min-h-screen bg-cream">
+      <PastDueBanner />
       <header className="sticky top-0 z-40 border-b border-border bg-cream/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5">
           <Link to="/app" className="flex items-center"><Wordmark size="md" /></Link>
