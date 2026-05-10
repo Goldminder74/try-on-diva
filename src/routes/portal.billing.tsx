@@ -120,6 +120,14 @@ function BillingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  useEffect(() => {
+    if (!user) return;
+    invoicesFn({ data: { environment: getPaddleEnvironment() } })
+      .then(setInvoices)
+      .catch(() => setInvoices([]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, sub?.paddle_subscription_id]);
+
   const isPaidActive =
     !!sub &&
     ["active", "trialing", "past_due"].includes(sub.status) &&
