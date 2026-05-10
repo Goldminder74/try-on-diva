@@ -14,9 +14,11 @@ import { Route as RetailerRouteImport } from './routes/retailer'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as CatalogRouteImport } from './routes/catalog'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WigIdRouteImport } from './routes/wig.$id'
 import { Route as RetailerSignupRouteImport } from './routes/retailer_.signup'
 import { Route as RetailerLoginRouteImport } from './routes/retailer_.login'
@@ -31,6 +33,10 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AdminRetailersRouteImport } from './routes/admin.retailers'
+import { Route as AdminFeaturedRouteImport } from './routes/admin.featured'
+import { Route as AdminConsumersRouteImport } from './routes/admin.consumers'
+import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as PortalCatalogIndexRouteImport } from './routes/portal.catalog.index'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
 import { Route as PortalCatalogNewRouteImport } from './routes/portal.catalog.new'
@@ -68,6 +74,11 @@ const CatalogRoute = CatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -81,6 +92,11 @@ const PortalIndexRoute = PortalIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PortalRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const WigIdRoute = WigIdRouteImport.update({
   id: '/wig/$id',
@@ -152,6 +168,26 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRetailersRoute = AdminRetailersRouteImport.update({
+  id: '/retailers',
+  path: '/retailers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFeaturedRoute = AdminFeaturedRouteImport.update({
+  id: '/featured',
+  path: '/featured',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConsumersRoute = AdminConsumersRouteImport.update({
+  id: '/consumers',
+  path: '/consumers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCatalogRoute = AdminCatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
+  getParentRoute: () => AdminRoute,
+} as any)
 const PortalCatalogIndexRoute = PortalCatalogIndexRouteImport.update({
   id: '/catalog/',
   path: '/catalog/',
@@ -213,11 +249,16 @@ const ApiPublicPaymentsWebhookRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/catalog': typeof CatalogRoute
   '/portal': typeof PortalRouteWithChildren
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
+  '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/consumers': typeof AdminConsumersRoute
+  '/admin/featured': typeof AdminFeaturedRoute
+  '/admin/retailers': typeof AdminRetailersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -232,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/retailer/login': typeof RetailerLoginRoute
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
@@ -251,6 +293,10 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
+  '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/consumers': typeof AdminConsumersRoute
+  '/admin/featured': typeof AdminFeaturedRoute
+  '/admin/retailers': typeof AdminRetailersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -265,6 +311,7 @@ export interface FileRoutesByTo {
   '/retailer/login': typeof RetailerLoginRoute
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/admin': typeof AdminIndexRoute
   '/portal': typeof PortalIndexRoute
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
@@ -282,11 +329,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/catalog': typeof CatalogRoute
   '/portal': typeof PortalRouteWithChildren
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
+  '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/consumers': typeof AdminConsumersRoute
+  '/admin/featured': typeof AdminFeaturedRoute
+  '/admin/retailers': typeof AdminRetailersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -301,6 +353,7 @@ export interface FileRoutesById {
   '/retailer_/login': typeof RetailerLoginRoute
   '/retailer_/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/_authenticated/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
@@ -318,11 +371,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/catalog'
     | '/portal'
     | '/pricing'
     | '/retailer'
     | '/try-on'
+    | '/admin/catalog'
+    | '/admin/consumers'
+    | '/admin/featured'
+    | '/admin/retailers'
     | '/auth/callback'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -337,6 +395,7 @@ export interface FileRouteTypes {
     | '/retailer/login'
     | '/retailer/signup'
     | '/wig/$id'
+    | '/admin/'
     | '/portal/'
     | '/app/catalog'
     | '/app/profile'
@@ -356,6 +415,10 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retailer'
     | '/try-on'
+    | '/admin/catalog'
+    | '/admin/consumers'
+    | '/admin/featured'
+    | '/admin/retailers'
     | '/auth/callback'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -370,6 +433,7 @@ export interface FileRouteTypes {
     | '/retailer/login'
     | '/retailer/signup'
     | '/wig/$id'
+    | '/admin'
     | '/portal'
     | '/app/catalog'
     | '/app/profile'
@@ -386,11 +450,16 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
     | '/catalog'
     | '/portal'
     | '/pricing'
     | '/retailer'
     | '/try-on'
+    | '/admin/catalog'
+    | '/admin/consumers'
+    | '/admin/featured'
+    | '/admin/retailers'
     | '/auth/callback'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -405,6 +474,7 @@ export interface FileRouteTypes {
     | '/retailer_/login'
     | '/retailer_/signup'
     | '/wig/$id'
+    | '/admin/'
     | '/portal/'
     | '/_authenticated/app/catalog'
     | '/_authenticated/app/profile'
@@ -422,6 +492,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   CatalogRoute: typeof CatalogRoute
   PortalRoute: typeof PortalRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -477,6 +548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -497,6 +575,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/'
       preLoaderRoute: typeof PortalIndexRouteImport
       parentRoute: typeof PortalRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/wig/$id': {
       id: '/wig/$id'
@@ -595,6 +680,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/callback'
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/retailers': {
+      id: '/admin/retailers'
+      path: '/retailers'
+      fullPath: '/admin/retailers'
+      preLoaderRoute: typeof AdminRetailersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/featured': {
+      id: '/admin/featured'
+      path: '/featured'
+      fullPath: '/admin/featured'
+      preLoaderRoute: typeof AdminFeaturedRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/consumers': {
+      id: '/admin/consumers'
+      path: '/consumers'
+      fullPath: '/admin/consumers'
+      preLoaderRoute: typeof AdminConsumersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/catalog': {
+      id: '/admin/catalog'
+      path: '/catalog'
+      fullPath: '/admin/catalog'
+      preLoaderRoute: typeof AdminCatalogRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/portal/catalog/': {
       id: '/portal/catalog/'
@@ -698,6 +811,24 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface AdminRouteChildren {
+  AdminCatalogRoute: typeof AdminCatalogRoute
+  AdminConsumersRoute: typeof AdminConsumersRoute
+  AdminFeaturedRoute: typeof AdminFeaturedRoute
+  AdminRetailersRoute: typeof AdminRetailersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCatalogRoute: AdminCatalogRoute,
+  AdminConsumersRoute: AdminConsumersRoute,
+  AdminFeaturedRoute: AdminFeaturedRoute,
+  AdminRetailersRoute: AdminRetailersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 interface PortalRouteChildren {
   PortalAnalyticsRoute: typeof PortalAnalyticsRoute
   PortalBillingRoute: typeof PortalBillingRoute
@@ -728,6 +859,7 @@ const PortalRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   CatalogRoute: CatalogRoute,
   PortalRoute: PortalRouteWithChildren,
   PricingRoute: PricingRoute,

@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } from "@tanstack/react-router";
-import { Heart, Home, Sparkles, User as UserIcon, Wand2, LogOut } from "lucide-react";
+import { Heart, Home, Sparkles, User as UserIcon, Wand2, LogOut, Shield } from "lucide-react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { Wordmark } from "@/components/wigsmi/Wordmark";
@@ -22,6 +23,18 @@ function AuthenticatedLayout() {
   const { user, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle()
+      .then(({ data }) => setIsAdmin(!!data));
+  }, [user]);
 
   const onSignOut = async () => {
     await signOut();
@@ -41,6 +54,14 @@ function AuthenticatedLayout() {
             <NavLink to="/app/wishlist" label="Wishlist" />
           </nav>
           <div className="flex items-center gap-3">
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="hidden items-center gap-1 rounded-md border border-gold/60 bg-gold/10 px-3 py-1.5 text-xs text-mahogany hover:bg-gold/20 md:inline-flex"
+              >
+                <Shield className="h-3.5 w-3.5" /> Admin
+              </Link>
+            )}
             <Link to="/app/profile" className="flex h-9 w-9 items-center justify-center rounded-full bg-mahogany text-cream">
               <span className="text-xs font-medium">
                 {(user?.user_metadata?.display_name || user?.email || "?")
