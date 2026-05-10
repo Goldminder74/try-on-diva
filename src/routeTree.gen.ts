@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TryOnRouteImport } from './routes/try-on'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as RetailerRouteImport } from './routes/retailer'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as CatalogRouteImport } from './routes/catalog'
@@ -58,9 +60,19 @@ const TryOnRoute = TryOnRouteImport.update({
   path: '/try-on',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RetailerRoute = RetailerRouteImport.update({
   id: '/retailer',
   path: '/retailer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -280,7 +292,9 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof CatalogRoute
   '/portal': typeof PortalRouteWithChildren
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/retailer': typeof RetailerRoute
+  '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/consumers': typeof AdminConsumersRoute
@@ -322,7 +336,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/catalog': typeof CatalogRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/retailer': typeof RetailerRoute
+  '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/consumers': typeof AdminConsumersRoute
@@ -368,7 +384,9 @@ export interface FileRoutesById {
   '/catalog': typeof CatalogRoute
   '/portal': typeof PortalRouteWithChildren
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
   '/retailer': typeof RetailerRoute
+  '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/consumers': typeof AdminConsumersRoute
@@ -414,7 +432,9 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/portal'
     | '/pricing'
+    | '/privacy'
     | '/retailer'
+    | '/terms'
     | '/try-on'
     | '/admin/catalog'
     | '/admin/consumers'
@@ -456,7 +476,9 @@ export interface FileRouteTypes {
     | '/'
     | '/catalog'
     | '/pricing'
+    | '/privacy'
     | '/retailer'
+    | '/terms'
     | '/try-on'
     | '/admin/catalog'
     | '/admin/consumers'
@@ -501,7 +523,9 @@ export interface FileRouteTypes {
     | '/catalog'
     | '/portal'
     | '/pricing'
+    | '/privacy'
     | '/retailer'
+    | '/terms'
     | '/try-on'
     | '/admin/catalog'
     | '/admin/consumers'
@@ -547,7 +571,9 @@ export interface RootRouteChildren {
   CatalogRoute: typeof CatalogRoute
   PortalRoute: typeof PortalRouteWithChildren
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
   RetailerRoute: typeof RetailerRoute
+  TermsRoute: typeof TermsRoute
   TryOnRoute: typeof TryOnRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -573,11 +599,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TryOnRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/retailer': {
       id: '/retailer'
       path: '/retailer'
       fullPath: '/retailer'
       preLoaderRoute: typeof RetailerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -948,7 +988,9 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogRoute: CatalogRoute,
   PortalRoute: PortalRouteWithChildren,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
   RetailerRoute: RetailerRoute,
+  TermsRoute: TermsRoute,
   TryOnRoute: TryOnRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
