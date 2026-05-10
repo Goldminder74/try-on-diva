@@ -13,8 +13,20 @@ import { Route as TryOnRouteImport } from './routes/try-on'
 import { Route as RetailerRouteImport } from './routes/retailer'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as CatalogRouteImport } from './routes/catalog'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WigIdRouteImport } from './routes/wig.$id'
+import { Route as AuthSignupRouteImport } from './routes/auth.signup'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
+import { Route as AuthenticatedAppWishlistRouteImport } from './routes/_authenticated.app.wishlist'
+import { Route as AuthenticatedAppTryOnRouteImport } from './routes/_authenticated.app.try-on'
+import { Route as AuthenticatedAppStyleQuizRouteImport } from './routes/_authenticated.app.style-quiz'
+import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated.app.profile'
+import { Route as AuthenticatedAppCatalogRouteImport } from './routes/_authenticated.app.catalog'
 
 const TryOnRoute = TryOnRouteImport.update({
   id: '/try-on',
@@ -36,6 +48,10 @@ const CatalogRoute = CatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -46,6 +62,63 @@ const WigIdRoute = WigIdRouteImport.update({
   path: '/wig/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/app/',
+  path: '/app/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAppWishlistRoute =
+  AuthenticatedAppWishlistRouteImport.update({
+    id: '/app/wishlist',
+    path: '/app/wishlist',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAppTryOnRoute = AuthenticatedAppTryOnRouteImport.update({
+  id: '/app/try-on',
+  path: '/app/try-on',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAppStyleQuizRoute =
+  AuthenticatedAppStyleQuizRouteImport.update({
+    id: '/app/style-quiz',
+    path: '/app/style-quiz',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
+  id: '/app/profile',
+  path: '/app/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAppCatalogRoute = AuthenticatedAppCatalogRouteImport.update({
+  id: '/app/catalog',
+  path: '/app/catalog',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,7 +126,18 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/app/catalog': typeof AuthenticatedAppCatalogRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
+  '/app/try-on': typeof AuthenticatedAppTryOnRoute
+  '/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,16 +145,39 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/app/catalog': typeof AuthenticatedAppCatalogRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
+  '/app/try-on': typeof AuthenticatedAppTryOnRoute
+  '/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/app': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/catalog': typeof CatalogRoute
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/_authenticated/app/catalog': typeof AuthenticatedAppCatalogRoute
+  '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
+  '/_authenticated/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
+  '/_authenticated/app/try-on': typeof AuthenticatedAppTryOnRoute
+  '/_authenticated/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,25 +187,71 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retailer'
     | '/try-on'
+    | '/auth/callback'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/reset-password'
+    | '/auth/signup'
     | '/wig/$id'
+    | '/app/catalog'
+    | '/app/profile'
+    | '/app/style-quiz'
+    | '/app/try-on'
+    | '/app/wishlist'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalog' | '/pricing' | '/retailer' | '/try-on' | '/wig/$id'
-  id:
-    | '__root__'
+  to:
     | '/'
     | '/catalog'
     | '/pricing'
     | '/retailer'
     | '/try-on'
+    | '/auth/callback'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/reset-password'
+    | '/auth/signup'
     | '/wig/$id'
+    | '/app/catalog'
+    | '/app/profile'
+    | '/app/style-quiz'
+    | '/app/try-on'
+    | '/app/wishlist'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/catalog'
+    | '/pricing'
+    | '/retailer'
+    | '/try-on'
+    | '/auth/callback'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/reset-password'
+    | '/auth/signup'
+    | '/wig/$id'
+    | '/_authenticated/app/catalog'
+    | '/_authenticated/app/profile'
+    | '/_authenticated/app/style-quiz'
+    | '/_authenticated/app/try-on'
+    | '/_authenticated/app/wishlist'
+    | '/_authenticated/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CatalogRoute: typeof CatalogRoute
   PricingRoute: typeof PricingRoute
   RetailerRoute: typeof RetailerRoute
   TryOnRoute: typeof TryOnRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthSignupRoute: typeof AuthSignupRoute
   WigIdRoute: typeof WigIdRoute
 }
 
@@ -132,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -146,15 +306,120 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WigIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/app'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/wishlist': {
+      id: '/_authenticated/app/wishlist'
+      path: '/app/wishlist'
+      fullPath: '/app/wishlist'
+      preLoaderRoute: typeof AuthenticatedAppWishlistRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/try-on': {
+      id: '/_authenticated/app/try-on'
+      path: '/app/try-on'
+      fullPath: '/app/try-on'
+      preLoaderRoute: typeof AuthenticatedAppTryOnRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/style-quiz': {
+      id: '/_authenticated/app/style-quiz'
+      path: '/app/style-quiz'
+      fullPath: '/app/style-quiz'
+      preLoaderRoute: typeof AuthenticatedAppStyleQuizRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/profile': {
+      id: '/_authenticated/app/profile'
+      path: '/app/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/catalog': {
+      id: '/_authenticated/app/catalog'
+      path: '/app/catalog'
+      fullPath: '/app/catalog'
+      preLoaderRoute: typeof AuthenticatedAppCatalogRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAppCatalogRoute: typeof AuthenticatedAppCatalogRoute
+  AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
+  AuthenticatedAppStyleQuizRoute: typeof AuthenticatedAppStyleQuizRoute
+  AuthenticatedAppTryOnRoute: typeof AuthenticatedAppTryOnRoute
+  AuthenticatedAppWishlistRoute: typeof AuthenticatedAppWishlistRoute
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAppCatalogRoute: AuthenticatedAppCatalogRoute,
+  AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
+  AuthenticatedAppStyleQuizRoute: AuthenticatedAppStyleQuizRoute,
+  AuthenticatedAppTryOnRoute: AuthenticatedAppTryOnRoute,
+  AuthenticatedAppWishlistRoute: AuthenticatedAppWishlistRoute,
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CatalogRoute: CatalogRoute,
   PricingRoute: PricingRoute,
   RetailerRoute: RetailerRoute,
   TryOnRoute: TryOnRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthSignupRoute: AuthSignupRoute,
   WigIdRoute: WigIdRoute,
 }
 export const routeTree = rootRouteImport
