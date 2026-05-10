@@ -34,6 +34,10 @@ function TryOn() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!wig && initialWig) setWig(initialWig);
+  }, [initialWig, wig]);
+
   const onFile = (f: File | undefined) => {
     if (!f) return;
     if (f.size > 10 * 1024 * 1024) { setError("File too large — max 10MB."); return; }
