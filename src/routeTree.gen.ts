@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TryOnRouteImport } from './routes/try-on'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as RetailerRouteImport } from './routes/retailer'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -57,6 +58,11 @@ import { Route as ApiPublicHooksQuotaResetRouteImport } from './routes/api/publi
 const TryOnRoute = TryOnRouteImport.update({
   id: '/try-on',
   path: '/try-on',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RetailerRoute = RetailerRouteImport.update({
@@ -288,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/retailer': typeof RetailerRoute
+  '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/consumers': typeof AdminConsumersRoute
@@ -331,6 +338,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/retailer': typeof RetailerRoute
+  '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/consumers': typeof AdminConsumersRoute
@@ -378,6 +386,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/retailer': typeof RetailerRoute
+  '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/consumers': typeof AdminConsumersRoute
@@ -425,6 +434,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/retailer'
+    | '/terms'
     | '/try-on'
     | '/admin/catalog'
     | '/admin/consumers'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/retailer'
+    | '/terms'
     | '/try-on'
     | '/admin/catalog'
     | '/admin/consumers'
@@ -514,6 +525,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/retailer'
+    | '/terms'
     | '/try-on'
     | '/admin/catalog'
     | '/admin/consumers'
@@ -561,6 +573,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RetailerRoute: typeof RetailerRoute
+  TermsRoute: typeof TermsRoute
   TryOnRoute: typeof TryOnRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -584,6 +597,13 @@ declare module '@tanstack/react-router' {
       path: '/try-on'
       fullPath: '/try-on'
       preLoaderRoute: typeof TryOnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/retailer': {
@@ -970,6 +990,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RetailerRoute: RetailerRoute,
+  TermsRoute: TermsRoute,
   TryOnRoute: TryOnRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
