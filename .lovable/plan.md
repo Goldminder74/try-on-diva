@@ -1,97 +1,99 @@
-# Seed Data + Admin Section
 
-Two tightly coupled pieces shipped together: a deterministic seed script that fills the database with realistic demo content, and the full `/admin/*` surface so Ayo (the admin) can actually moderate that content. No schema changes — the existing tables and RLS policies (admin role has wide read/write via `has_role(auth.uid(), 'admin')`) already cover everything.
+# Lifecycle plumbing: trials, emails, and quota reset
 
-## Part 1 — Seed script
+This finishes the last piece of core business logic. Three things ship together because they share infrastructure (pg_cron, Lovable Emails, the retailer/consumer lifecycle).
 
-A one-shot Node script (`scripts/seed.ts`) committed to the repo, run locally with `bun run seed`. Idempotent: re-running upserts on stable slugs/emails, never duplicates. Uses the service-role key from `.env` (already set as a server secret, mirrored locally) and the admin Supabase client.
+I'm making three opinionated calls so we can move:
 
-**Creates:**
-- **Admin user** — `ayo@wigsmi.com` (password: `Wigsmi!Admin2026`), display name "Ayo", role `admin`.
-- **2 retailer owners** — `owner@crownandcoils.com` ("Crown & Coils"), `owner@silkscalp.co` ("Silk & Scalp"). Each gets:
-  - Auth user (password printed once at end of script run for the operator)
-  - `profiles` row (auto-created by `handle_new_user` trigger)
-  - `user_roles` row promoted to `retailer`
-  - `retailers` row with business name, slug, country (UK / US), brand_primary, currency, contact_name, website, logo placeholder, `onboarding_completed = true`, `trial_ends_at = now() + 60d`
-  - One `widget_embeds` row each (default config, `allowed_domains: []`)
-- **2 demo consumers** — `maya@example.com`, `zola@example.com` (password printed). Empty wishlists/quiz so the operator can test those flows.
-- **20 wigs** spread 12/8 across the two retailers. Mix of style_type (`bob`, `lace-front`, `closure`, `pixie`, `braided`, `loose-wave`, `kinky-straight`), hair_texture (`4a`, `4b`, `4c`, `straight`, `wavy`, `curly`), hair_length (`short`, `medium`, `long`, `bust`), hair_origin (`brazilian`, `peruvian`, `synthetic`), prices £45–£420, realistic names ("Lagos Honey 22\"", "Brooklyn Bob 12\"", "Goddess Kinky 26\"", etc.) and 1–2 sentence descriptions. Images use `https://picsum.photos/seed/<wig-slug>/800/1000` (seeded so they stay stable across runs). **Comment at top of file flags every image URL as demo content.**
-- **5 featured wigs** — `is_featured = true`, `featured_rank` 1–5, distributed across both retailers.
-- **Synthetic analytics data** (optional, controlled by `--with-analytics` flag) — ~400 `try_on_events` and ~120 `wig_clicks` spread over the last 30 days across all 20 wigs, so the analytics dashboard isn't empty in demos. Devices/sources/countries varied. Skipped by default to keep the seed fast.
+1. **Emails** → Lovable Emails (built-in, no DNS friction, uses `wigsmi.com` automatically). Resend stays available as a separate connector if we ever need marketing later.
+2. **Trial-end behaviour** → **Hard lock**. When a retailer's trial expires without payment, their wigs are auto-unpublished (hidden from `/catalog` and widgets) and the portal shows a paywall. Republished on subscribe. Cleaner than soft-lock — consumers never see a broken "Try on" button that links to a dead retailer.
+3. **Quota reset** → Calendar-month boundary (matches the existing `try_on_month_reset` column default).
 
-**Output:** Prints a summary table with all created credentials so the operator can sign in immediately.
+If either #2 or #3 is wrong, say which one and I'll revise.
 
-## Part 2 — Admin section (`/admin/*`)
+---
 
-New layout route + 5 child pages. Mirrors the visual language of `/portal` (mahogany sidebar, cream main, gold accents) but with a distinct "Admin" label so it can never be confused with a retailer view. Built entirely on existing tables and RLS — admins already have read access everywhere via the `has_role` policy clauses.
+## Part 1 — Trial lifecycle enforcement
 
-### Route structure
-```text
-src/routes/
-  admin.tsx                   layout: gates on admin role, renders sidebar + Outlet
-  admin.index.tsx             /admin                  platform overview
-  admin.retailers.tsx         /admin/retailers        retailers list + detail drawer
-  admin.consumers.tsx         /admin/consumers        consumers list
-  admin.catalog.tsx           /admin/catalog          all wigs, moderation actions
-  admin.featured.tsx          /admin/featured         featured-wig editor
-```
+**Daily cron at 02:00 UTC** (`/api/public/hooks/trials-tick`):
+- Find retailers where `trial_ends_at < now()`, no active subscription, `is_active = true`.
+  - Set `is_active = false` → existing RLS already hides them from public reads.
+  - Set `is_published = false` on all their wigs.
+  - Insert an analytics event `trial_expired`.
+  - Enqueue **"Trial ended"** email.
+- Find retailers where `trial_ends_at` is **3 days away** and no email yet sent for this milestone.
+  - Enqueue **"Trial ending in 3 days"** email.
+  - Track sent-state on a new `retailer_lifecycle_events` table (retailer_id + event_type + sent_at, unique) so we don't double-send.
 
-### Access gating
-`admin.tsx` runs `beforeLoad`:
-1. Require auth (redirect to `/auth/login` if not signed in).
-2. Query `user_roles` for `role = 'admin'` for the current user; redirect to `/app` if not an admin.
+**Portal paywall** (`/retailer/*`):
+- New helper `useRetailerStatus()` → returns `{ trialDaysLeft, isPaywalled, hasSubscription }`.
+- When `isPaywalled`, the portal layout swaps the main content for a paywall card: "Your trial has ended" + CTA → `/retailer/pricing`. Settings page stays accessible (so they can still log out / contact support).
+- Trial banner already exists; extend it to show "Trial ends in 3 days" in amber when ≤3 days left.
 
-A server function `getAdminContext` (in `src/lib/admin.functions.ts`) double-checks the role server-side and is called by every admin page loader — defense in depth, since RLS already enforces it but UX should hide 403s.
+**On successful subscription** (handled in the existing Paddle webhook):
+- Republish wigs that were auto-unpublished by the cron (track this via a new `auto_unpublished_at` column on `wigs` — only republish wigs that were auto-unpublished, not ones the retailer manually hid).
+- Set `is_active = true` on the retailer.
+- Enqueue **"Welcome — you're live"** email.
 
-### Pages
+## Part 2 — App emails (via Lovable Emails)
 
-**`/admin` — Platform overview**
-KPI strip: total retailers, active retailers (trial not expired OR paid sub), total consumers, total wigs, total try-ons (30d), total clicks (30d), MRR estimate (sum of active paid subs converted to monthly). Below: 30-day try-ons line chart (reuses the analytics chart component) and a "Recent signups" list (latest 10 retailers + latest 10 consumers, tabbed).
+Six React Email templates registered in `src/lib/email-templates/`:
 
-**`/admin/retailers` — Retailers**
-Sortable table: business name, slug, country, plan, trial_ends_at, wig count, try-ons (30d), status (active/suspended), created_at. Row click opens a side drawer with full profile, the retailer's wigs (link to `/admin/catalog?retailer=<id>`), subscription row (if any), and three actions:
-- **Suspend / Reactivate** — toggle `retailers.is_active` (suspended retailers' wigs disappear from public catalog via existing RLS on the `is_active` retailer policy).
-- **Extend trial** — `+30d` button that updates `trial_ends_at`.
-- **Impersonate** (optional, marked `// TODO: requires service-role flow`, left as a no-op button with a tooltip for now to avoid a security hole).
+| Template | Trigger |
+|---|---|
+| `retailer-welcome` | Retailer completes signup (existing signup flow) |
+| `retailer-trial-ending` | Cron, 3 days before `trial_ends_at` |
+| `retailer-trial-ended` | Cron, on the day `trial_ends_at < now()` |
+| `retailer-subscribed` | Paddle `subscription.created` webhook |
+| `retailer-payment-failed` | Paddle `transaction.payment_failed` webhook |
+| `consumer-welcome` | First sign-in of a new consumer |
 
-Search box filters by business name / slug / contact email.
+All templates use the Wigsmi mahogany/cream palette and the same `Inter`/serif heading stack as the app. Sender: `notify@wigsmi.com` (Lovable Emails will provision this subdomain).
 
-**`/admin/consumers` — Consumers**
-Sortable table: display name, email, country, try-ons this month, wishlist count, signup date. Row click opens drawer with profile, quiz answers, last 10 try-on events. Single action: **Disable account** — sets a flag on `user_roles` (covered by existing admin policy on that table) and signs them out. Since there's no `disabled` column today, this action is rendered but flagged behind a `// TODO: needs schema column` — listed as a known gap in the closing summary rather than added in this chunk (avoids unplanned schema change).
+No marketing emails. No bulk loops. Each send is 1:1, triggered by a specific event, with `idempotencyKey = ${event_type}-${retailer_id_or_event_id}`.
 
-**`/admin/catalog` — Catalog moderation**
-All wigs across all retailers in a grid (same `WigCard` look but with retailer badge in the corner). Filters: retailer, style, texture, is_published, is_featured, in_stock. Actions per wig: **Unpublish** (`is_published = false`), **Republish**, **Feature** (links to `/admin/featured` with that wig preselected), **Delete** (hard delete via service-role server fn — confirm dialog). Pagination at 60 per page.
+## Part 3 — Monthly try-on quota reset
 
-**`/admin/featured` — Featured wig editor**
-Up to 5 slots, drag-to-reorder. Each slot shows the current wig (image, name, retailer) and an "Edit" button that opens a wig picker (searchable list of all published wigs). Save persists `is_featured` and `featured_rank` 1..5 on the chosen wigs and clears the flag on any wig that was previously featured but is no longer in the list. The consumer home (`_authenticated.app.index.tsx`) and the marketing landing already query `is_featured order by featured_rank` so changes appear instantly.
+**Monthly cron, 1st of month at 00:05 UTC** (`/api/public/hooks/quota-reset`):
+- `UPDATE consumer_profiles SET try_on_count_this_month = 0, try_on_month_reset = date_trunc('month', now())::date WHERE try_on_month_reset < date_trunc('month', now())::date;`
 
-### Server functions
+Pure SQL job — no email, no webhook.
 
-A single new file `src/lib/admin.functions.ts` exposes:
-- `getAdminOverview()` — KPIs for the index page
-- `listRetailers(filters)` / `getRetailerDetail(id)` / `setRetailerActive(id, active)` / `extendTrial(id, days)`
-- `listConsumers(filters)` / `getConsumerDetail(userId)`
-- `listAdminCatalog(filters, page)` / `setWigPublished(id, published)` / `deleteWig(id)`
-- `getFeaturedWigs()` / `setFeaturedWigs(orderedWigIds[])`
-- `searchPublishedWigs(query)` (for the featured picker)
+---
 
-All use `requireSupabaseAuth` middleware plus an inline `has_role(userId, 'admin')` check. Destructive ops (`deleteWig`, `setRetailerActive(false)`) use `supabaseAdmin` (service role) so the action succeeds regardless of RLS edge cases; the admin role check on the user is the security boundary.
+## Files & migrations
 
-### Navigation entry point
-The existing portal sidebar (`src/routes/portal.tsx`) gets a conditional "Admin" link rendered only when the signed-in user has the admin role (queried once by the layout). Clicking it goes to `/admin`. The admin layout has its own sidebar — it does not nest inside `/portal`.
+**Migration:**
+- `retailer_lifecycle_events` table (retailer_id, event_type, sent_at; unique on retailer_id+event_type).
+- `wigs.auto_unpublished_at timestamptz` column.
+- Two pg_cron schedules (trials-tick daily, quota-reset monthly).
 
-### Out of scope (deferred)
-- Consumer disable (needs schema column)
-- Retailer impersonation (needs service-role session handoff)
-- Platform-level analytics export
-- Audit log of admin actions
+**New server routes:**
+- `src/routes/api/public/hooks/trials-tick.ts`
+- `src/routes/api/public/hooks/quota-reset.ts`
 
-## Acceptance criteria
+**New email templates** (six files in `src/lib/email-templates/` + `registry.ts` update).
 
-- `bun run seed` from a fresh DB produces: 1 admin, 2 retailers (each with widget embed + 8–12 wigs), 2 consumers, 20 wigs total, 5 featured. Idempotent on re-run.
-- Signing in as Ayo lands on `/app`; the "Admin" link is visible in the user menu and goes to `/admin`.
-- `/admin/*` redirects non-admins away. All five pages render with seeded data.
-- Suspending a retailer hides their wigs from `/catalog` immediately.
-- Unpublishing a wig removes it from consumer-facing surfaces but keeps it visible to the owning retailer in `/portal/catalog`.
-- Reordering featured wigs is reflected on the consumer home on next load.
-- No new tables, no new RLS policies — verified by re-running the migration list.
+**New client lib:** `src/lib/email/send.ts` (thin helper around `/lovable/email/transactional/send`).
+
+**Edits:**
+- `src/routes/retailer.tsx` — paywall layout when `isPaywalled`.
+- Existing Paddle webhook (`src/routes/api/public/payments/webhook.ts`) — enqueue `retailer-subscribed` / `retailer-payment-failed`, republish auto-unpublished wigs on subscription created.
+- Existing signup flow — enqueue welcome emails.
+
+**Prerequisite tool calls** (no user action needed beyond approving the plan):
+1. `email_domain--check_email_domain_status` — confirm wigsmi.com status.
+2. If no domain: open setup dialog for `wigsmi.com`.
+3. `email_domain--setup_email_infra` → `email_domain--scaffold_transactional_email`.
+
+## Out of scope (next chunk)
+- `/app/subscription`, `/retailer/api-keys`, `/retailer/pricing` polish routes.
+- Admin audit log, retailer impersonation.
+- CSV analytics export.
+
+## Acceptance
+- A retailer with `trial_ends_at` set to yesterday is, after the next cron tick, `is_active=false`, their wigs are unpublished, and they receive one "trial ended" email. Their `/retailer` shows the paywall.
+- Subscribing republishes the wigs and sends the "welcome — you're live" email.
+- A consumer with `try_on_count_this_month = 50` on Jan 31 sees `0` after the Feb 1 cron.
+- All six templates render in the Lovable email preview with brand styling.
+- No marketing emails, no bulk sends, all sends idempotent.
