@@ -5,9 +5,27 @@ import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { getPaddleEnvironment } from "@/lib/paddle";
 import { useServerFn } from "@tanstack/react-start";
-import { changeSubscriptionPlan, createPortalSession } from "@/lib/subscription.functions";
-import { CheckCircle2, Sparkles, Loader2, ExternalLink } from "lucide-react";
+import {
+  changeSubscriptionPlan,
+  createPortalSession,
+  listInvoices,
+} from "@/lib/subscription.functions";
+import { CheckCircle2, Sparkles, Loader2, ExternalLink, FileText } from "lucide-react";
 import { toast } from "sonner";
+
+interface Invoice {
+  id: string;
+  number: string | null;
+  status: string;
+  currency: string;
+  total: number;
+  billedAt: string | null;
+  invoiceUrl: string | null;
+}
+
+function formatMoney(amountMinor: number, currency: string) {
+  return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(amountMinor / 100);
+}
 
 export const Route = createFileRoute("/portal/billing")({
   component: BillingPage,
