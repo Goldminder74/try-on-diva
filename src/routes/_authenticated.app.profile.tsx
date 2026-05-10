@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyConsumerProfile, updateProfile } from "@/lib/consumer-profile.functions";
@@ -123,6 +123,15 @@ function Profile() {
           <button onClick={async () => { await signOut(); nav({ to: "/" }); }} className="text-sm text-muted-foreground hover:text-mahogany">
             Sign out
           </button>
+        </div>
+
+        <div className="mt-6 border-t border-border pt-6">
+          <Link
+            to="/app/subscription"
+            className="inline-flex items-center gap-1 text-sm font-medium text-mahogany underline-offset-4 hover:underline"
+          >
+            View subscription & usage →
+          </Link>
         </div>
       </div>
     </div>
