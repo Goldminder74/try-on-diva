@@ -86,18 +86,29 @@ async function syncRetailerPlanFromSub(subId: string, env: PaddleEnv) {
 }
 
 async function handleSubscriptionUpdated(data: any, env: PaddleEnv) {
-  const { id, status, currentBillingPeriod, scheduledChange } = data;
+  const { id, status, currentBillingPeriod, scheduledChange, items } = data;
+  const item = items?.[0];
+  const priceId = item?.price?.importMeta?.externalId;
+  const productId = item?.product?.importMeta?.externalId;
+  const update: Record<string, unknown> = {
+    status,
+    current_period_start: currentBillingPeriod?.startsAt,
+    current_period_end: currentBillingPeriod?.endsAt,
+    cancel_at_period_end: scheduledChange?.action === "cancel",
+    updated_at: new Date().toISOString(),
+  };
+  if (priceId) update.price_id = priceId;
+  if (productId) {
+    update.product_id = productId;
+    update.plan = planFromProduct(productId);
+    update.customer_type = customerType(productId);
+  }
   await getSupabase()
     .from("subscriptions")
-    .update({
-      status,
-      current_period_start: currentBillingPeriod?.startsAt,
-      current_period_end: currentBillingPeriod?.endsAt,
-      cancel_at_period_end: scheduledChange?.action === "cancel",
-      updated_at: new Date().toISOString(),
-    })
+    .update(update)
     .eq("paddle_subscription_id", id)
     .eq("environment", env);
+  await syncRetailerPlanFromSub(id, env);
 }
 
 async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
@@ -109,6 +120,7 @@ async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
     })
     .eq("paddle_subscription_id", data.id)
     .eq("environment", env);
+  await syncRetailerPlanFromSub(data.id, env);
 }
 
 async function handleWebhook(req: Request, env: PaddleEnv) {
