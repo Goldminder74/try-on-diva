@@ -29,8 +29,11 @@ function Catalog() {
 
   const toggle = (arr: string[], v: string) => arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
 
+  const { data: wigs, loading, error } = useAsync<Wig[]>(() => fetchWigs(), []);
+
   const filtered = useMemo(() => {
-    let out = WIGS.filter(w => {
+    const source = wigs ?? [];
+    let out = source.filter((w: Wig) => {
       if (query && !w.name.toLowerCase().includes(query.toLowerCase()) && !w.retailer.toLowerCase().includes(query.toLowerCase())) return false;
       if (styles.length && !styles.includes(w.style_type)) return false;
       if (textures.length && !textures.includes(w.hair_texture)) return false;
@@ -44,7 +47,9 @@ function Catalog() {
       case "featured": out = [...out].sort((a, b) => Number(b.is_featured) - Number(a.is_featured)); break;
     }
     return out;
-  }, [query, styles, textures, sort]);
+  }, [query, styles, textures, sort, wigs]);
+
+  void loading; void error;
 
   return (
     <div className="min-h-screen bg-cream">

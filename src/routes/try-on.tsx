@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Upload, RefreshCw } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
-import { FEATURED_WIGS, WIGS, type Wig } from "@/lib/wigs";
+import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
+import { useAsync } from "@/lib/use-async";
 
 type Search = { wig?: string };
 
@@ -25,11 +26,17 @@ export const Route = createFileRoute("/try-on")({
 
 function TryOn() {
   const search = Route.useSearch();
-  const initialWig = (search.wig && WIGS.find(w => w.id === search.wig)) || FEATURED_WIGS[0];
+  const { data: featured } = useAsync<Wig[]>(() => fetchFeaturedWigs(9), []);
+  const list: Wig[] = featured ?? [];
+  const initialWig = (search.wig && list.find((w: Wig) => w.id === search.wig)) || list[0];
   const [photo, setPhoto] = useState<File | null>(null);
-  const [wig, setWig] = useState<Wig | null>(initialWig ?? null);
+  const [wig, setWig] = useState<Wig | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!wig && initialWig) setWig(initialWig);
+  }, [initialWig, wig]);
 
   const onFile = (f: File | undefined) => {
     if (!f) return;
@@ -85,7 +92,7 @@ function TryOn() {
           <aside>
             <p className="mb-3 font-mono text-xs uppercase tracking-wider text-gold-dark">Choose a wig</p>
             <div className="grid grid-cols-3 gap-3">
-              {FEATURED_WIGS.map(w => (
+              {list.map((w: Wig) => (
                 <button
                   key={w.id}
                   onClick={() => setWig(w)}

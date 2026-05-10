@@ -4,13 +4,14 @@ import { Heart, ExternalLink, ArrowLeft } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
-import { WIGS, getWigById, formatPrice } from "@/lib/wigs";
+import { fetchWigById, fetchRelatedWigs, formatPrice, type Wig } from "@/lib/wigs";
 
 export const Route = createFileRoute("/wig/$id")({
-  loader: ({ params }) => {
-    const wig = getWigById(params.id);
+  loader: async ({ params }) => {
+    const wig = await fetchWigById(params.id);
     if (!wig) throw notFound();
-    return { wig };
+    const related = await fetchRelatedWigs(wig.style_type, wig.id, 4);
+    return { wig, related };
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [
@@ -53,9 +54,8 @@ export const Route = createFileRoute("/wig/$id")({
 });
 
 function WigDetail() {
-  const { wig } = Route.useLoaderData();
+  const { wig, related } = Route.useLoaderData();
   const [active, setActive] = useState(0);
-  const related = WIGS.filter(w => w.style_type === wig.style_type && w.id !== wig.id).slice(0, 4);
 
   return (
     <div className="min-h-screen bg-cream">
@@ -132,7 +132,7 @@ function WigDetail() {
           <section className="mt-20">
             <h2 className="font-display text-2xl text-mahogany">You might also like</h2>
             <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-              {related.map(w => <WigCard key={w.id} wig={w} />)}
+              {related.map((w: Wig) => <WigCard key={w.id} wig={w} />)}
             </div>
           </section>
         )}
