@@ -1,99 +1,64 @@
+# Next chunk — Polish routes
 
-# Lifecycle plumbing: trials, emails, and quota reset
+The big systems are in place (auth, catalog, widget, payments, lifecycle, admin). What's left is the **connective tissue** retailers and consumers expect from a real SaaS but that we've been deferring. I recommend doing all three of these together because they share patterns (read subscription, render state, link to Paddle portal) and individually they're each too small to justify a round trip.
 
-This finishes the last piece of core business logic. Three things ship together because they share infrastructure (pg_cron, Lovable Emails, the retailer/consumer lifecycle).
+## What we'll build
 
-I'm making three opinionated calls so we can move:
+### 1. `/retailer/pricing` — public pricing page
+A marketing-facing page anyone can hit (logged-out included) showing the two plans (Starter / Growth) with feature lists, the 3-month free trial CTA, FAQ, and a "Talk to us" footer. Links to `/retailer/signup` for new users, `/portal/billing` for logged-in retailers. SEO-tuned (unique title/description/og). This is what we'd link from the homepage and from cold outreach.
 
-1. **Emails** → Lovable Emails (built-in, no DNS friction, uses `wigsmi.com` automatically). Resend stays available as a separate connector if we ever need marketing later.
-2. **Trial-end behaviour** → **Hard lock**. When a retailer's trial expires without payment, their wigs are auto-unpublished (hidden from `/catalog` and widgets) and the portal shows a paywall. Republished on subscribe. Cleaner than soft-lock — consumers never see a broken "Try on" button that links to a dead retailer.
-3. **Quota reset** → Calendar-month boundary (matches the existing `try_on_month_reset` column default).
+### 2. `/app/subscription` — consumer subscription/usage page
+For logged-in consumers. Shows:
+- Current plan (Free vs. Pro if/when we add one — for now: Free)
+- Try-ons used this month vs. quota (`try_on_count_this_month` / limit)
+- Reset date (1st of next month)
+- Upgrade CTA (placeholder — wired but disabled until we add a consumer paid tier)
+- Account actions: change email, delete account
 
-If either #2 or #3 is wrong, say which one and I'll revise.
+This closes the loop on the quota system we just shipped — right now consumers can hit the limit with no UI to see why.
 
----
+### 3. `/retailer/api-keys` — programmatic widget access
+Inside the portal (gated). Lets a retailer:
+- View their widget embed token (already exists on `retailers.widget_token`)
+- Regenerate the token (invalidates the old embed — confirm modal)
+- Copy embed snippet for their site
+- View API key for headless use (new column: `retailers.api_key`, hashed)
+- Regenerate API key
 
-## Part 1 — Trial lifecycle enforcement
+This unlocks Shopify / custom-storefront integrations without us building a full OAuth app.
 
-**Daily cron at 02:00 UTC** (`/api/public/hooks/trials-tick`):
-- Find retailers where `trial_ends_at < now()`, no active subscription, `is_active = true`.
-  - Set `is_active = false` → existing RLS already hides them from public reads.
-  - Set `is_published = false` on all their wigs.
-  - Insert an analytics event `trial_expired`.
-  - Enqueue **"Trial ended"** email.
-- Find retailers where `trial_ends_at` is **3 days away** and no email yet sent for this milestone.
-  - Enqueue **"Trial ending in 3 days"** email.
-  - Track sent-state on a new `retailer_lifecycle_events` table (retailer_id + event_type + sent_at, unique) so we don't double-send.
+## Out of scope (next chunks after this)
 
-**Portal paywall** (`/retailer/*`):
-- New helper `useRetailerStatus()` → returns `{ trialDaysLeft, isPaywalled, hasSubscription }`.
-- When `isPaywalled`, the portal layout swaps the main content for a paywall card: "Your trial has ended" + CTA → `/retailer/pricing`. Settings page stays accessible (so they can still log out / contact support).
-- Trial banner already exists; extend it to show "Trial ends in 3 days" in amber when ≤3 days left.
+- Admin audit log table + viewer
+- Retailer impersonation from admin
+- CSV analytics export
+- Consumer paid tier (just the UI shell now; pricing decision later)
+- Email domain DNS — still pending user action, doesn't block this
 
-**On successful subscription** (handled in the existing Paddle webhook):
-- Republish wigs that were auto-unpublished by the cron (track this via a new `auto_unpublished_at` column on `wigs` — only republish wigs that were auto-unpublished, not ones the retailer manually hid).
-- Set `is_active = true` on the retailer.
-- Enqueue **"Welcome — you're live"** email.
+## Technical details
 
-## Part 2 — App emails (via Lovable Emails)
+**Database migration:**
+- `retailers.api_key_hash text` (nullable, indexed)
+- `retailers.api_key_last_four text` (display only)
+- No raw key stored — we show the full key once on generation, then only the last 4
 
-Six React Email templates registered in `src/lib/email-templates/`:
-
-| Template | Trigger |
-|---|---|
-| `retailer-welcome` | Retailer completes signup (existing signup flow) |
-| `retailer-trial-ending` | Cron, 3 days before `trial_ends_at` |
-| `retailer-trial-ended` | Cron, on the day `trial_ends_at < now()` |
-| `retailer-subscribed` | Paddle `subscription.created` webhook |
-| `retailer-payment-failed` | Paddle `transaction.payment_failed` webhook |
-| `consumer-welcome` | First sign-in of a new consumer |
-
-All templates use the Wigsmi mahogany/cream palette and the same `Inter`/serif heading stack as the app. Sender: `notify@wigsmi.com` (Lovable Emails will provision this subdomain).
-
-No marketing emails. No bulk loops. Each send is 1:1, triggered by a specific event, with `idempotencyKey = ${event_type}-${retailer_id_or_event_id}`.
-
-## Part 3 — Monthly try-on quota reset
-
-**Monthly cron, 1st of month at 00:05 UTC** (`/api/public/hooks/quota-reset`):
-- `UPDATE consumer_profiles SET try_on_count_this_month = 0, try_on_month_reset = date_trunc('month', now())::date WHERE try_on_month_reset < date_trunc('month', now())::date;`
-
-Pure SQL job — no email, no webhook.
-
----
-
-## Files & migrations
-
-**Migration:**
-- `retailer_lifecycle_events` table (retailer_id, event_type, sent_at; unique on retailer_id+event_type).
-- `wigs.auto_unpublished_at timestamptz` column.
-- Two pg_cron schedules (trials-tick daily, quota-reset monthly).
-
-**New server routes:**
-- `src/routes/api/public/hooks/trials-tick.ts`
-- `src/routes/api/public/hooks/quota-reset.ts`
-
-**New email templates** (six files in `src/lib/email-templates/` + `registry.ts` update).
-
-**New client lib:** `src/lib/email/send.ts` (thin helper around `/lovable/email/transactional/send`).
+**New files:**
+- `src/routes/pricing.tsx` already exists — audit it, expand if thin, otherwise rename plan to "polish existing"
+- `src/routes/_authenticated.app.subscription.tsx`
+- `src/routes/portal.api-keys.tsx`
+- `src/lib/api-keys.functions.ts` — `generateApiKey`, `revokeApiKey` server fns (auth-protected via `requireSupabaseAuth`)
+- `src/components/portal/ApiKeyCard.tsx`, `EmbedSnippetCard.tsx`
+- `src/components/app/QuotaCard.tsx`
 
 **Edits:**
-- `src/routes/retailer.tsx` — paywall layout when `isPaywalled`.
-- Existing Paddle webhook (`src/routes/api/public/payments/webhook.ts`) — enqueue `retailer-subscribed` / `retailer-payment-failed`, republish auto-unpublished wigs on subscription created.
-- Existing signup flow — enqueue welcome emails.
+- `src/routes/portal.tsx` — add "API keys" nav item
+- `src/routes/_authenticated.app.index.tsx` or app nav — link to `/app/subscription`
+- `src/routes/index.tsx` — ensure homepage links to `/retailer/pricing`
 
-**Prerequisite tool calls** (no user action needed beyond approving the plan):
-1. `email_domain--check_email_domain_status` — confirm wigsmi.com status.
-2. If no domain: open setup dialog for `wigsmi.com`.
-3. `email_domain--setup_email_infra` → `email_domain--scaffold_transactional_email`.
+**Patterns reused:** `useSubscription`, `useRetailerStatus`, Paddle customer-portal flow already wired in `/portal/billing`.
 
-## Out of scope (next chunk)
-- `/app/subscription`, `/retailer/api-keys`, `/retailer/pricing` polish routes.
-- Admin audit log, retailer impersonation.
-- CSV analytics export.
+## Why this order
 
-## Acceptance
-- A retailer with `trial_ends_at` set to yesterday is, after the next cron tick, `is_active=false`, their wigs are unpublished, and they receive one "trial ended" email. Their `/retailer` shows the paywall.
-- Subscribing republishes the wigs and sends the "welcome — you're live" email.
-- A consumer with `try_on_count_this_month = 50` on Jan 31 sees `0` after the Feb 1 cron.
-- All six templates render in the Lovable email preview with brand styling.
-- No marketing emails, no bulk sends, all sends idempotent.
+These are the three "where do I go to do X" gaps real users will hit in the first week post-launch. Everything bigger left on the list (audit log, impersonation, CSV export) is admin-side and can wait until we have actual retailers using the product.
+
+Approve and I'll ship all three in one pass.
