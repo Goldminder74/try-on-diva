@@ -92,7 +92,7 @@ function TryOn() {
           <aside>
             <p className="mb-3 font-mono text-xs uppercase tracking-wider text-gold-dark">Choose a wig</p>
             <div className="grid grid-cols-3 gap-3">
-              {FEATURED_WIGS.map(w => (
+              {list.map((w: Wig) => (
                 <button
                   key={w.id}
                   onClick={() => setWig(w)}
