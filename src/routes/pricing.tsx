@@ -49,6 +49,8 @@ const PLANS: {
   desc: string;
   badge?: string;
   prices: { monthly: string; yearly: string };
+  monthlyEquivYearly?: string;
+  yearlySavings?: string;
   priceIds: PriceMap;
   features: readonly (readonly [boolean, string])[];
   planKey: "free" | "plus" | "pro";
@@ -73,6 +75,8 @@ const PLANS: {
     desc: "Unlimited try-ons and personalised picks.",
     badge: "Most popular",
     prices: { monthly: "£4.99", yearly: "£38.92" },
+    monthlyEquivYearly: "£3.24",
+    yearlySavings: "£20.96",
     priceIds: { monthly: "consumer_plus_monthly", yearly: "consumer_plus_yearly" },
     planKey: "plus",
     features: [
@@ -88,6 +92,8 @@ const PLANS: {
     name: "Pro",
     desc: "Everything, plus first-look at new arrivals.",
     prices: { monthly: "£9.99", yearly: "£77.92" },
+    monthlyEquivYearly: "£6.49",
+    yearlySavings: "£41.96",
     priceIds: { monthly: "consumer_pro_monthly", yearly: "consumer_pro_yearly" },
     planKey: "pro",
     features: [
