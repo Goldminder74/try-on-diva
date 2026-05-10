@@ -9,17 +9,24 @@ export const Route = createFileRoute("/auth/callback")({
 function Callback() {
   const navigate = useNavigate();
   useEffect(() => {
-    // Session is set by the lovable.auth helper or by Supabase's auto handler.
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next");
     const t = setTimeout(() => {
       supabase.auth.getSession().then(({ data }) => {
-        navigate({ to: data.session ? "/app" : "/auth/login" });
+        if (!data.session) {
+          navigate({ to: "/auth/login" });
+          return;
+        }
+        navigate({ to: (next as "/app") || "/app" });
       });
     }, 200);
     return () => clearTimeout(t);
   }, [navigate]);
   return (
     <div className="flex min-h-screen items-center justify-center bg-cream">
-      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Signing you in…</p>
+      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
+        Signing you in…
+      </p>
     </div>
   );
 }
