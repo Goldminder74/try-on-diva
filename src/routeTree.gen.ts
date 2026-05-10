@@ -15,6 +15,11 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WigIdRouteImport } from './routes/wig.$id'
+import { Route as AuthSignupRouteImport } from './routes/auth.signup'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
 const TryOnRoute = TryOnRouteImport.update({
   id: '/try-on',
@@ -46,6 +51,31 @@ const WigIdRoute = WigIdRouteImport.update({
   path: '/wig/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,6 +83,11 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/wig/$id': typeof WigIdRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +96,11 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/wig/$id': typeof WigIdRoute
 }
 export interface FileRoutesById {
@@ -70,6 +110,11 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
   '/try-on': typeof TryOnRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/signup': typeof AuthSignupRoute
   '/wig/$id': typeof WigIdRoute
 }
 export interface FileRouteTypes {
@@ -80,9 +125,25 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retailer'
     | '/try-on'
+    | '/auth/callback'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/reset-password'
+    | '/auth/signup'
     | '/wig/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalog' | '/pricing' | '/retailer' | '/try-on' | '/wig/$id'
+  to:
+    | '/'
+    | '/catalog'
+    | '/pricing'
+    | '/retailer'
+    | '/try-on'
+    | '/auth/callback'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/reset-password'
+    | '/auth/signup'
+    | '/wig/$id'
   id:
     | '__root__'
     | '/'
@@ -90,6 +151,11 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retailer'
     | '/try-on'
+    | '/auth/callback'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/reset-password'
+    | '/auth/signup'
     | '/wig/$id'
   fileRoutesById: FileRoutesById
 }
@@ -99,6 +165,11 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   RetailerRoute: typeof RetailerRoute
   TryOnRoute: typeof TryOnRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthSignupRoute: typeof AuthSignupRoute
   WigIdRoute: typeof WigIdRoute
 }
 
@@ -146,6 +217,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WigIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -155,6 +261,11 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   RetailerRoute: RetailerRoute,
   TryOnRoute: TryOnRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthSignupRoute: AuthSignupRoute,
   WigIdRoute: WigIdRoute,
 }
 export const routeTree = rootRouteImport
