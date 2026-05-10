@@ -13,22 +13,30 @@ export const Route = createFileRoute("/portal/billing")({
   component: BillingPage,
 });
 
-const RETAILER_PLANS = [
+type Interval = "monthly" | "yearly";
+
+const RETAILER_PLANS: {
+  id: string;
+  name: string;
+  prices: { monthly: string; yearly: string };
+  priceIds: { monthly: string | null; yearly: string | null };
+  desc: string;
+  badge?: string;
+  features: string[];
+}[] = [
   {
     id: "starter",
     name: "Starter (Trial)",
-    price: "Free",
-    period: "for 3 months",
-    priceId: null as string | null,
+    prices: { monthly: "Free", yearly: "Free" },
+    priceIds: { monthly: null, yearly: null },
     desc: "Get started with up to 30 wigs.",
     features: ["Up to 30 wigs", "Basic analytics", "Email support"],
   },
   {
     id: "growth",
     name: "Growth",
-    price: "£149",
-    period: "per month",
-    priceId: "retailer_growth_monthly" as string | null,
+    prices: { monthly: "£149", yearly: "£1,162.20" },
+    priceIds: { monthly: "retailer_growth_monthly", yearly: "retailer_growth_yearly" },
     desc: "Up to 150 wigs and full analytics.",
     badge: "Most popular",
     features: ["Up to 150 wigs", "Full analytics", "Priority email"],
@@ -36,9 +44,8 @@ const RETAILER_PLANS = [
   {
     id: "scale",
     name: "Scale",
-    price: "£399",
-    period: "per month",
-    priceId: "retailer_scale_monthly" as string | null,
+    prices: { monthly: "£399", yearly: "£3,112.20" },
+    priceIds: { monthly: "retailer_scale_monthly", yearly: "retailer_scale_yearly" },
     desc: "Unlimited wigs, premium support.",
     features: ["Unlimited wigs", "Multi-store", "Priority phone support"],
   },
