@@ -132,7 +132,7 @@ function WigDetail() {
           <section className="mt-20">
             <h2 className="font-display text-2xl text-mahogany">You might also like</h2>
             <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-              {related.map(w => <WigCard key={w.id} wig={w} />)}
+              {related.map((w: Wig) => <WigCard key={w.id} wig={w} />)}
             </div>
           </section>
         )}
