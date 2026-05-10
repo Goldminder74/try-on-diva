@@ -20,9 +20,7 @@ export const Route = createFileRoute("/pricing")({
 
 const PLANS = [
   {
-const PLANS = [
-  {
-    name: "Free", price: "£0", period: "forever", priceId: null,
+    name: "Free", price: "£0", period: "forever", priceId: null as string | null,
     desc: "Browse the full catalog and try out the AI.",
     features: [
       [true, "5 try-ons per month"],
@@ -34,7 +32,7 @@ const PLANS = [
     ] as const,
   },
   {
-    name: "Plus", price: "£4.99", period: "per month", priceId: "consumer_plus_monthly",
+    name: "Plus", price: "£4.99", period: "per month", priceId: "consumer_plus_monthly" as string | null,
     desc: "Unlimited try-ons and personalised picks.",
     badge: "Most popular",
     features: [
@@ -47,7 +45,7 @@ const PLANS = [
     ] as const,
   },
   {
-    name: "Pro", price: "£9.99", period: "per month", priceId: "consumer_pro_monthly",
+    name: "Pro", price: "£9.99", period: "per month", priceId: "consumer_pro_monthly" as string | null,
     desc: "Everything, plus first-look at new arrivals.",
     features: [
       [true, "Everything in Plus"],
@@ -70,7 +68,7 @@ function Pricing() {
       return;
     }
     if (!user) {
-      navigate({ to: "/auth/login", search: { redirect: "/pricing" } as any });
+      navigate({ to: "/auth/login" });
       return;
     }
     try {
@@ -122,16 +120,17 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <Link
-                to="/try-on"
-                className={`mt-7 block rounded-md py-2.5 text-center text-sm font-medium transition-all ${
+              <button
+                onClick={() => onChoose(p.priceId, p.name)}
+                disabled={loading}
+                className={`mt-7 block w-full rounded-md py-2.5 text-center text-sm font-medium transition-all disabled:opacity-50 ${
                   p.badge
                     ? "bg-mahogany text-cream hover:bg-mahogany-soft"
                     : "border border-mahogany text-mahogany hover:bg-mahogany hover:text-cream"
                 }`}
               >
                 {p.name === "Free" ? "Start free" : `Choose ${p.name}`}
-              </Link>
+              </button>
             </div>
           ))}
         </div>
