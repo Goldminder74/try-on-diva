@@ -13,6 +13,7 @@ import { Route as TryOnRouteImport } from './routes/try-on'
 import { Route as RetailerRouteImport } from './routes/retailer'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as CatalogRouteImport } from './routes/catalog'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WigIdRouteImport } from './routes/wig.$id'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
@@ -20,6 +21,12 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
+import { Route as AuthenticatedAppWishlistRouteImport } from './routes/_authenticated.app.wishlist'
+import { Route as AuthenticatedAppTryOnRouteImport } from './routes/_authenticated.app.try-on'
+import { Route as AuthenticatedAppStyleQuizRouteImport } from './routes/_authenticated.app.style-quiz'
+import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated.app.profile'
+import { Route as AuthenticatedAppCatalogRouteImport } from './routes/_authenticated.app.catalog'
 
 const TryOnRoute = TryOnRouteImport.update({
   id: '/try-on',
@@ -39,6 +46,10 @@ const PricingRoute = PricingRouteImport.update({
 const CatalogRoute = CatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -76,6 +87,38 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/app/',
+  path: '/app/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAppWishlistRoute =
+  AuthenticatedAppWishlistRouteImport.update({
+    id: '/app/wishlist',
+    path: '/app/wishlist',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAppTryOnRoute = AuthenticatedAppTryOnRouteImport.update({
+  id: '/app/try-on',
+  path: '/app/try-on',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAppStyleQuizRoute =
+  AuthenticatedAppStyleQuizRouteImport.update({
+    id: '/app/style-quiz',
+    path: '/app/style-quiz',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
+  id: '/app/profile',
+  path: '/app/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAppCatalogRoute = AuthenticatedAppCatalogRouteImport.update({
+  id: '/app/catalog',
+  path: '/app/catalog',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +132,12 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/app/catalog': typeof AuthenticatedAppCatalogRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
+  '/app/try-on': typeof AuthenticatedAppTryOnRoute
+  '/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,10 +151,17 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/app/catalog': typeof AuthenticatedAppCatalogRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
+  '/app/try-on': typeof AuthenticatedAppTryOnRoute
+  '/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/app': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/catalog': typeof CatalogRoute
   '/pricing': typeof PricingRoute
   '/retailer': typeof RetailerRoute
@@ -116,6 +172,12 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/wig/$id': typeof WigIdRoute
+  '/_authenticated/app/catalog': typeof AuthenticatedAppCatalogRoute
+  '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
+  '/_authenticated/app/style-quiz': typeof AuthenticatedAppStyleQuizRoute
+  '/_authenticated/app/try-on': typeof AuthenticatedAppTryOnRoute
+  '/_authenticated/app/wishlist': typeof AuthenticatedAppWishlistRoute
+  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +193,12 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/wig/$id'
+    | '/app/catalog'
+    | '/app/profile'
+    | '/app/style-quiz'
+    | '/app/try-on'
+    | '/app/wishlist'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,9 +212,16 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/wig/$id'
+    | '/app/catalog'
+    | '/app/profile'
+    | '/app/style-quiz'
+    | '/app/try-on'
+    | '/app/wishlist'
+    | '/app'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/catalog'
     | '/pricing'
     | '/retailer'
@@ -157,10 +232,17 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/wig/$id'
+    | '/_authenticated/app/catalog'
+    | '/_authenticated/app/profile'
+    | '/_authenticated/app/style-quiz'
+    | '/_authenticated/app/try-on'
+    | '/_authenticated/app/wishlist'
+    | '/_authenticated/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CatalogRoute: typeof CatalogRoute
   PricingRoute: typeof PricingRoute
   RetailerRoute: typeof RetailerRoute
@@ -201,6 +283,13 @@ declare module '@tanstack/react-router' {
       path: '/catalog'
       fullPath: '/catalog'
       preLoaderRoute: typeof CatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -252,11 +341,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/app'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/wishlist': {
+      id: '/_authenticated/app/wishlist'
+      path: '/app/wishlist'
+      fullPath: '/app/wishlist'
+      preLoaderRoute: typeof AuthenticatedAppWishlistRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/try-on': {
+      id: '/_authenticated/app/try-on'
+      path: '/app/try-on'
+      fullPath: '/app/try-on'
+      preLoaderRoute: typeof AuthenticatedAppTryOnRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/style-quiz': {
+      id: '/_authenticated/app/style-quiz'
+      path: '/app/style-quiz'
+      fullPath: '/app/style-quiz'
+      preLoaderRoute: typeof AuthenticatedAppStyleQuizRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/profile': {
+      id: '/_authenticated/app/profile'
+      path: '/app/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/catalog': {
+      id: '/_authenticated/app/catalog'
+      path: '/app/catalog'
+      fullPath: '/app/catalog'
+      preLoaderRoute: typeof AuthenticatedAppCatalogRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAppCatalogRoute: typeof AuthenticatedAppCatalogRoute
+  AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
+  AuthenticatedAppStyleQuizRoute: typeof AuthenticatedAppStyleQuizRoute
+  AuthenticatedAppTryOnRoute: typeof AuthenticatedAppTryOnRoute
+  AuthenticatedAppWishlistRoute: typeof AuthenticatedAppWishlistRoute
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAppCatalogRoute: AuthenticatedAppCatalogRoute,
+  AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
+  AuthenticatedAppStyleQuizRoute: AuthenticatedAppStyleQuizRoute,
+  AuthenticatedAppTryOnRoute: AuthenticatedAppTryOnRoute,
+  AuthenticatedAppWishlistRoute: AuthenticatedAppWishlistRoute,
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CatalogRoute: CatalogRoute,
   PricingRoute: PricingRoute,
   RetailerRoute: RetailerRoute,
@@ -271,3 +425,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
