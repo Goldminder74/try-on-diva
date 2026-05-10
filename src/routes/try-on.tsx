@@ -4,7 +4,8 @@ import { Upload, RefreshCw } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
-import { FEATURED_WIGS, WIGS, type Wig } from "@/lib/wigs";
+import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
+import { useAsync } from "@/lib/use-async";
 
 type Search = { wig?: string };
 
