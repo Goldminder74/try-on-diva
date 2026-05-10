@@ -16,6 +16,8 @@ import { Route as CatalogRouteImport } from './routes/catalog'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WigIdRouteImport } from './routes/wig.$id'
+import { Route as RetailerSignupRouteImport } from './routes/retailer_.signup'
+import { Route as RetailerLoginRouteImport } from './routes/retailer_.login'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
@@ -60,6 +62,16 @@ const IndexRoute = IndexRouteImport.update({
 const WigIdRoute = WigIdRouteImport.update({
   id: '/wig/$id',
   path: '/wig/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetailerSignupRoute = RetailerSignupRouteImport.update({
+  id: '/retailer_/signup',
+  path: '/retailer/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetailerLoginRoute = RetailerLoginRouteImport.update({
+  id: '/retailer_/login',
+  path: '/retailer/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -131,6 +143,8 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/retailer/login': typeof RetailerLoginRoute
+  '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
@@ -150,6 +164,8 @@ export interface FileRoutesByTo {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/retailer/login': typeof RetailerLoginRoute
+  '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
@@ -171,6 +187,8 @@ export interface FileRoutesById {
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/retailer_/login': typeof RetailerLoginRoute
+  '/retailer_/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
   '/_authenticated/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
@@ -192,6 +210,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/retailer/login'
+    | '/retailer/signup'
     | '/wig/$id'
     | '/app/catalog'
     | '/app/profile'
@@ -211,6 +231,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/retailer/login'
+    | '/retailer/signup'
     | '/wig/$id'
     | '/app/catalog'
     | '/app/profile'
@@ -231,6 +253,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/signup'
+    | '/retailer_/login'
+    | '/retailer_/signup'
     | '/wig/$id'
     | '/_authenticated/app/catalog'
     | '/_authenticated/app/profile'
@@ -252,6 +276,8 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  RetailerLoginRoute: typeof RetailerLoginRoute
+  RetailerSignupRoute: typeof RetailerSignupRoute
   WigIdRoute: typeof WigIdRoute
 }
 
@@ -304,6 +330,20 @@ declare module '@tanstack/react-router' {
       path: '/wig/$id'
       fullPath: '/wig/$id'
       preLoaderRoute: typeof WigIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retailer_/signup': {
+      id: '/retailer_/signup'
+      path: '/retailer/signup'
+      fullPath: '/retailer/signup'
+      preLoaderRoute: typeof RetailerSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retailer_/login': {
+      id: '/retailer_/login'
+      path: '/retailer/login'
+      fullPath: '/retailer/login'
+      preLoaderRoute: typeof RetailerLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
@@ -420,8 +460,20 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
+  RetailerLoginRoute: RetailerLoginRoute,
+  RetailerSignupRoute: RetailerSignupRoute,
   WigIdRoute: WigIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
