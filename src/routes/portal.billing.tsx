@@ -178,6 +178,8 @@ function BillingPage() {
         <h1 className="mt-1 font-display text-3xl text-mahogany">Your plan</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Current plan: <span className="font-medium capitalize text-foreground">{currentPlanId}</span>
+          {sub?.billing_interval === "year" && <span className="capitalize text-foreground"> · Yearly</span>}
+          {sub?.billing_interval === "month" && <span className="capitalize text-foreground"> · Monthly</span>}
           {sub?.status && (
             <>
               {" "}· Status: <span className="capitalize">{sub.status}</span>
