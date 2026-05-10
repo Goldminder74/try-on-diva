@@ -105,6 +105,16 @@ const PLANS: {
   },
 ];
 
+interface PreviewState {
+  planKey: string;
+  planName: string;
+  priceId: string;
+  currency: string;
+  immediateAmount: number;
+  nextAmount: number;
+  nextBilledAt: string | null;
+}
+
 function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -112,11 +122,20 @@ function Pricing() {
   const { subscription, isActive } = useSubscription();
   const changePlan = useServerFn(changeSubscriptionPlan);
   const portal = useServerFn(createPortalSession);
+  const preview = useServerFn(previewPlanChange);
+  const cancelSub = useServerFn(cancelSubscription);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [interval, setInterval] = useState<"monthly" | "yearly">("monthly");
+  const [previewState, setPreviewState] = useState<PreviewState | null>(null);
+  const [confirmingSwitch, setConfirmingSwitch] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   const currentPlanKey =
     isActive && subscription?.customer_type === "consumer" ? subscription.plan : "free";
+  const isConsumerSub =
+    isActive &&
+    subscription?.customer_type === "consumer" &&
+    subscription.paddle_subscription_id !== null;
 
   const onChoose = async (priceId: string | null, planName: string, planKey: string) => {
     if (!priceId) {
@@ -129,16 +148,18 @@ function Pricing() {
     }
     setBusyId(planKey);
     try {
-      // If user already has an active consumer subscription, switch instead of new checkout.
-      if (
-        isActive &&
-        subscription?.customer_type === "consumer" &&
-        subscription.paddle_subscription_id !== null
-      ) {
-        await changePlan({
-          data: { newPriceId: priceId, environment: getPaddleEnvironment() },
+      if (isConsumerSub) {
+        const env = getPaddleEnvironment();
+        const p = await preview({ data: { newPriceId: priceId, environment: env } });
+        setPreviewState({
+          planKey,
+          planName,
+          priceId,
+          currency: p.currency,
+          immediateAmount: p.immediateAmount,
+          nextAmount: p.nextAmount,
+          nextBilledAt: p.nextBilledAt,
         });
-        toast.success("Plan updated. Your account will refresh in a few seconds.");
         return;
       }
       await openCheckout({
@@ -149,6 +170,35 @@ function Pricing() {
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const onConfirmSwitch = async () => {
+    if (!previewState) return;
+    setConfirmingSwitch(true);
+    try {
+      await changePlan({
+        data: { newPriceId: previewState.priceId, environment: getPaddleEnvironment() },
+      });
+      toast.success("Plan updated. Your account will refresh in a few seconds.");
+      setPreviewState(null);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not update plan");
+    } finally {
+      setConfirmingSwitch(false);
+    }
+  };
+
+  const onConfirmCancel = async () => {
+    setBusyId("cancel");
+    try {
+      await cancelSub({ data: { environment: getPaddleEnvironment() } });
+      toast.success("Subscription cancelled. You keep access until the end of your billing period.");
+      setConfirmCancel(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not cancel subscription");
     } finally {
       setBusyId(null);
     }
@@ -196,10 +246,23 @@ function Pricing() {
 
           {isActive && subscription?.customer_type === "consumer" && (
             <p className="mt-4 text-xs text-muted-foreground">
-              You're on <span className="capitalize text-foreground">{subscription.plan}</span>.{" "}
+              You're on{" "}
+              <span className="capitalize text-foreground">
+                {subscription.plan}
+                {subscription.billing_interval === "year" ? " · Yearly" : subscription.billing_interval === "month" ? " · Monthly" : ""}
+              </span>
+              .{" "}
               <button onClick={onManage} className="text-mahogany underline" disabled={busyId === "portal"}>
                 Manage subscription
               </button>
+              {isConsumerSub && subscription?.status !== "canceled" && (
+                <>
+                  {" · "}
+                  <button onClick={() => setConfirmCancel(true)} className="text-mahogany underline">
+                    Cancel
+                  </button>
+                </>
+              )}
             </p>
           )}
         </div>
@@ -209,6 +272,7 @@ function Pricing() {
             const priceId = p.priceIds[interval];
             const isCurrent = currentPlanKey === p.planKey;
             const busy = busyId === p.planKey || (busyId === null && checkoutLoading);
+            const showYearly = interval === "yearly" && p.planKey !== "free";
             return (
               <div
                 key={p.name}
@@ -222,10 +286,22 @@ function Pricing() {
                   </span>
                 )}
                 <p className="font-display text-2xl text-mahogany">{p.name}</p>
-                <p className="mt-3 font-mono text-4xl text-foreground">{p.prices[interval]}</p>
-                <p className="text-xs text-muted-foreground">
-                  {p.planKey === "free" ? "forever" : interval === "monthly" ? "per month" : "per year"}
-                </p>
+                {showYearly && p.monthlyEquivYearly ? (
+                  <>
+                    <p className="mt-3 font-mono text-4xl text-foreground">{p.monthlyEquivYearly}</p>
+                    <p className="text-xs text-muted-foreground">per month, billed annually ({p.prices.yearly}/yr)</p>
+                    {p.yearlySavings && (
+                      <p className="mt-1 text-xs font-medium text-gold-dark">Save {p.yearlySavings}/yr</p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-3 font-mono text-4xl text-foreground">{p.prices[interval]}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {p.planKey === "free" ? "forever" : "per month"}
+                    </p>
+                  </>
+                )}
                 <p className="mt-4 text-sm text-foreground/80">{p.desc}</p>
                 <ul className="mt-6 space-y-2.5">
                   {p.features.map(([on, label], i) => (
@@ -254,7 +330,7 @@ function Pricing() {
                     {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                     {p.planKey === "free"
                       ? "Start free"
-                      : isActive && subscription?.customer_type === "consumer"
+                      : isConsumerSub
                         ? `Switch to ${p.name}`
                         : `Choose ${p.name}`}
                   </button>
@@ -264,10 +340,90 @@ function Pricing() {
           })}
         </div>
 
-        <p className="mt-10 text-center text-xs text-muted-foreground">
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          VAT included where applicable. Payments processed securely by Paddle.
+        </p>
+
+        <p className="mt-6 text-center text-xs text-muted-foreground">
           Are you a wig retailer? <Link to="/retailer" className="text-mahogany underline">See retailer plans →</Link>
         </p>
       </div>
+
+      <AlertDialog
+        open={!!previewState}
+        onOpenChange={(open) => !open && setPreviewState(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Switch to {previewState?.planName}?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm">
+                {previewState && previewState.immediateAmount > 0 && (
+                  <p>
+                    You'll be charged{" "}
+                    <span className="font-medium text-foreground">
+                      {formatGBP(previewState.immediateAmount)}
+                    </span>{" "}
+                    today (prorated).
+                  </p>
+                )}
+                {previewState && previewState.immediateAmount < 0 && (
+                  <p>
+                    You'll receive a credit of{" "}
+                    <span className="font-medium text-foreground">
+                      {formatGBP(Math.abs(previewState.immediateAmount))}
+                    </span>{" "}
+                    toward your next invoice.
+                  </p>
+                )}
+                {previewState && previewState.immediateAmount === 0 && (
+                  <p>No charge today.</p>
+                )}
+                {previewState?.nextBilledAt && (
+                  <p className="text-muted-foreground">
+                    Next renewal: {formatGBP(previewState.nextAmount)} on{" "}
+                    {new Date(previewState.nextBilledAt).toLocaleDateString("en-GB", {
+                      day: "numeric", month: "long", year: "numeric",
+                    })}.
+                  </p>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={confirmingSwitch}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirmSwitch} disabled={confirmingSwitch}>
+              {confirmingSwitch && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Confirm switch
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel your subscription?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You'll keep your current plan until{" "}
+              {subscription?.current_period_end
+                ? new Date(subscription.current_period_end).toLocaleDateString("en-GB", {
+                    day: "numeric", month: "long", year: "numeric",
+                  })
+                : "the end of this billing period"}
+              , then move to Free. You can resubscribe any time.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busyId === "cancel"}>Keep my plan</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirmCancel} disabled={busyId === "cancel"}>
+              {busyId === "cancel" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Cancel subscription
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Footer />
     </div>
   );
