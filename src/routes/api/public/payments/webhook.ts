@@ -24,6 +24,15 @@ function planFromProduct(productId?: string): string {
   return productId.replace(/^(consumer_|retailer_)/, "");
 }
 
+function intervalFromItem(item: any): string | null {
+  const i = item?.price?.billingCycle?.interval;
+  if (i === "month" || i === "year" || i === "week" || i === "day") return i;
+  const ext: string | undefined = item?.price?.importMeta?.externalId;
+  if (ext?.endsWith("_yearly")) return "year";
+  if (ext?.endsWith("_monthly")) return "month";
+  return null;
+}
+
 async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
   const { id, customerId, items, status, currentBillingPeriod, customData } = data;
   const userId = customData?.userId;
