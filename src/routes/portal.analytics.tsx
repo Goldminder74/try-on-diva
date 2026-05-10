@@ -147,29 +147,29 @@ function AnalyticsPage() {
                 <AreaChart data={data.timeseries} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
                   <defs>
                     <linearGradient id="tryOnFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(var(--mahogany))" stopOpacity={0.25} />
-                      <stop offset="100%" stopColor="hsl(var(--mahogany))" stopOpacity={0} />
+                      <stop offset="0%" stopColor="var(--mahogany)" stopOpacity={0.25} />
+                      <stop offset="100%" stopColor="var(--mahogany)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" vertical={false} />
+                  <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                     tickFormatter={(v: string) => v.slice(5)}
                     tickLine={false}
                     axisLine={false}
                   />
                   <YAxis
                     allowDecimals={false}
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                     tickLine={false}
                     axisLine={false}
                     width={32}
                   />
                   <RTooltip
                     contentStyle={{
-                      background: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
                       borderRadius: 8,
                       fontSize: 12,
                     }}
@@ -177,7 +177,7 @@ function AnalyticsPage() {
                   <Area
                     type="monotone"
                     dataKey="tryOns"
-                    stroke="hsl(var(--mahogany))"
+                    stroke="var(--mahogany)"
                     strokeWidth={2}
                     fill="url(#tryOnFill)"
                   />
