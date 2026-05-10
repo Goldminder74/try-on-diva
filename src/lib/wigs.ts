@@ -1,23 +1,13 @@
-// Demo wig data. Replaced by Supabase queries in Phase 2.
+// Live wig data via Supabase. Replaces the previous static demo array.
+import { supabase } from "@/integrations/supabase/client";
 
 export type StyleType =
-  | "Lace Front"
-  | "HD Wig"
-  | "Glueless"
-  | "Closure"
-  | "Bob"
-  | "Long"
-  | "Braided/Protective"
-  | "360 Lace";
+  | "Lace Front" | "HD Wig" | "Glueless" | "Closure"
+  | "Bob" | "Long" | "Braided/Protective" | "360 Lace";
 
 export type HairTexture =
-  | "Kinky Coily"
-  | "Kinky Straight"
-  | "Deep Wave"
-  | "Body Wave"
-  | "Straight"
-  | "Curly"
-  | "Loose Wave";
+  | "Kinky Coily" | "Kinky Straight" | "Deep Wave"
+  | "Body Wave" | "Straight" | "Curly" | "Loose Wave";
 
 export interface Wig {
   id: string;
@@ -26,10 +16,10 @@ export interface Wig {
   retailer_id: string;
   price: number;
   currency: string;
-  style_type: StyleType;
-  hair_texture: HairTexture;
-  hair_length: string;
-  hair_origin: string;
+  style_type: string;
+  hair_texture: string;
+  hair_length: string | null;
+  hair_origin: string | null;
   colors: string[];
   description: string;
   images: string[];
@@ -37,95 +27,9 @@ export interface Wig {
   is_featured: boolean;
   in_stock: boolean;
   try_on_count: number;
-  product_url: string;
+  product_url: string | null;
   created_at: string;
 }
-
-const img = (seed: string, w = 800) =>
-  `https://picsum.photos/seed/wigsmi-${seed}/${w}/${w}`;
-
-export const WIGS: Wig[] = [
-  {
-    id: "w-001", name: "Amara Body Wave 22\"", retailer: "Crown & Coil",
-    retailer_id: "r-1", price: 189, currency: "GBP",
-    style_type: "Lace Front", hair_texture: "Body Wave", hair_length: "Long (18–26\")",
-    hair_origin: "Virgin Hair", colors: ["Natural Black", "Mahogany"],
-    description: "A flowing body wave with a delicate HD lace front. Pre-plucked hairline, glueless install option.",
-    images: [img("amara"), img("amara2")], ar_asset_url: null,
-    is_featured: true, in_stock: true, try_on_count: 1240,
-    product_url: "#", created_at: "2025-04-12",
-  },
-  {
-    id: "w-002", name: "Zola Kinky Coily Afro", retailer: "Crown & Coil",
-    retailer_id: "r-1", price: 145, currency: "GBP",
-    style_type: "Glueless", hair_texture: "Kinky Coily", hair_length: "Medium (12–18\")",
-    hair_origin: "Human Hair", colors: ["Natural Black"],
-    description: "A statement afro with the bounce and definition of natural 4C texture.",
-    images: [img("zola"), img("zola2")], ar_asset_url: null,
-    is_featured: true, in_stock: true, try_on_count: 894,
-    product_url: "#", created_at: "2025-04-20",
-  },
-  {
-    id: "w-003", name: "Imani Sleek Bob", retailer: "Lumi Hair Co.",
-    retailer_id: "r-2", price: 99, currency: "GBP",
-    style_type: "Bob", hair_texture: "Straight", hair_length: "Short (under 12\")",
-    hair_origin: "Remy Human Hair", colors: ["Jet Black", "Honey"],
-    description: "A sharp chin-length bob — the boardroom-to-cocktail classic.",
-    images: [img("imani"), img("imani2")], ar_asset_url: null,
-    is_featured: true, in_stock: true, try_on_count: 2103,
-    product_url: "#", created_at: "2025-05-01",
-  },
-  {
-    id: "w-004", name: "Nia Deep Wave 26\"", retailer: "Lumi Hair Co.",
-    retailer_id: "r-2", price: 245, currency: "GBP",
-    style_type: "HD Wig", hair_texture: "Deep Wave", hair_length: "Long (18–26\")",
-    hair_origin: "Virgin Hair", colors: ["Natural Black", "Auburn"],
-    description: "Voluminous deep wave with HD melt lace that disappears on every skin tone.",
-    images: [img("nia"), img("nia2")], ar_asset_url: null,
-    is_featured: true, in_stock: true, try_on_count: 3221,
-    product_url: "#", created_at: "2025-05-08",
-  },
-  {
-    id: "w-005", name: "Adaeze Knotless Braids", retailer: "Crown & Coil",
-    retailer_id: "r-1", price: 165, currency: "GBP",
-    style_type: "Braided/Protective", hair_texture: "Kinky Straight", hair_length: "Long (18–26\")",
-    hair_origin: "Synthetic", colors: ["Natural Black", "Burgundy"],
-    description: "Hand-tied knotless braid wig — protective styling without the salon hours.",
-    images: [img("adaeze"), img("adaeze2")], ar_asset_url: null,
-    is_featured: true, in_stock: true, try_on_count: 1782,
-    product_url: "#", created_at: "2025-05-12",
-  },
-  {
-    id: "w-006", name: "Yara Loose Wave 20\"", retailer: "Lumi Hair Co.",
-    retailer_id: "r-2", price: 175, currency: "GBP",
-    style_type: "Lace Front", hair_texture: "Loose Wave", hair_length: "Long (18–26\")",
-    hair_origin: "Human Hair", colors: ["Natural Black"],
-    description: "Effortless loose wave with movement that catches the light.",
-    images: [img("yara"), img("yara2")], ar_asset_url: null,
-    is_featured: false, in_stock: true, try_on_count: 612,
-    product_url: "#", created_at: "2025-05-15",
-  },
-  {
-    id: "w-007", name: "Folake 360 Lace", retailer: "Crown & Coil",
-    retailer_id: "r-1", price: 289, currency: "GBP",
-    style_type: "360 Lace", hair_texture: "Body Wave", hair_length: "Long (18–26\")",
-    hair_origin: "Virgin Hair", colors: ["Natural Black", "Honey Blonde"],
-    description: "Full 360 lace for high ponytails and updos — versatility without limits.",
-    images: [img("folake"), img("folake2")], ar_asset_url: null,
-    is_featured: false, in_stock: true, try_on_count: 478,
-    product_url: "#", created_at: "2025-05-20",
-  },
-  {
-    id: "w-008", name: "Sade Curly Closure", retailer: "Lumi Hair Co.",
-    retailer_id: "r-2", price: 129, currency: "GBP",
-    style_type: "Closure", hair_texture: "Curly", hair_length: "Medium (12–18\")",
-    hair_origin: "Remy Human Hair", colors: ["Natural Black", "Caramel"],
-    description: "Defined springy curls in a 5x5 closure unit — soft, breathable, beginner-friendly.",
-    images: [img("sade"), img("sade2")], ar_asset_url: null,
-    is_featured: false, in_stock: true, try_on_count: 856,
-    product_url: "#", created_at: "2025-05-22",
-  },
-];
 
 export const STYLE_TYPES: StyleType[] = [
   "Lace Front", "HD Wig", "Glueless", "Closure", "Bob", "Long", "Braided/Protective", "360 Lace",
@@ -142,8 +46,101 @@ export function formatPrice(price: number, currency: string) {
   }
 }
 
-export function getWigById(id: string) {
-  return WIGS.find((w) => w.id === id);
+type WigRow = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  currency: string;
+  style_type: string;
+  hair_texture: string;
+  hair_length: string | null;
+  hair_origin: string | null;
+  colors: string[] | null;
+  images: string[] | null;
+  ar_asset_url: string | null;
+  is_featured: boolean;
+  in_stock: boolean;
+  try_on_count: number;
+  product_url: string | null;
+  created_at: string;
+  retailer_id: string;
+  retailers: { display_name: string } | { display_name: string }[] | null;
+};
+
+function mapWig(w: WigRow): Wig {
+  const retailerRel = Array.isArray(w.retailers) ? w.retailers[0] : w.retailers;
+  return {
+    id: w.id,
+    name: w.name,
+    description: w.description ?? "",
+    price: Number(w.price),
+    currency: w.currency,
+    style_type: w.style_type,
+    hair_texture: w.hair_texture,
+    hair_length: w.hair_length,
+    hair_origin: w.hair_origin,
+    colors: w.colors ?? [],
+    images: w.images ?? [],
+    ar_asset_url: w.ar_asset_url,
+    is_featured: w.is_featured,
+    in_stock: w.in_stock,
+    try_on_count: w.try_on_count,
+    product_url: w.product_url,
+    created_at: w.created_at,
+    retailer_id: w.retailer_id,
+    retailer: retailerRel?.display_name ?? "",
+  };
 }
 
-export const FEATURED_WIGS = WIGS.filter((w) => w.is_featured);
+const SELECT = `
+  id, name, description, price, currency, style_type, hair_texture, hair_length,
+  hair_origin, colors, images, ar_asset_url, is_featured, in_stock, try_on_count,
+  product_url, created_at, retailer_id,
+  retailers ( display_name )
+`;
+
+export async function fetchWigs(): Promise<Wig[]> {
+  const { data, error } = await supabase
+    .from("wigs")
+    .select(SELECT)
+    .eq("is_published", true)
+    .order("is_featured", { ascending: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((row) => mapWig(row as unknown as WigRow));
+}
+
+export async function fetchFeaturedWigs(limit = 6): Promise<Wig[]> {
+  const { data, error } = await supabase
+    .from("wigs")
+    .select(SELECT)
+    .eq("is_published", true)
+    .eq("is_featured", true)
+    .order("featured_rank", { ascending: true })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []).map((row) => mapWig(row as unknown as WigRow));
+}
+
+export async function fetchWigById(id: string): Promise<Wig | null> {
+  const { data, error } = await supabase
+    .from("wigs")
+    .select(SELECT)
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapWig(data as unknown as WigRow) : null;
+}
+
+export async function fetchRelatedWigs(styleType: string, excludeId: string, limit = 4): Promise<Wig[]> {
+  const { data, error } = await supabase
+    .from("wigs")
+    .select(SELECT)
+    .eq("is_published", true)
+    .eq("style_type", styleType)
+    .neq("id", excludeId)
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []).map((row) => mapWig(row as unknown as WigRow));
+}

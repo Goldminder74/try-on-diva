@@ -4,7 +4,9 @@ import heroModel from "@/assets/hero-model.jpg";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
-import { FEATURED_WIGS } from "@/lib/wigs";
+import { WigCardSkeleton } from "@/components/wigsmi/WigCardSkeleton";
+import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
+import { useAsync } from "@/lib/use-async";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -119,9 +121,7 @@ function Landing() {
               View all →
             </Link>
           </div>
-          <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-            {FEATURED_WIGS.slice(0, 5).map((w) => <WigCard key={w.id} wig={w} />)}
-          </div>
+          <FeaturedRow />
         </div>
       </section>
 
@@ -166,6 +166,22 @@ function Landing() {
       </section>
 
       <Footer />
+    </div>
+  );
+}
+
+function FeaturedRow() {
+  const { data, loading } = useAsync<Wig[]>(() => fetchFeaturedWigs(5), []);
+  if (loading) {
+    return (
+      <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+        {Array.from({ length: 5 }).map((_, i) => <WigCardSkeleton key={i} />)}
+      </div>
+    );
+  }
+  return (
+    <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+      {(data ?? []).map((w) => <WigCard key={w.id} wig={w} />)}
     </div>
   );
 }
