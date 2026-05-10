@@ -14,7 +14,7 @@ import { Wordmark } from "@/components/wigsmi/Wordmark";
 import { PastDueBanner } from "@/components/PastDueBanner";
 import { TrialEndingBanner, TrialExpiredPaywall } from "@/components/retailer/TrialGate";
 import { useRetailerStatus } from "@/hooks/use-retailer-status";
-import { useLocation } from "@tanstack/react-router";
+
 
 export const Route = createFileRoute("/portal")({
   beforeLoad: async ({ location }) => {
