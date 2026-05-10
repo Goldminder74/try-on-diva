@@ -128,7 +128,7 @@ function PortalLayout() {
         </aside>
 
         <main className="flex-1 min-w-0">
-          <Outlet />
+          {showPaywall ? <TrialExpiredPaywall /> : <Outlet />}
         </main>
       </div>
     </div>
