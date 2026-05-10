@@ -12,6 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { Wordmark } from "@/components/wigsmi/Wordmark";
 import { PastDueBanner } from "@/components/PastDueBanner";
+import { TrialEndingBanner, TrialExpiredPaywall } from "@/components/retailer/TrialGate";
+import { useRetailerStatus } from "@/hooks/use-retailer-status";
+import { useLocation } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/portal")({
   beforeLoad: async ({ location }) => {
