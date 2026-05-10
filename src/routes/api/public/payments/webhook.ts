@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { verifyWebhook, EventName, type PaddleEnv } from "@/lib/paddle.server";
+import { serverSendTransactionalEmail } from "@/lib/email/server-send";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase(): any {
