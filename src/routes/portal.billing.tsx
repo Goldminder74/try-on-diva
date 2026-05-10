@@ -13,22 +13,30 @@ export const Route = createFileRoute("/portal/billing")({
   component: BillingPage,
 });
 
-const RETAILER_PLANS = [
+type Interval = "monthly" | "yearly";
+
+const RETAILER_PLANS: {
+  id: string;
+  name: string;
+  prices: { monthly: string; yearly: string };
+  priceIds: { monthly: string | null; yearly: string | null };
+  desc: string;
+  badge?: string;
+  features: string[];
+}[] = [
   {
     id: "starter",
     name: "Starter (Trial)",
-    price: "Free",
-    period: "for 3 months",
-    priceId: null as string | null,
+    prices: { monthly: "Free", yearly: "Free" },
+    priceIds: { monthly: null, yearly: null },
     desc: "Get started with up to 30 wigs.",
     features: ["Up to 30 wigs", "Basic analytics", "Email support"],
   },
   {
     id: "growth",
     name: "Growth",
-    price: "£149",
-    period: "per month",
-    priceId: "retailer_growth_monthly" as string | null,
+    prices: { monthly: "£149", yearly: "£1,162.20" },
+    priceIds: { monthly: "retailer_growth_monthly", yearly: "retailer_growth_yearly" },
     desc: "Up to 150 wigs and full analytics.",
     badge: "Most popular",
     features: ["Up to 150 wigs", "Full analytics", "Priority email"],
@@ -36,9 +44,8 @@ const RETAILER_PLANS = [
   {
     id: "scale",
     name: "Scale",
-    price: "£399",
-    period: "per month",
-    priceId: "retailer_scale_monthly" as string | null,
+    prices: { monthly: "£399", yearly: "£3,112.20" },
+    priceIds: { monthly: "retailer_scale_monthly", yearly: "retailer_scale_yearly" },
     desc: "Unlimited wigs, premium support.",
     features: ["Unlimited wigs", "Multi-store", "Priority phone support"],
   },
@@ -58,6 +65,7 @@ function BillingPage() {
   const portal = useServerFn(createPortalSession);
   const [sub, setSub] = useState<CurrentSub | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [interval, setBillingInterval] = useState<Interval>("monthly");
 
   const refetch = () => {
     if (!user) return;
@@ -164,10 +172,31 @@ function BillingPage() {
         )}
       </div>
 
+      <div className="mb-6 inline-flex rounded-full border border-border bg-card p-1">
+        <button
+          onClick={() => setBillingInterval("monthly")}
+          className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+            interval === "monthly" ? "bg-mahogany text-cream" : "text-foreground/70"
+          }`}
+        >
+          Monthly
+        </button>
+        <button
+          onClick={() => setBillingInterval("yearly")}
+          className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+            interval === "yearly" ? "bg-mahogany text-cream" : "text-foreground/70"
+          }`}
+        >
+          Yearly <span className="ml-1 text-gold">-35%</span>
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {RETAILER_PLANS.map((p) => {
           const isCurrent = p.id === currentPlanId;
           const busyHere = busy === p.id || (busy === null && checkoutLoading);
+          const priceId = p.priceIds[interval];
+          const periodLabel = p.id === "starter" ? "for 3 months" : interval === "monthly" ? "per month" : "per year";
           return (
             <div
               key={p.id}
@@ -181,8 +210,8 @@ function BillingPage() {
                 </span>
               )}
               <p className="font-display text-xl text-mahogany">{p.name}</p>
-              <p className="mt-3 font-mono text-3xl">{p.price}</p>
-              <p className="text-xs text-muted-foreground">{p.period}</p>
+              <p className="mt-3 font-mono text-3xl">{p.prices[interval]}</p>
+              <p className="text-xs text-muted-foreground">{periodLabel}</p>
               <p className="mt-3 text-sm">{p.desc}</p>
               <ul className="mt-4 space-y-2">
                 {p.features.map((f) => (
@@ -196,9 +225,9 @@ function BillingPage() {
                 <div className="mt-6 rounded-md border border-mahogany/20 bg-mahogany/5 py-2 text-center text-xs font-mono uppercase tracking-wider text-mahogany">
                   Current plan
                 </div>
-              ) : p.priceId ? (
+              ) : priceId ? (
                 <button
-                  onClick={() => onChoose(p.priceId, p.id)}
+                  onClick={() => onChoose(priceId, p.id)}
                   disabled={busyHere}
                   className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-mahogany py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
                 >
