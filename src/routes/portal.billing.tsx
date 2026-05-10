@@ -275,6 +275,45 @@ function BillingPage() {
         })}
       </div>
 
+      {invoices && invoices.length > 0 && (
+        <div className="mt-10">
+          <h2 className="mb-3 font-display text-xl text-mahogany">Invoices</h2>
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-2 font-medium">Date</th>
+                  <th className="px-4 py-2 font-medium">Amount</th>
+                  <th className="px-4 py-2 font-medium">Status</th>
+                  <th className="px-4 py-2 font-medium text-right">Invoice</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoices.map((inv) => (
+                  <tr key={inv.id} className="border-t border-border">
+                    <td className="px-4 py-2">
+                      {inv.billedAt ? new Date(inv.billedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—"}
+                    </td>
+                    <td className="px-4 py-2 font-mono">{formatMoney(inv.total, inv.currency)}</td>
+                    <td className="px-4 py-2 capitalize text-muted-foreground">{inv.status}</td>
+                    <td className="px-4 py-2 text-right">
+                      {inv.invoiceUrl ? (
+                        <a href={inv.invoiceUrl} target="_blank" rel="noopener" className="inline-flex items-center gap-1 text-mahogany underline">
+                          <FileText className="h-3.5 w-3.5" /> PDF
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">VAT included where applicable.</p>
+        </div>
+      )}
+
       <p className="mt-8 text-xs text-muted-foreground">
         Need a custom plan?{" "}
         <Link to="/retailer" className="text-mahogany underline">
