@@ -172,10 +172,31 @@ function BillingPage() {
         )}
       </div>
 
+      <div className="mb-6 inline-flex rounded-full border border-border bg-card p-1">
+        <button
+          onClick={() => setBillingInterval("monthly")}
+          className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+            interval === "monthly" ? "bg-mahogany text-cream" : "text-foreground/70"
+          }`}
+        >
+          Monthly
+        </button>
+        <button
+          onClick={() => setBillingInterval("yearly")}
+          className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+            interval === "yearly" ? "bg-mahogany text-cream" : "text-foreground/70"
+          }`}
+        >
+          Yearly <span className="ml-1 text-gold">-35%</span>
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {RETAILER_PLANS.map((p) => {
           const isCurrent = p.id === currentPlanId;
           const busyHere = busy === p.id || (busy === null && checkoutLoading);
+          const priceId = p.priceIds[interval];
+          const periodLabel = p.id === "starter" ? "for 3 months" : interval === "monthly" ? "per month" : "per year";
           return (
             <div
               key={p.id}
@@ -189,8 +210,8 @@ function BillingPage() {
                 </span>
               )}
               <p className="font-display text-xl text-mahogany">{p.name}</p>
-              <p className="mt-3 font-mono text-3xl">{p.price}</p>
-              <p className="text-xs text-muted-foreground">{p.period}</p>
+              <p className="mt-3 font-mono text-3xl">{p.prices[interval]}</p>
+              <p className="text-xs text-muted-foreground">{periodLabel}</p>
               <p className="mt-3 text-sm">{p.desc}</p>
               <ul className="mt-4 space-y-2">
                 {p.features.map((f) => (
@@ -204,9 +225,9 @@ function BillingPage() {
                 <div className="mt-6 rounded-md border border-mahogany/20 bg-mahogany/5 py-2 text-center text-xs font-mono uppercase tracking-wider text-mahogany">
                   Current plan
                 </div>
-              ) : p.priceId ? (
+              ) : priceId ? (
                 <button
-                  onClick={() => onChoose(p.priceId, p.id)}
+                  onClick={() => onChoose(priceId, p.id)}
                   disabled={busyHere}
                   className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-mahogany py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
                 >
