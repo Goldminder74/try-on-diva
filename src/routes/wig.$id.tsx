@@ -4,13 +4,14 @@ import { Heart, ExternalLink, ArrowLeft } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
-import { WIGS, getWigById, formatPrice } from "@/lib/wigs";
+import { fetchWigById, fetchRelatedWigs, formatPrice, type Wig } from "@/lib/wigs";
 
 export const Route = createFileRoute("/wig/$id")({
-  loader: ({ params }) => {
-    const wig = getWigById(params.id);
+  loader: async ({ params }) => {
+    const wig = await fetchWigById(params.id);
     if (!wig) throw notFound();
-    return { wig };
+    const related = await fetchRelatedWigs(wig.style_type, wig.id, 4);
+    return { wig, related };
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [
