@@ -14,16 +14,553 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+          retailer_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json
+          retailer_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          retailer_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_retailer_id_fkey"
+            columns: ["retailer_id"]
+            isOneToOne: false
+            referencedRelation: "retailers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      api_keys: {
+        Row: {
+          created_at: string
+          id: string
+          key_hash: string
+          last_used_at: string | null
+          last4: string
+          name: string
+          retailer_id: string
+          revoked_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key_hash: string
+          last_used_at?: string | null
+          last4: string
+          name?: string
+          retailer_id: string
+          revoked_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key_hash?: string
+          last_used_at?: string | null
+          last4?: string
+          name?: string
+          retailer_id?: string
+          revoked_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_retailer_id_fkey"
+            columns: ["retailer_id"]
+            isOneToOne: false
+            referencedRelation: "retailers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consumer_profiles: {
+        Row: {
+          budget: string | null
+          created_at: string
+          face_shape: string | null
+          last_photo_url: string | null
+          lifestyle: string[] | null
+          notify_email: boolean
+          quiz_completed_at: string | null
+          skin_tone: number | null
+          style_vibe: string[] | null
+          try_on_count_this_month: number
+          try_on_month_reset: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget?: string | null
+          created_at?: string
+          face_shape?: string | null
+          last_photo_url?: string | null
+          lifestyle?: string[] | null
+          notify_email?: boolean
+          quiz_completed_at?: string | null
+          skin_tone?: number | null
+          style_vibe?: string[] | null
+          try_on_count_this_month?: number
+          try_on_month_reset?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget?: string | null
+          created_at?: string
+          face_shape?: string | null
+          last_photo_url?: string | null
+          lifestyle?: string[] | null
+          notify_email?: boolean
+          quiz_completed_at?: string | null
+          skin_tone?: number | null
+          style_vibe?: string[] | null
+          try_on_count_this_month?: number
+          try_on_month_reset?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          country: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      retailers: {
+        Row: {
+          brand_primary: string | null
+          business_name: string
+          contact_name: string | null
+          country: string | null
+          created_at: string
+          currency: string
+          display_name: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          onboarding_completed: boolean
+          owner_id: string | null
+          plan: string
+          referral_source: string | null
+          slug: string
+          trial_ends_at: string | null
+          updated_at: string
+          website: string | null
+          widget_cta_text: string | null
+        }
+        Insert: {
+          brand_primary?: string | null
+          business_name: string
+          contact_name?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string
+          display_name: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          onboarding_completed?: boolean
+          owner_id?: string | null
+          plan?: string
+          referral_source?: string | null
+          slug: string
+          trial_ends_at?: string | null
+          updated_at?: string
+          website?: string | null
+          widget_cta_text?: string | null
+        }
+        Update: {
+          brand_primary?: string | null
+          business_name?: string
+          contact_name?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          onboarding_completed?: boolean
+          owner_id?: string | null
+          plan?: string
+          referral_source?: string | null
+          slug?: string
+          trial_ends_at?: string | null
+          updated_at?: string
+          website?: string | null
+          widget_cta_text?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          billing_interval: string | null
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          customer_type: string
+          id: string
+          plan: string
+          profile_id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_interval?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          customer_type: string
+          id?: string
+          plan: string
+          profile_id: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_interval?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          customer_type?: string
+          id?: string
+          plan?: string
+          profile_id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      try_on_events: {
+        Row: {
+          anonymous_session: string | null
+          country: string | null
+          created_at: string
+          device: string | null
+          id: string
+          retailer_id: string | null
+          source: string | null
+          user_id: string | null
+          wig_id: string
+        }
+        Insert: {
+          anonymous_session?: string | null
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          retailer_id?: string | null
+          source?: string | null
+          user_id?: string | null
+          wig_id: string
+        }
+        Update: {
+          anonymous_session?: string | null
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          retailer_id?: string | null
+          source?: string | null
+          user_id?: string | null
+          wig_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "try_on_events_retailer_id_fkey"
+            columns: ["retailer_id"]
+            isOneToOne: false
+            referencedRelation: "retailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "try_on_events_wig_id_fkey"
+            columns: ["wig_id"]
+            isOneToOne: false
+            referencedRelation: "wigs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      widget_embeds: {
+        Row: {
+          allowed_domains: string[]
+          config: Json
+          created_at: string
+          embed_token: string
+          id: string
+          is_active: boolean
+          retailer_id: string
+          updated_at: string
+          widget_type: string
+        }
+        Insert: {
+          allowed_domains?: string[]
+          config?: Json
+          created_at?: string
+          embed_token?: string
+          id?: string
+          is_active?: boolean
+          retailer_id: string
+          updated_at?: string
+          widget_type?: string
+        }
+        Update: {
+          allowed_domains?: string[]
+          config?: Json
+          created_at?: string
+          embed_token?: string
+          id?: string
+          is_active?: boolean
+          retailer_id?: string
+          updated_at?: string
+          widget_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "widget_embeds_retailer_id_fkey"
+            columns: ["retailer_id"]
+            isOneToOne: false
+            referencedRelation: "retailers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wig_clicks: {
+        Row: {
+          created_at: string
+          id: string
+          retailer_id: string | null
+          user_id: string | null
+          wig_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          retailer_id?: string | null
+          user_id?: string | null
+          wig_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          retailer_id?: string | null
+          user_id?: string | null
+          wig_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wig_clicks_retailer_id_fkey"
+            columns: ["retailer_id"]
+            isOneToOne: false
+            referencedRelation: "retailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wig_clicks_wig_id_fkey"
+            columns: ["wig_id"]
+            isOneToOne: false
+            referencedRelation: "wigs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wigs: {
+        Row: {
+          ar_asset_url: string | null
+          click_count: number
+          colors: string[]
+          created_at: string
+          currency: string
+          description: string | null
+          featured_rank: number | null
+          hair_length: string | null
+          hair_origin: string | null
+          hair_texture: string
+          id: string
+          images: string[]
+          in_stock: boolean
+          is_featured: boolean
+          is_published: boolean
+          name: string
+          price: number
+          product_url: string | null
+          retailer_id: string
+          style_type: string
+          try_on_count: number
+          updated_at: string
+        }
+        Insert: {
+          ar_asset_url?: string | null
+          click_count?: number
+          colors?: string[]
+          created_at?: string
+          currency?: string
+          description?: string | null
+          featured_rank?: number | null
+          hair_length?: string | null
+          hair_origin?: string | null
+          hair_texture: string
+          id?: string
+          images?: string[]
+          in_stock?: boolean
+          is_featured?: boolean
+          is_published?: boolean
+          name: string
+          price?: number
+          product_url?: string | null
+          retailer_id: string
+          style_type: string
+          try_on_count?: number
+          updated_at?: string
+        }
+        Update: {
+          ar_asset_url?: string | null
+          click_count?: number
+          colors?: string[]
+          created_at?: string
+          currency?: string
+          description?: string | null
+          featured_rank?: number | null
+          hair_length?: string | null
+          hair_origin?: string | null
+          hair_texture?: string
+          id?: string
+          images?: string[]
+          in_stock?: boolean
+          is_featured?: boolean
+          is_published?: boolean
+          name?: string
+          price?: number
+          product_url?: string | null
+          retailer_id?: string
+          style_type?: string
+          try_on_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wigs_retailer_id_fkey"
+            columns: ["retailer_id"]
+            isOneToOne: false
+            referencedRelation: "retailers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wishlist_items: {
+        Row: {
+          created_at: string
+          user_id: string
+          wig_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+          wig_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+          wig_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_items_wig_id_fkey"
+            columns: ["wig_id"]
+            isOneToOne: false
+            referencedRelation: "wigs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "consumer" | "retailer" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +687,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["consumer", "retailer", "admin"],
+    },
   },
 } as const
