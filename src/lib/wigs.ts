@@ -105,6 +105,7 @@ export async function fetchWigs(): Promise<Wig[]> {
     .from("wigs")
     .select(SELECT)
     .eq("is_published", true)
+    .is("deleted_at", null)
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
   if (error) throw error;
@@ -116,6 +117,7 @@ export async function fetchFeaturedWigs(limit = 6): Promise<Wig[]> {
     .from("wigs")
     .select(SELECT)
     .eq("is_published", true)
+    .is("deleted_at", null)
     .eq("is_featured", true)
     .order("featured_rank", { ascending: true })
     .limit(limit);
@@ -138,6 +140,7 @@ export async function fetchRelatedWigs(styleType: string, excludeId: string, lim
     .from("wigs")
     .select(SELECT)
     .eq("is_published", true)
+    .is("deleted_at", null)
     .eq("style_type", styleType)
     .neq("id", excludeId)
     .limit(limit);

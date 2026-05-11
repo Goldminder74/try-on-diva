@@ -106,6 +106,10 @@ function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <title>Wigsmi — Try every wig before you buy it</title>
+        <meta name="twitter:site" content="@wigsmi" />
+        <meta name="twitter:title" content="Wigsmi — Try every wig before you buy it" />
+        <meta property="og:image" content="https://www.wigsmi.com/og-image.jpg" />
         <HeadContent />
       </head>
       <body>
