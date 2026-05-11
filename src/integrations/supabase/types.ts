@@ -490,6 +490,7 @@ export type Database = {
           colors: string[]
           created_at: string
           currency: string
+          deleted_at: string | null
           description: string | null
           featured_rank: number | null
           hair_length: string | null
@@ -515,6 +516,7 @@ export type Database = {
           colors?: string[]
           created_at?: string
           currency?: string
+          deleted_at?: string | null
           description?: string | null
           featured_rank?: number | null
           hair_length?: string | null
@@ -540,6 +542,7 @@ export type Database = {
           colors?: string[]
           created_at?: string
           currency?: string
+          deleted_at?: string | null
           description?: string | null
           featured_rank?: number | null
           hair_length?: string | null
