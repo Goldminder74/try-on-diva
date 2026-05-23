@@ -101,13 +101,19 @@ async function fetchRetailerNames(retailerIds: string[]): Promise<Map<string, st
   const uniqueIds = [...new Set(retailerIds)].filter(Boolean);
   if (uniqueIds.length === 0) return new Map();
 
-  const { data, error } = await supabase
-    .from("retailers")
-    .select("id, display_name")
-    .in("id", uniqueIds);
+  // Uses the public SECURITY DEFINER function that returns only safe columns
+  // (no plan, trial_ends_at, owner_id, contact info, etc.).
+  const { data, error } = await supabase.rpc("get_retailers_public", {
+    retailer_ids: uniqueIds,
+  });
 
   if (error) return new Map();
-  return new Map((data ?? []).map((retailer) => [retailer.id, retailer.display_name]));
+  return new Map(
+    ((data ?? []) as Array<{ id: string; display_name: string }>).map((r) => [
+      r.id,
+      r.display_name,
+    ]),
+  );
 }
 
 async function mapWigsWithRetailers(rows: unknown[] | null): Promise<Wig[]> {
