@@ -49,8 +49,6 @@ function Catalog() {
     return out;
   }, [query, styles, textures, sort, wigs]);
 
-  void loading; void error;
-
   return (
     <div className="min-h-screen bg-cream">
       <Header />
@@ -60,7 +58,7 @@ function Catalog() {
             <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Catalog</p>
             <h1 className="mt-1 font-display text-4xl text-mahogany md:text-5xl">Find your next look.</h1>
           </div>
-          <p className="hidden text-sm text-muted-foreground md:block">{filtered.length} wigs</p>
+          <p className="hidden text-sm text-muted-foreground md:block">{loading ? "Loading wigs…" : `${filtered.length} wigs`}</p>
         </div>
 
         {/* Search + sort */}
@@ -117,7 +115,16 @@ function Catalog() {
 
           {/* Grid */}
           <div>
-            {filtered.length === 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                {Array.from({ length: 9 }).map((_, i) => <WigCardSkeleton key={i} />)}
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-sand/40 px-6 py-20 text-center">
+                <p className="font-display text-2xl text-mahogany">The catalog couldn't load.</p>
+                <p className="mt-2 text-sm text-muted-foreground">Refresh the page to try again.</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-sand/40 px-6 py-20 text-center">
                 <p className="font-display text-2xl text-mahogany">No wigs match those filters.</p>
                 <p className="mt-2 text-sm text-muted-foreground">Try clearing a filter or two.</p>
