@@ -602,6 +602,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_retailers_public: {
+        Args: { retailer_ids?: string[] }
+        Returns: {
+          brand_primary: string
+          display_name: string
+          id: string
+          logo_url: string
+          slug: string
+          website: string
+        }[]
+      }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
