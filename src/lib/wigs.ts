@@ -65,11 +65,9 @@ type WigRow = {
   product_url: string | null;
   created_at: string;
   retailer_id: string;
-  retailers: { display_name: string } | { display_name: string }[] | null;
 };
 
-function mapWig(w: WigRow): Wig {
-  const retailerRel = Array.isArray(w.retailers) ? w.retailers[0] : w.retailers;
+function mapWig(w: WigRow, retailerNames: Map<string, string> = new Map()): Wig {
   return {
     id: w.id,
     name: w.name,
@@ -89,16 +87,34 @@ function mapWig(w: WigRow): Wig {
     product_url: w.product_url,
     created_at: w.created_at,
     retailer_id: w.retailer_id,
-    retailer: retailerRel?.display_name ?? "",
+    retailer: retailerNames.get(w.retailer_id) ?? "",
   };
 }
 
 const SELECT = `
   id, name, description, price, currency, style_type, hair_texture, hair_length,
   hair_origin, colors, images, ar_asset_url, is_featured, in_stock, try_on_count,
-  product_url, created_at, retailer_id,
-  retailers ( display_name )
+  product_url, created_at, retailer_id
 `;
+
+async function fetchRetailerNames(retailerIds: string[]): Promise<Map<string, string>> {
+  const uniqueIds = [...new Set(retailerIds)].filter(Boolean);
+  if (uniqueIds.length === 0) return new Map();
+
+  const { data, error } = await supabase
+    .from("retailers")
+    .select("id, display_name")
+    .in("id", uniqueIds);
+
+  if (error) return new Map();
+  return new Map((data ?? []).map((retailer) => [retailer.id, retailer.display_name]));
+}
+
+async function mapWigsWithRetailers(rows: unknown[] | null): Promise<Wig[]> {
+  const wigRows = (rows ?? []) as WigRow[];
+  const retailerNames = await fetchRetailerNames(wigRows.map((row) => row.retailer_id));
+  return wigRows.map((row) => mapWig(row, retailerNames));
+}
 
 export async function fetchWigs(): Promise<Wig[]> {
   const { data, error } = await supabase
@@ -109,7 +125,7 @@ export async function fetchWigs(): Promise<Wig[]> {
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((row) => mapWig(row as unknown as WigRow));
+  return mapWigsWithRetailers(data);
 }
 
 export async function fetchFeaturedWigs(limit = 6): Promise<Wig[]> {
@@ -122,7 +138,7 @@ export async function fetchFeaturedWigs(limit = 6): Promise<Wig[]> {
     .order("featured_rank", { ascending: true })
     .limit(limit);
   if (error) throw error;
-  return (data ?? []).map((row) => mapWig(row as unknown as WigRow));
+  return mapWigsWithRetailers(data);
 }
 
 export async function fetchWigById(id: string): Promise<Wig | null> {
