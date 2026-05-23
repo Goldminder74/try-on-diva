@@ -148,7 +148,9 @@ export async function fetchWigById(id: string): Promise<Wig | null> {
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
-  return data ? mapWig(data as unknown as WigRow) : null;
+  if (!data) return null;
+  const [wig] = await mapWigsWithRetailers([data]);
+  return wig ?? null;
 }
 
 export async function fetchRelatedWigs(styleType: string, excludeId: string, limit = 4): Promise<Wig[]> {
@@ -161,5 +163,5 @@ export async function fetchRelatedWigs(styleType: string, excludeId: string, lim
     .neq("id", excludeId)
     .limit(limit);
   if (error) throw error;
-  return (data ?? []).map((row) => mapWig(row as unknown as WigRow));
+  return mapWigsWithRetailers(data);
 }
