@@ -47,13 +47,6 @@ export type Database = {
             referencedRelation: "retailers"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "analytics_events_retailer_id_fkey"
-            columns: ["retailer_id"]
-            isOneToOne: false
-            referencedRelation: "retailers_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       api_keys: {
@@ -93,13 +86,6 @@ export type Database = {
             columns: ["retailer_id"]
             isOneToOne: false
             referencedRelation: "retailers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "api_keys_retailer_id_fkey"
-            columns: ["retailer_id"]
-            isOneToOne: false
-            referencedRelation: "retailers_public"
             referencedColumns: ["id"]
           },
         ]
@@ -384,13 +370,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "try_on_events_retailer_id_fkey"
-            columns: ["retailer_id"]
-            isOneToOne: false
-            referencedRelation: "retailers_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "try_on_events_wig_id_fkey"
             columns: ["wig_id"]
             isOneToOne: false
@@ -462,13 +441,6 @@ export type Database = {
             referencedRelation: "retailers"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "widget_embeds_retailer_id_fkey"
-            columns: ["retailer_id"]
-            isOneToOne: false
-            referencedRelation: "retailers_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       wig_clicks: {
@@ -499,13 +471,6 @@ export type Database = {
             columns: ["retailer_id"]
             isOneToOne: false
             referencedRelation: "retailers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "wig_clicks_retailer_id_fkey"
-            columns: ["retailer_id"]
-            isOneToOne: false
-            referencedRelation: "retailers_public"
             referencedColumns: ["id"]
           },
           {
@@ -604,13 +569,6 @@ export type Database = {
             referencedRelation: "retailers"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "wigs_retailer_id_fkey"
-            columns: ["retailer_id"]
-            isOneToOne: false
-            referencedRelation: "retailers_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       wishlist_items: {
@@ -641,35 +599,20 @@ export type Database = {
       }
     }
     Views: {
-      retailers_public: {
-        Row: {
-          brand_primary: string | null
-          display_name: string | null
-          id: string | null
-          logo_url: string | null
-          slug: string | null
-          website: string | null
-        }
-        Insert: {
-          brand_primary?: string | null
-          display_name?: string | null
-          id?: string | null
-          logo_url?: string | null
-          slug?: string | null
-          website?: string | null
-        }
-        Update: {
-          brand_primary?: string | null
-          display_name?: string | null
-          id?: string | null
-          logo_url?: string | null
-          slug?: string | null
-          website?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
+      get_retailers_public: {
+        Args: { retailer_ids?: string[] }
+        Returns: {
+          brand_primary: string
+          display_name: string
+          id: string
+          logo_url: string
+          slug: string
+          website: string
+        }[]
+      }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
