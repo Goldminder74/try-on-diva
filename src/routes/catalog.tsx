@@ -53,6 +53,22 @@ function Catalog() {
   return (
     <div className="min-h-screen bg-cream">
       <Header />
+      {bannerVisible && (
+        <div className="w-full bg-[#F59E0B] px-5 py-[10px]">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+            <p className="mx-auto text-center text-sm font-medium text-[#1C1C1C]">
+              🧪 Beta Catalog — These are demo products for illustration purposes. Real retailer inventory coming soon.
+            </p>
+            <button
+              onClick={() => { setBannerVisible(false); sessionStorage.setItem("catalog-beta-banner-dismissed", "true"); }}
+              className="shrink-0 rounded-full p-1 text-[#1C1C1C] hover:bg-black/10"
+              aria-label="Dismiss banner"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
       <div className="mx-auto w-full max-w-7xl px-5 py-10">
         <div className="flex items-end justify-between gap-4">
           <div>
