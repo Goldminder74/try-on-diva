@@ -26,6 +26,7 @@ function Catalog() {
   const [textures, setTextures] = useState<string[]>([]);
   const [sort, setSort] = useState<"featured" | "newest" | "popular" | "price-asc" | "price-desc">("featured");
   const [showFilters, setShowFilters] = useState(false);
+  const [bannerVisible, setBannerVisible] = useState(() => sessionStorage.getItem("catalog-beta-banner-dismissed") !== "true");
 
   const toggle = (arr: string[], v: string) => arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
 
