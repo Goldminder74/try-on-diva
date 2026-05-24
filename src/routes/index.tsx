@@ -121,7 +121,7 @@ function Landing() {
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="font-display text-3xl text-mahogany md:text-4xl">Trending styles</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Most-tried wigs this week.</p>
+              <p className="mt-2 text-sm text-muted-foreground">Featured Styles</p>
             </div>
             <Link to="/catalog" className="hidden text-sm font-medium text-mahogany underline-offset-4 hover:underline md:inline">
               View all →

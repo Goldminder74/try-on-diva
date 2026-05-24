@@ -52,11 +52,6 @@ export function WigCard({ wig, savedInitial = false }: { wig: Wig; savedInitial?
             Try it on
           </span>
         </div>
-        {wig.try_on_count > 1000 && (
-          <span className="absolute left-2 top-2 rounded-sm bg-gold px-1.5 py-0.5 font-mono text-[10px] font-medium text-mahogany">
-            {wig.try_on_count.toLocaleString()} try-ons
-          </span>
-        )}
       </div>
       <div className="pt-3">
         <h3 className="line-clamp-1 text-sm font-medium text-foreground">{wig.name}</h3>
