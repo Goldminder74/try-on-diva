@@ -378,26 +378,26 @@ export type Database = {
           },
         ]
       }
-      tryon_events: {
+      tryon_results: {
         Row: {
           created_at: string
           id: string
           result_url: string
-          user_id: string | null
+          user_id: string
           wig_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           result_url: string
-          user_id?: string | null
+          user_id: string
           wig_id: string
         }
         Update: {
           created_at?: string
           id?: string
           result_url?: string
-          user_id?: string | null
+          user_id?: string
           wig_id?: string
         }
         Relationships: []
