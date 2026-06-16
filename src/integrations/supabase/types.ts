@@ -378,6 +378,30 @@ export type Database = {
           },
         ]
       }
+      tryon_events: {
+        Row: {
+          created_at: string
+          id: string
+          result_url: string
+          user_id: string | null
+          wig_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          result_url: string
+          user_id?: string | null
+          wig_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          result_url?: string
+          user_id?: string | null
+          wig_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
