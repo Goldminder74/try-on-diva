@@ -390,7 +390,8 @@ function AppTryOn() {
           )}
         </div>
       </section>
-      {/* ===================== END TEMPORARY TEST BLOCK ====================== */}
     </div>
   );
 }
+
+         
