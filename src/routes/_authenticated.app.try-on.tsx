@@ -4,12 +4,10 @@ import { Upload, RefreshCw } from "lucide-react";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
 import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
 import { useServerFn } from "@tanstack/react-start";
-import { getTryOnQuota, uploadTryOnResult, generateTryOn } from "@/lib/try-on.functions";
+import { getTryOnQuota } from "@/lib/try-on.functions";
 import { Link } from "@tanstack/react-router";
 // Apply-wig generation logic lives in a hook outside this Lovable-managed file.
-import { useApplyWig, blobToBase64 } from "@/hooks/useApplyWig";
-// TEMP: placeholder selfie for the generate test (same-origin bundled asset). Remove with the panel.
-import heroModel from "@/assets/hero-model.jpg";
+import { useApplyWig } from "@/hooks/useApplyWig";
 
 export const Route = createFileRoute("/_authenticated/app/try-on")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -19,30 +17,6 @@ export const Route = createFileRoute("/_authenticated/app/try-on")({
   component: AppTryOn,
 });
 
-// 1x1 transparent PNG, base64 (no data-URL prefix).
-const TINY_PNG =
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
-
-// TEMP: state shape for the storage self-test. Remove with the panel before launch.
-type StorageTest = {
-  running: boolean;
-  path?: string;
-  signedUrl?: string;
-  publicUrl?: string;
-  publicResult?: "checking" | "failed" | "loaded";
-  error?: string;
-};
-
-// TEMP: state shape for the Gemini generate test. Remove with the panel before launch.
-type GenerateTest = {
-  running: boolean;
-  source?: string;
-  wigName?: string;
-  model?: string;
-  path?: string;
-  signedUrl?: string;
-  error?: string;
-};
 
 function AppTryOn() {
   const search = Route.useSearch();
@@ -59,11 +33,6 @@ function AppTryOn() {
 
   const fetchQuota = useServerFn(getTryOnQuota);
 
-  // TEMP: storage + generate self-test wiring. Remove before launch.
-  const runUpload = useServerFn(uploadTryOnResult);
-  const runGenerate = useServerFn(generateTryOn);
-  const [test, setTest] = useState<StorageTest | null>(null);
-  const [gen, setGen] = useState<GenerateTest | null>(null);
 
   useEffect(() => {
     fetchFeaturedWigs(9).then((items) => {
@@ -83,89 +52,6 @@ function AppTryOn() {
     setPhoto(f);
   };
 
-  // TEMP: uploads a 1x1 PNG, then checks the signed URL loads and the public URL
-  // is blocked (proving the bucket is private). Remove before launch.
-  const runStorageTest = async () => {
-    setTest({ running: true });
-    try {
-      const res = await runUpload({ data: { wigId: "test-sku", imageBase64: TINY_PNG } });
-      const signedUrl = res.signedUrl;
-      // Derive the public-style URL: swap the sign path and drop the token query.
-      const publicUrl = signedUrl.replace("/object/sign/", "/object/public/").split("?")[0];
-
-      setTest({
-        running: false,
-        path: res.path,
-        signedUrl,
-        publicUrl,
-        publicResult: "checking",
-      });
-
-      // A private bucket must reject this. fetch resolving with !ok, or throwing,
-      // both count as "failed" => good.
-      try {
-        const r = await fetch(publicUrl, { method: "GET" });
-        setTest((t) => (t ? { ...t, publicResult: r.ok ? "loaded" : "failed" } : t));
-      } catch {
-        setTest((t) => (t ? { ...t, publicResult: "failed" } : t));
-      }
-    } catch (err) {
-      setTest({ running: false, error: err instanceof Error ? err.message : "Storage test failed." });
-    }
-  };
-
-  // TEMP: fires generateTryOn end to end with the selected wig and either the
-  // uploaded selfie or a placeholder photo, then renders the result. Remove
-  // before launch.
-  const runGenerateTest = async () => {
-    setGen({ running: true });
-    try {
-      const testWig = wig ?? list[0];
-      if (!testWig) throw new Error("No wig selected.");
-      if (!testWig.images?.[0]) throw new Error("Selected wig has no product image.");
-
-      // Photo: uploaded selfie if present, else the bundled hero image (same-origin).
-      let userPhotoBase64: string;
-      let userPhotoMimeType: "image/jpeg" | "image/png" | "image/webp";
-      let source: string;
-      if (photo) {
-        userPhotoBase64 = await blobToBase64(photo);
-        userPhotoMimeType = photo.type as "image/jpeg" | "image/png" | "image/webp";
-        source = "uploaded selfie";
-      } else {
-        const blob = await (await fetch(heroModel)).blob();
-        userPhotoBase64 = await blobToBase64(blob);
-        userPhotoMimeType = "image/jpeg";
-        source = "placeholder photo";
-      }
-
-      // Make the wig image URL absolute so the server can fetch it.
-      const wigImageUrl = new URL(testWig.images[0], window.location.origin).href;
-
-      const res = await runGenerate({
-        data: {
-          userPhotoBase64,
-          userPhotoMimeType,
-          wigId: testWig.id,
-          wigImageUrl,
-          wigName: testWig.name,
-          wigStyleType: testWig.style_type || "wig",
-          wigColour: testWig.colors?.[0] || "natural",
-        },
-      });
-
-      setGen({
-        running: false,
-        source,
-        wigName: testWig.name,
-        model: res.model,
-        path: res.path,
-        signedUrl: res.signedUrl,
-      });
-    } catch (err) {
-      setGen({ running: false, error: err instanceof Error ? err.message : "Generate test failed." });
-    }
-  };
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-10">
