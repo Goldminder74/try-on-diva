@@ -133,6 +133,7 @@ function AppTryOn() {
     if (f.size > 10 * 1024 * 1024) return setError("File too large — max 10MB.");
     if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) return setError("Use JPEG, PNG or WebP.");
     setError(null);
+    setGeneratedUrl(null);
     setPhoto(f);
   };
 
