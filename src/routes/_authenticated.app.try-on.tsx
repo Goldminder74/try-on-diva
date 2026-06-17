@@ -245,29 +245,38 @@ function AppTryOn() {
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         <div>
-          <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
+          {generatedUrl ? (
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
+              <img src={generatedUrl} alt="Your try-on result" className="w-full object-contain" />
+            </div>
+          ) : (
+            <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
+          )}
           <div className="mt-4 flex flex-wrap gap-3">
             <button
               onClick={() => fileRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-md border border-mahogany bg-transparent px-4 py-2 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream"
+              disabled={applying}
+              className="inline-flex items-center gap-2 rounded-md border border-mahogany bg-transparent px-4 py-2 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream disabled:opacity-50"
             >
               <Upload className="h-4 w-4" /> {photo ? "Change photo" : "Upload selfie"}
             </button>
-            {photo && (
+            {(photo || generatedUrl) && (
               <button
-                onClick={() => setPhoto(null)}
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany"
+                onClick={() => { setPhoto(null); setGeneratedUrl(null); setError(null); }}
+                disabled={applying}
+                className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany disabled:opacity-50"
               >
                 <RefreshCw className="h-4 w-4" /> Reset
               </button>
             )}
             <button
               onClick={onTryOn}
-              disabled={!wig || blocked}
+              disabled={!wig || !photo || blocked || applying}
               className="inline-flex items-center gap-2 rounded-md bg-gold px-4 py-2 text-sm font-medium text-mahogany hover:bg-gold-dark hover:text-cream disabled:opacity-50"
             >
-              Apply wig
+              {applying ? (<><RefreshCw className="h-4 w-4 animate-spin" /> Generating…</>) : "Apply wig"}
             </button>
+
             <input
               ref={fileRef}
               type="file"
