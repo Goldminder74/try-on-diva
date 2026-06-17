@@ -88,17 +88,43 @@ function AppTryOn() {
   }, [fetchQuota, search.wig]);
 
   const onTryOn = async () => {
-    if (!wig) return;
+    if (!wig || !photo) {
+      setError(!photo ? "Upload a selfie first." : "Pick a wig first.");
+      return;
+    }
     setError(null);
+    setApplying(true);
     try {
       const res = await record({ data: { wigId: wig.id } });
       if (!res.allowed) {
         setBlocked(true);
+        setApplying(false);
         return;
       }
       setQuota((q) => (q ? { ...q, remaining: res.remaining } : q));
+
+      if (!wig.images?.[0]) throw new Error("This wig has no image.");
+      const userPhotoBase64 = await blobToBase64(photo);
+      const userPhotoMimeType = photo.type as "image/jpeg" | "image/png" | "image/webp";
+      const wigImageUrl = new URL(wig.images[0], window.location.origin).href;
+
+      const out = await runGenerate({
+        data: {
+          userPhotoBase64,
+          userPhotoMimeType,
+          wigId: wig.id,
+          wigImageUrl,
+          wigName: wig.name,
+          wigStyleType: wig.style_type || "wig",
+          wigColour: wig.colors?.[0] || "natural",
+        },
+      });
+      setGeneratedUrl(out.signedUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't record try-on.");
+      setGeneratedUrl(null);
+      setError(err instanceof Error ? err.message : "Try-on generation failed.");
+    } finally {
+      setApplying(false);
     }
   };
 
