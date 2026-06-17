@@ -1,11 +1,20 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
 type Mode = "login" | "signup";
 
+// Only allow same-origin relative paths to avoid open-redirect abuse.
+function safeRedirect(r: string | undefined): string {
+  if (!r) return "/app";
+  if (!r.startsWith("/") || r.startsWith("//")) return "/app";
+  return r;
+}
+
 export function AuthForm({ mode }: { mode: Mode }) {
+  const search = useSearch({ strict: false }) as { redirect?: string };
+  const redirectTo = safeRedirect(search.redirect);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
