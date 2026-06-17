@@ -26,7 +26,12 @@ function Catalog() {
   const [textures, setTextures] = useState<string[]>([]);
   const [sort, setSort] = useState<"featured" | "newest" | "popular" | "price-asc" | "price-desc">("featured");
   const [showFilters, setShowFilters] = useState(false);
-  const [bannerVisible, setBannerVisible] = useState(() => typeof window !== "undefined" && sessionStorage.getItem("catalog-beta-banner-dismissed") !== "true");
+  const [bannerVisible, setBannerVisible] = useState(false);
+
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem("catalog-beta-banner-dismissed") === "true";
+    setBannerVisible(!dismissed);
+  }, []);
 
   const toggle = (arr: string[], v: string) => arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
 
