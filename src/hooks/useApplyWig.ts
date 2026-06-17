@@ -50,9 +50,6 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
   }, []);
 
   const applyWig = useCallback(async () => {
-    // TEMP DEBUG: log exactly what the hook received on click.
-    console.log("[applyWig] click — wig:", wig, "photo:", photo);
-
     if (!wig) return setError("Pick a wig first.");
     if (!wig.images?.[0]) return setError("This wig has no product image.");
     if (!photo) return setError("Upload a selfie first.");
@@ -64,7 +61,6 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
       // Freemium quota gate (also records the analytics event + increments the
       // monthly count). Blocks generation once the free allowance is used up.
       const gate = await record({ data: { wigId: wig.id } });
-      console.log("[applyWig] quota gate result:", gate);
       if (!gate.allowed) {
         setBlocked(true);
         setError("Free try-on limit reached this month."); // surface it, not just the banner
@@ -76,12 +72,6 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
       const userPhotoBase64 = await blobToBase64(photo);
       const userPhotoMimeType = photo.type as "image/jpeg" | "image/png" | "image/webp";
       const wigImageUrl = new URL(wig.images[0], window.location.origin).href;
-      console.log("[applyWig] calling generateTryOn", {
-        wigId: wig.id,
-        wigImageUrl,
-        userPhotoMimeType,
-        photoBase64Length: userPhotoBase64.length,
-      });
 
       const out = await runGenerate({
         data: {
@@ -94,7 +84,6 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
           wigColour: wig.colors?.[0] || "natural",
         },
       });
-      console.log("[applyWig] generateTryOn result:", out);
 
       if (!out?.signedUrl) {
         setError("Generation returned no image URL.");
@@ -102,7 +91,6 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
       }
       setResultUrl(out.signedUrl);
     } catch (err) {
-      console.error("[applyWig] error:", err);
       setResultUrl(null);
       setError(err instanceof Error ? err.message : "Try-on generation failed.");
     } finally {

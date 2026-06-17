@@ -5,7 +5,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
-const FREE_QUOTA = 50; // TEMP: raised from 5 for testing. Restore to the real limit before launch.
+const FREE_QUOTA = 5;
 
 // Signed URLs for stored try-on results last 7 days.
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 7;

@@ -118,10 +118,6 @@ function AppTryOn() {
             />
           </div>
           {(error || applyError) && <p className="mt-3 text-sm text-error">{error || applyError}</p>}
-          {/* TEMP DEBUG: shows the state the hook currently holds. Remove before launch. */}
-          <p className="mt-2 font-mono text-[11px] leading-relaxed text-foreground/50">
-            debug · wig: {wig ? `${wig.name} [${wig.id.slice(0, 8)}] img:${wig.images?.[0] ? "yes" : "no"}` : "none"} · photo: {photo ? `${photo.name} ${photo.type} ${(photo.size / 1024).toFixed(0)}KB` : "none"} · applying:{String(applying)} · blocked:{String(blocked)} · result:{resultUrl ? "yes" : "no"}
-          </p>
         </div>
 
         <aside>
