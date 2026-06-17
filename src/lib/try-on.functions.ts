@@ -508,4 +508,7 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
       .toISOString()
       .slice(0, 10);
     const count = prof && prof.try_on_month_reset >= monthStart ? prof.try_on_count_this_month : 0;
+    return { count, remaining: Math.max(0, FREE_QUOTA - count), limit: FREE_QUOTA };
+  });
+
 
