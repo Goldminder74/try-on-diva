@@ -39,11 +39,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
           },
         });
         if (error) throw error;
+        // Stash post-auth redirect so /auth/callback can honor it after email confirmation.
+        if (typeof window !== "undefined") {
+          window.sessionStorage.setItem("wigsmi:postAuthRedirect", redirectTo);
+        }
         setInfo("Check your email to confirm your account, then log in.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate({ to: "/app" });
+        navigate({ to: redirectTo });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
