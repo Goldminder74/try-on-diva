@@ -1,11 +1,20 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
 type Mode = "login" | "signup";
 
+// Only allow same-origin relative paths to avoid open-redirect abuse.
+function safeRedirect(r: string | undefined): string {
+  if (!r) return "/app";
+  if (!r.startsWith("/") || r.startsWith("//")) return "/app";
+  return r;
+}
+
 export function AuthForm({ mode }: { mode: Mode }) {
+  const search = useSearch({ strict: false }) as { redirect?: string };
+  const redirectTo = safeRedirect(search.redirect);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -30,11 +39,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
           },
         });
         if (error) throw error;
+        // Stash post-auth redirect so /auth/callback can honor it after email confirmation.
+        if (typeof window !== "undefined") {
+          window.sessionStorage.setItem("wigsmi:postAuthRedirect", redirectTo);
+        }
         setInfo("Check your email to confirm your account, then log in.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate({ to: "/app" });
+        navigate({ to: redirectTo });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -47,6 +60,10 @@ export function AuthForm({ mode }: { mode: Mode }) {
     setError(null);
     setBusy(true);
     try {
+      // Stash redirect for /auth/callback to consume after OAuth round-trip.
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem("wigsmi:postAuthRedirect", redirectTo);
+      }
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: `${window.location.origin}/auth/callback`,
       });
@@ -56,7 +73,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         return;
       }
       if (result.redirected) return;
-      navigate({ to: "/app" });
+      navigate({ to: redirectTo });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-in failed.");
       setBusy(false);

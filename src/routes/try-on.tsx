@@ -1,11 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
-import { Upload, RefreshCw } from "lucide-react";
+import { Upload, RefreshCw, Sparkles } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
 import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
 import { useAsync } from "@/lib/use-async";
+import { useAuth } from "@/contexts/auth-context";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Search = { wig?: string };
 
@@ -26,6 +37,8 @@ export const Route = createFileRoute("/try-on")({
 
 function TryOn() {
   const search = Route.useSearch();
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const { data: featured } = useAsync<Wig[]>(() => fetchFeaturedWigs(9), []);
   const list: Wig[] = featured ?? [];
   const initialWig = (search.wig && list.find((w: Wig) => w.id === search.wig)) || list[0];
@@ -33,6 +46,7 @@ function TryOn() {
   const [wig, setWig] = useState<Wig | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [promptOpen, setPromptOpen] = useState(false);
 
   useEffect(() => {
     if (!wig && initialWig) setWig(initialWig);
@@ -45,6 +59,21 @@ function TryOn() {
     setError(null);
     setPhoto(f);
   };
+
+  const onApply = () => {
+    if (!wig) { setError("Pick a wig first."); return; }
+    setError(null);
+    if (authLoading) return;
+    if (!user) {
+      setPromptOpen(true);
+      return;
+    }
+    // Signed in: hand off to the real generator with wig preselected.
+    navigate({ to: "/app/try-on", search: { wig: wig.id } });
+  };
+
+  // Preserve at minimum the wig selection across the auth round-trip.
+  const redirectTarget = wig ? `/try-on?wig=${wig.id}` : "/try-on";
 
   return (
     <div className="min-h-screen bg-cream">
@@ -77,6 +106,13 @@ function TryOn() {
                   <RefreshCw className="h-4 w-4" /> Reset
                 </button>
               )}
+              <button
+                onClick={onApply}
+                disabled={!wig}
+                className="inline-flex items-center gap-2 rounded-md bg-gold px-4 py-2 text-sm font-medium text-mahogany hover:bg-gold-dark hover:text-cream disabled:opacity-50"
+              >
+                <Sparkles className="h-4 w-4" /> Apply wig
+              </button>
               <input
                 ref={fileRef}
                 type="file"
@@ -109,11 +145,44 @@ function TryOn() {
               ))}
             </div>
             <p className="mt-5 rounded-md border border-gold/30 bg-gold/10 p-3 font-mono text-[11px] leading-relaxed text-gold-dark">
-              The AR engine is in preview mode. Real-time wig overlay coming soon — we'll let you know.
+              Tap Apply wig to generate your AI try-on. Free account, 5 try-ons every month.
             </p>
           </aside>
         </div>
       </div>
+
+      <AlertDialog open={promptOpen} onOpenChange={setPromptOpen}>
+        <AlertDialogContent className="bg-cream">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display text-2xl text-mahogany">
+              Create a free account to try this wig on.
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-foreground/75">
+              You get 5 free try-ons every month, no card needed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel className="border-border">Not now</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() =>
+                navigate({ to: "/auth/login", search: { redirect: redirectTarget } })
+              }
+              className="border border-mahogany bg-transparent text-mahogany hover:bg-mahogany hover:text-cream"
+            >
+              Log in
+            </AlertDialogAction>
+            <AlertDialogAction
+              onClick={() =>
+                navigate({ to: "/auth/signup", search: { redirect: redirectTarget } })
+              }
+              className="bg-mahogany text-cream hover:bg-mahogany-soft"
+            >
+              Create account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Footer />
     </div>
   );
