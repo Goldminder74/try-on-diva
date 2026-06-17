@@ -63,11 +63,25 @@ async function maybeSendWelcome(session: { user: { id: string; email?: string | 
   }
 }
 
+function safeRedirect(r: string | null | undefined): string {
+  if (!r) return "/app";
+  if (!r.startsWith("/") || r.startsWith("//")) return "/app";
+  return r;
+}
+
 function Callback() {
   const navigate = useNavigate();
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const next = params.get("next");
+    const stashed =
+      typeof window !== "undefined"
+        ? window.sessionStorage.getItem("wigsmi:postAuthRedirect")
+        : null;
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem("wigsmi:postAuthRedirect");
+    }
+    const target = safeRedirect(next ?? stashed);
     const t = setTimeout(() => {
       supabase.auth.getSession().then(({ data }) => {
         if (!data.session) {
@@ -76,7 +90,7 @@ function Callback() {
         }
         // Fire-and-forget welcome (won't delay redirect).
         void maybeSendWelcome(data.session as never);
-        navigate({ to: (next as "/app") || "/app" });
+        navigate({ to: target as "/app" });
       });
     }, 200);
     return () => clearTimeout(t);
