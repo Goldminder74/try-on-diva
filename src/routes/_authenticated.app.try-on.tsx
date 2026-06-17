@@ -49,6 +49,7 @@ type GenerateTest = {
   running: boolean;
   source?: string;
   wigName?: string;
+  model?: string;
   path?: string;
   signedUrl?: string;
   error?: string;
@@ -182,6 +183,7 @@ function AppTryOn() {
         running: false,
         source,
         wigName: testWig.name,
+        model: res.model,
         path: res.path,
         signedUrl: res.signedUrl,
       });
@@ -364,6 +366,7 @@ function AppTryOn() {
             <div className="mt-5 space-y-4 text-sm">
               <p className="text-xs text-foreground/60">
                 Wig: <span className="font-medium text-foreground">{gen.wigName}</span> · Photo: {gen.source}
+                {gen.model ? <> · Model: <span className="font-medium text-foreground">{gen.model}</span></> : null}
               </p>
               <div>
                 <p className="font-mono text-xs uppercase tracking-wider text-foreground/50">Stored path</p>
@@ -383,11 +386,4 @@ function AppTryOn() {
                   />
                 )}
               </div>
-            </div>
-          )}
-        </div>
-      </section>
-      {/* ===================== END TEMPORARY TEST BLOCK ====================== */}
-    </div>
-  );
-}
+         

@@ -33,9 +33,16 @@ Strict requirements, in priority order:
 5. Match the lighting and shadow of IMAGE 1 so the wig looks photographed on this person.
 
 Output only the final composited image.`;
-// Gemini image-generation model. Swapping the backend later only touches
-// callGeminiImageAPI below, not generateTryOn.
-const GEMINI_MODEL = "gemini-2.0-flash-preview-image-generation";
+// Gemini image-generation model candidates, tried in order until one returns an
+// image. Swapping the backend later only touches callGeminiImageAPI below.
+// Note: gemini-1.5-flash and imagen-3.0-generate-002 are unlikely to succeed via
+// this generateContent call (1.5-flash returns text, not an inline image; Imagen
+// uses a different :predict endpoint), so gemini-2.0-flash-exp is the real target.
+const GEMINI_MODELS = [
+  "gemini-2.0-flash-exp",
+  "gemini-1.5-flash",
+  "imagen-3.0-generate-002",
+] as const;
 
 // Build a Supabase client for use inside server functions.
 // Lovable Cloud only exposes the publishable (anon) key server-side — there is no
@@ -119,14 +126,11 @@ async function callGeminiImageAPI(input: {
   userPhotoMimeType: string;
   wigImageBase64: string;
   wigImageMimeType: string;
-}): Promise<{ imageBase64: string; mimeType: string }> {
+}): Promise<{ imageBase64: string; mimeType: string; model: string }> {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
     throw new Error("Missing GEMINI_API_KEY in the server environment.");
   }
-
-  const endpoint =
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
   const body = {
     contents: [
@@ -138,34 +142,51 @@ async function callGeminiImageAPI(input: {
         ],
       },
     ],
-    // This preview model requires the response modalities to be declared.
+    // Ask for an image modality in the response.
     generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
   };
 
-  const res = await fetch(endpoint, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  // Try each candidate model in order; return the first that yields an image.
+  const failures: string[] = [];
+  for (const model of GEMINI_MODELS) {
+    try {
+      const endpoint =
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`Gemini API error ${res.status}: ${detail.slice(0, 500)}`);
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const detail = await res.text().catch(() => "");
+        failures.push(`${model}: HTTP ${res.status} ${detail.slice(0, 200)}`);
+        continue;
+      }
+
+      const json: any = await res.json();
+      const parts: any[] = json?.candidates?.[0]?.content?.parts ?? [];
+      // REST responses use camelCase (inlineData); accept snake_case defensively too.
+      const imagePart = parts.find((p) => p?.inlineData?.data || p?.inline_data?.data);
+      const data: string | undefined =
+        imagePart?.inlineData?.data ?? imagePart?.inline_data?.data;
+      const mimeType: string =
+        imagePart?.inlineData?.mimeType ?? imagePart?.inline_data?.mime_type ?? "image/png";
+
+      if (!data) {
+        failures.push(`${model}: no image in response`);
+        continue;
+      }
+
+      console.log(`[generateTryOn] image generated with model: ${model}`);
+      return { imageBase64: data, mimeType, model };
+    } catch (err) {
+      failures.push(`${model}: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
-  const json: any = await res.json();
-  const parts: any[] = json?.candidates?.[0]?.content?.parts ?? [];
-  // REST responses use camelCase (inlineData); accept snake_case defensively too.
-  const imagePart = parts.find((p) => p?.inlineData?.data || p?.inline_data?.data);
-  const data: string | undefined = imagePart?.inlineData?.data ?? imagePart?.inline_data?.data;
-  const mimeType: string =
-    imagePart?.inlineData?.mimeType ?? imagePart?.inline_data?.mime_type ?? "image/png";
-
-  if (!data) {
-    throw new Error("Gemini returned no image in the response.");
-  }
-
-  return { imageBase64: data, mimeType };
+  throw new Error(`All Gemini models failed. ${failures.join(" | ")}`);
 }
 
 /**
@@ -391,6 +412,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
       path: stored.path,
       signedUrl: stored.signedUrl,
       expiresIn: stored.expiresIn,
+      model: generated.model,
     };
   });
 
@@ -487,27 +509,3 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
       .slice(0, 10);
     const count = prof && prof.try_on_month_reset >= monthStart ? prof.try_on_count_this_month : 0;
 
-    const { data: subRows } = await supabase
-      .from("subscriptions")
-      .select("plan, status, current_period_end")
-      .eq("profile_id", userId)
-      .eq("customer_type", "consumer")
-      .order("created_at", { ascending: false })
-      .limit(1);
-    const subRow = subRows?.[0];
-    const stillValid =
-      !!subRow &&
-      ((["active", "trialing", "past_due"].includes(subRow.status) &&
-        (!subRow.current_period_end || new Date(subRow.current_period_end) > new Date())) ||
-        (subRow.status === "canceled" &&
-          subRow.current_period_end &&
-          new Date(subRow.current_period_end) > new Date()));
-    const isPaid = Boolean(stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro"));
-
-    return {
-      isPaid,
-      used: count,
-      quota: FREE_QUOTA,
-      remaining: isPaid ? null : Math.max(0, FREE_QUOTA - count),
-    };
-  });
