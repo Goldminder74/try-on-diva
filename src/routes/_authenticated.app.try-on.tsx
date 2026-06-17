@@ -64,16 +64,18 @@ function AppTryOn() {
   const [error, setError] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ remaining: number | null; isPaid: boolean } | null>(null);
   const [blocked, setBlocked] = useState(false);
+  const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
+  const [applying, setApplying] = useState(false);
 
   const record = useServerFn(recordTryOn);
   const fetchQuota = useServerFn(getTryOnQuota);
+  const runGenerate = useServerFn(generateTryOn);
 
   // TEMP: storage self-test wiring. Remove before launch.
   const runUpload = useServerFn(uploadTryOnResult);
   const [test, setTest] = useState<StorageTest | null>(null);
 
   // TEMP: Gemini generate-test wiring. Remove before launch.
-  const runGenerate = useServerFn(generateTryOn);
   const [gen, setGen] = useState<GenerateTest | null>(null);
 
   useEffect(() => {
