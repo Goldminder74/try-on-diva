@@ -525,30 +525,3 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
       isPaid,
     };
   });
-
-
-
-    const { data: subRows } = await supabase
-      .from("subscriptions")
-      .select("plan, status, current_period_end")
-      .eq("profile_id", userId)
-      .eq("customer_type", "consumer")
-      .order("created_at", { ascending: false })
-      .limit(1);
-    const subRow = subRows?.[0];
-    const stillValid =
-      !!subRow &&
-      ((["active", "trialing", "past_due"].includes(subRow.status) &&
-        (!subRow.current_period_end || new Date(subRow.current_period_end) > new Date())) ||
-        (subRow.status === "canceled" &&
-          subRow.current_period_end &&
-          new Date(subRow.current_period_end) > new Date()));
-    const isPaid = Boolean(stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro"));
-
-    return {
-      isPaid,
-      used: count,
-      quota: FREE_QUOTA,
-      remaining: isPaid ? null : Math.max(0, FREE_QUOTA - count),
-    };
-  });
