@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Upload, RefreshCw, FlaskConical } from "lucide-react";
+import { Upload, RefreshCw } from "lucide-react";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
 import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
 import { useServerFn } from "@tanstack/react-start";
