@@ -64,16 +64,18 @@ function AppTryOn() {
   const [error, setError] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ remaining: number | null; isPaid: boolean } | null>(null);
   const [blocked, setBlocked] = useState(false);
+  const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
+  const [applying, setApplying] = useState(false);
 
   const record = useServerFn(recordTryOn);
   const fetchQuota = useServerFn(getTryOnQuota);
+  const runGenerate = useServerFn(generateTryOn);
 
   // TEMP: storage self-test wiring. Remove before launch.
   const runUpload = useServerFn(uploadTryOnResult);
   const [test, setTest] = useState<StorageTest | null>(null);
 
   // TEMP: Gemini generate-test wiring. Remove before launch.
-  const runGenerate = useServerFn(generateTryOn);
   const [gen, setGen] = useState<GenerateTest | null>(null);
 
   useEffect(() => {
@@ -86,17 +88,43 @@ function AppTryOn() {
   }, [fetchQuota, search.wig]);
 
   const onTryOn = async () => {
-    if (!wig) return;
+    if (!wig || !photo) {
+      setError(!photo ? "Upload a selfie first." : "Pick a wig first.");
+      return;
+    }
     setError(null);
+    setApplying(true);
     try {
       const res = await record({ data: { wigId: wig.id } });
       if (!res.allowed) {
         setBlocked(true);
+        setApplying(false);
         return;
       }
       setQuota((q) => (q ? { ...q, remaining: res.remaining } : q));
+
+      if (!wig.images?.[0]) throw new Error("This wig has no image.");
+      const userPhotoBase64 = await blobToBase64(photo);
+      const userPhotoMimeType = photo.type as "image/jpeg" | "image/png" | "image/webp";
+      const wigImageUrl = new URL(wig.images[0], window.location.origin).href;
+
+      const out = await runGenerate({
+        data: {
+          userPhotoBase64,
+          userPhotoMimeType,
+          wigId: wig.id,
+          wigImageUrl,
+          wigName: wig.name,
+          wigStyleType: wig.style_type || "wig",
+          wigColour: wig.colors?.[0] || "natural",
+        },
+      });
+      setGeneratedUrl(out.signedUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't record try-on.");
+      setGeneratedUrl(null);
+      setError(err instanceof Error ? err.message : "Try-on generation failed.");
+    } finally {
+      setApplying(false);
     }
   };
 
@@ -105,6 +133,7 @@ function AppTryOn() {
     if (f.size > 10 * 1024 * 1024) return setError("File too large — max 10MB.");
     if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) return setError("Use JPEG, PNG or WebP.");
     setError(null);
+    setGeneratedUrl(null);
     setPhoto(f);
   };
 
@@ -216,29 +245,38 @@ function AppTryOn() {
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         <div>
-          <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
+          {generatedUrl ? (
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
+              <img src={generatedUrl} alt="Your try-on result" className="w-full object-contain" />
+            </div>
+          ) : (
+            <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
+          )}
           <div className="mt-4 flex flex-wrap gap-3">
             <button
               onClick={() => fileRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-md border border-mahogany bg-transparent px-4 py-2 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream"
+              disabled={applying}
+              className="inline-flex items-center gap-2 rounded-md border border-mahogany bg-transparent px-4 py-2 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream disabled:opacity-50"
             >
               <Upload className="h-4 w-4" /> {photo ? "Change photo" : "Upload selfie"}
             </button>
-            {photo && (
+            {(photo || generatedUrl) && (
               <button
-                onClick={() => setPhoto(null)}
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany"
+                onClick={() => { setPhoto(null); setGeneratedUrl(null); setError(null); }}
+                disabled={applying}
+                className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany disabled:opacity-50"
               >
                 <RefreshCw className="h-4 w-4" /> Reset
               </button>
             )}
             <button
               onClick={onTryOn}
-              disabled={!wig || blocked}
+              disabled={!wig || !photo || blocked || applying}
               className="inline-flex items-center gap-2 rounded-md bg-gold px-4 py-2 text-sm font-medium text-mahogany hover:bg-gold-dark hover:text-cream disabled:opacity-50"
             >
-              Apply wig
+              {applying ? (<><RefreshCw className="h-4 w-4 animate-spin" /> Generating…</>) : "Apply wig"}
             </button>
+
             <input
               ref={fileRef}
               type="file"
