@@ -11,6 +11,32 @@ const FREE_QUOTA = 5;
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 7;
 const TRYONS_BUCKET = "tryons";
 
+// ---------------------------------------------------------------------------
+// Gemini try-on generation (Phase 1C)
+// ---------------------------------------------------------------------------
+
+// EDITABLE PROMPT — replace this placeholder with the real try-on prompt.
+// The following tokens are substituted at call time with the selected wig's
+// fields, so you can use them in the real prompt: {wigName}, {wigStyleType},
+// {wigColour}. Tokens that are not present are simply left out.
+const TRYON_PROMPT = `You are compositing a virtual hair try-on. You are given two images:
+IMAGE 1 is a photograph of a real person.
+IMAGE 2 is a wig product, named "{wigName}", style type "{wigStyleType}", colour "{wigColour}".
+
+Task: produce a single photorealistic image of the SAME person from IMAGE 1 now wearing the EXACT wig shown in IMAGE 2.
+
+Strict requirements, in priority order:
+1. Preserve the person's identity completely: same face, same features, same expression, same body, same background.
+2. Preserve the person's skin tone EXACTLY as it appears in IMAGE 1. Do not lighten, brighten, warm, cool, or otherwise alter the skin. Match the original luminance and undertone precisely. This is critical and non-negotiable.
+3. Reproduce the wig from IMAGE 2 faithfully: the same length, shape, parting, colour, and texture, including the specific pattern of any braids, locs, or curls. Do not substitute a generic or stylised version. The customer is buying this exact product.
+4. Fit the wig naturally with a realistic hairline and natural edges. Replace existing hair.
+5. Match the lighting and shadow of IMAGE 1 so the wig looks photographed on this person.
+
+Output only the final composited image.`;
+// Gemini image-generation model. Swapping the backend later only touches
+// callGeminiImageAPI below, not generateTryOn.
+const GEMINI_MODEL = "gemini-2.0-flash-preview-image-generation";
+
 // Build a Supabase client for use inside server functions.
 // Lovable Cloud only exposes the publishable (anon) key server-side — there is no
 // service-role key — so all access runs under the publishable key. When an access
@@ -58,6 +84,88 @@ function getBearerToken(): string {
   const request = getRequest();
   const authHeader = request?.headers?.get("authorization") ?? "";
   return authHeader.startsWith("Bearer ") ? authHeader.slice("Bearer ".length).trim() : "";
+}
+
+// Encode raw bytes (e.g. a fetched wig image) to base64 for a Gemini inline part.
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
+// Substitute the wig fields into TRYON_PROMPT. Unknown tokens are left untouched;
+// the placeholder prompt has no tokens, so this is a no-op until you add them.
+function buildTryOnPrompt(wig: { name: string; styleType: string; colour: string }): string {
+  return TRYON_PROMPT.replaceAll("{wigName}", wig.name)
+    .replaceAll("{wigStyleType}", wig.styleType)
+    .replaceAll("{wigColour}", wig.colour);
+}
+
+/**
+ * Single, swappable boundary around the image-generation backend.
+ *
+ * It takes a text prompt plus the user photo and wig product image (both as
+ * base64 + mime type) and returns the generated image as base64. To move off
+ * Gemini later, reimplement only this function — generateTryOn never references
+ * the provider directly.
+ *
+ * GEMINI_API_KEY is read here from the server-side environment and is never
+ * sent to or exposed in the client.
+ */
+async function callGeminiImageAPI(input: {
+  prompt: string;
+  userPhotoBase64: string;
+  userPhotoMimeType: string;
+  wigImageBase64: string;
+  wigImageMimeType: string;
+}): Promise<{ imageBase64: string; mimeType: string }> {
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  if (!GEMINI_API_KEY) {
+    throw new Error("Missing GEMINI_API_KEY in the server environment.");
+  }
+
+  const endpoint =
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+
+  const body = {
+    contents: [
+      {
+        parts: [
+          { text: input.prompt },
+          { inline_data: { mime_type: input.userPhotoMimeType, data: input.userPhotoBase64 } },
+          { inline_data: { mime_type: input.wigImageMimeType, data: input.wigImageBase64 } },
+        ],
+      },
+    ],
+    // This preview model requires the response modalities to be declared.
+    generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+  };
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`Gemini API error ${res.status}: ${detail.slice(0, 500)}`);
+  }
+
+  const json: any = await res.json();
+  const parts: any[] = json?.candidates?.[0]?.content?.parts ?? [];
+  // REST responses use camelCase (inlineData); accept snake_case defensively too.
+  const imagePart = parts.find((p) => p?.inlineData?.data || p?.inline_data?.data);
+  const data: string | undefined = imagePart?.inlineData?.data ?? imagePart?.inline_data?.data;
+  const mimeType: string =
+    imagePart?.inlineData?.mimeType ?? imagePart?.inline_data?.mime_type ?? "image/png";
+
+  if (!data) {
+    throw new Error("Gemini returned no image in the response.");
+  }
+
+  return { imageBase64: data, mimeType };
 }
 
 /**
@@ -188,6 +296,101 @@ export const getTryOnSignedUrl = createServerFn({ method: "GET" })
       path: row.result_url,
       signedUrl: signed.signedUrl,
       expiresIn: SIGNED_URL_TTL_SECONDS,
+    };
+  });
+
+/**
+ * Generate a virtual try-on image, store it, and return a signed URL.
+ *
+ * Flow: fetch the wig product image -> call the image-generation backend
+ * (callGeminiImageAPI) with the user photo, the wig image and the prompt ->
+ * hand the generated base64 to uploadTryOnResult for storage + a signed URL ->
+ * log the analytics event to try_on_events (without the result path).
+ *
+ * COST: every call incurs a Gemini image-generation fee (billed per generated
+ * image). A billing cap is set on the Google Cloud / Gemini API project so a
+ * traffic spike cannot run up an unbounded bill.
+ */
+export const generateTryOn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (d: {
+      userPhotoBase64: string;
+      userPhotoMimeType: string;
+      wigId: string;
+      wigImageUrl: string;
+      wigName: string;
+      wigStyleType: string;
+      wigColour: string;
+    }) =>
+      z
+        .object({
+          userPhotoBase64: z.string().min(1),
+          userPhotoMimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+          wigId: z.string().uuid(),
+          wigImageUrl: z.string().url(),
+          wigName: z.string().min(1),
+          wigStyleType: z.string().min(1),
+          wigColour: z.string().min(1),
+        })
+        .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    // 1. Fetch the wig product image and encode it for an inline Gemini part.
+    const wigRes = await fetch(data.wigImageUrl);
+    if (!wigRes.ok) {
+      throw new Error(`Could not fetch wig image (${wigRes.status}).`);
+    }
+    const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
+    const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
+
+    // 2. Generate the try-on image (provider hidden behind callGeminiImageAPI).
+    const prompt = buildTryOnPrompt({
+      name: data.wigName,
+      styleType: data.wigStyleType,
+      colour: data.wigColour,
+    });
+    const generated = await callGeminiImageAPI({
+      prompt,
+      userPhotoBase64: data.userPhotoBase64,
+      userPhotoMimeType: data.userPhotoMimeType,
+      wigImageBase64,
+      wigImageMimeType,
+    });
+
+    // 3. Store the result and get a signed URL. uploadTryOnResult reads the same
+    //    caller token from the request, so the upload + tryon_results insert run
+    //    under this user's RLS.
+    const stored = await uploadTryOnResult({
+      data: {
+        wigId: data.wigId,
+        imageBase64: generated.imageBase64,
+        contentType: generated.mimeType,
+      },
+    });
+
+    // 4. Record the analytics event exactly like recordTryOn does — note that the
+    //    result path is intentionally NOT written to try_on_events.
+    const { data: wig } = await supabase
+      .from("wigs")
+      .select("retailer_id")
+      .eq("id", data.wigId)
+      .maybeSingle();
+    const { error: evErr } = await supabase.from("try_on_events").insert({
+      user_id: userId,
+      wig_id: data.wigId,
+      retailer_id: wig?.retailer_id ?? null,
+      source: "app",
+    });
+    if (evErr) throw evErr;
+
+    return {
+      id: stored.id,
+      path: stored.path,
+      signedUrl: stored.signedUrl,
+      expiresIn: stored.expiresIn,
     };
   });
 
