@@ -217,7 +217,7 @@ function AppTryOn() {
             )}
             <button
               onClick={() => applyWig()}
-              disabled={!wig || !photo || blocked || applying}
+              disabled={!wig || blocked || applying}
               className="inline-flex items-center gap-2 rounded-md bg-gold px-4 py-2 text-sm font-medium text-mahogany hover:bg-gold-dark hover:text-cream disabled:opacity-50"
             >
               {applying ? (<><RefreshCw className="h-4 w-4 animate-spin" /> Generating…</>) : "Apply wig"}
