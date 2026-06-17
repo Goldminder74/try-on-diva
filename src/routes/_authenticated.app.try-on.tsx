@@ -4,8 +4,10 @@ import { Upload, RefreshCw, FlaskConical } from "lucide-react";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
 import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
 import { useServerFn } from "@tanstack/react-start";
-import { recordTryOn, getTryOnQuota, uploadTryOnResult } from "@/lib/try-on.functions";
+import { recordTryOn, getTryOnQuota, uploadTryOnResult, generateTryOn } from "@/lib/try-on.functions";
 import { Link } from "@tanstack/react-router";
+// TEMP: placeholder selfie for the generate test (same-origin bundled asset). Remove with the panel.
+import heroModel from "@/assets/hero-model.jpg";
 
 export const Route = createFileRoute("/_authenticated/app/try-on")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -19,6 +21,19 @@ export const Route = createFileRoute("/_authenticated/app/try-on")({
 const TINY_PNG =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
+// TEMP: read a Blob/File as base64 (strips the data-URL prefix). Remove with the panel.
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      resolve(result.slice(result.indexOf(",") + 1));
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 // TEMP: state shape for the storage self-test. Remove with the panel before launch.
 type StorageTest = {
   running: boolean;
@@ -26,6 +41,16 @@ type StorageTest = {
   signedUrl?: string;
   publicUrl?: string;
   publicResult?: "checking" | "failed" | "loaded";
+  error?: string;
+};
+
+// TEMP: state shape for the Gemini generate test. Remove with the panel before launch.
+type GenerateTest = {
+  running: boolean;
+  source?: string;
+  wigName?: string;
+  path?: string;
+  signedUrl?: string;
   error?: string;
 };
 
@@ -45,6 +70,10 @@ function AppTryOn() {
   // TEMP: storage self-test wiring. Remove before launch.
   const runUpload = useServerFn(uploadTryOnResult);
   const [test, setTest] = useState<StorageTest | null>(null);
+
+  // TEMP: Gemini generate-test wiring. Remove before launch.
+  const runGenerate = useServerFn(generateTryOn);
+  const [gen, setGen] = useState<GenerateTest | null>(null);
 
   useEffect(() => {
     fetchFeaturedWigs(9).then((items) => {
@@ -106,6 +135,58 @@ function AppTryOn() {
       }
     } catch (err) {
       setTest({ running: false, error: err instanceof Error ? err.message : "Storage test failed." });
+    }
+  };
+
+  // TEMP: fires generateTryOn end to end with the first catalogue wig and either
+  // the uploaded selfie or a placeholder photo, then renders the result. Remove
+  // before launch.
+  const runGenerateTest = async () => {
+    setGen({ running: true });
+    try {
+      const testWig = list[0];
+      if (!testWig) throw new Error("No wig in the catalogue yet.");
+      if (!testWig.images?.[0]) throw new Error("First wig has no product image.");
+
+      // Photo: uploaded selfie if present, else the bundled hero image (same-origin).
+      let userPhotoBase64: string;
+      let userPhotoMimeType: "image/jpeg" | "image/png" | "image/webp";
+      let source: string;
+      if (photo) {
+        userPhotoBase64 = await blobToBase64(photo);
+        userPhotoMimeType = photo.type as "image/jpeg" | "image/png" | "image/webp";
+        source = "uploaded selfie";
+      } else {
+        const blob = await (await fetch(heroModel)).blob();
+        userPhotoBase64 = await blobToBase64(blob);
+        userPhotoMimeType = "image/jpeg";
+        source = "placeholder photo";
+      }
+
+      // Make the wig image URL absolute so the server can fetch it.
+      const wigImageUrl = new URL(testWig.images[0], window.location.origin).href;
+
+      const res = await runGenerate({
+        data: {
+          userPhotoBase64,
+          userPhotoMimeType,
+          wigId: testWig.id,
+          wigImageUrl,
+          wigName: testWig.name,
+          wigStyleType: testWig.style_type || "wig",
+          wigColour: testWig.colors?.[0] || "natural",
+        },
+      });
+
+      setGen({
+        running: false,
+        source,
+        wigName: testWig.name,
+        path: res.path,
+        signedUrl: res.signedUrl,
+      });
+    } catch (err) {
+      setGen({ running: false, error: err instanceof Error ? err.message : "Generate test failed." });
     }
   };
 
@@ -256,6 +337,55 @@ function AppTryOn() {
             </div>
           </div>
         )}
+
+        {/* --- Gemini generate test (end to end) --- */}
+        <div className="mt-8 border-t border-gold/30 pt-6">
+          <h2 className="font-display text-2xl text-mahogany">Gemini generate test</h2>
+          <p className="mt-1 text-sm text-foreground/70">
+            Calls <code>generateTryOn</code> with the first catalogue wig and your uploaded selfie
+            (or a placeholder photo if none). The generated image renders below. This is where we
+            check skin tone is preserved and the wig is faithful.
+          </p>
+
+          <button
+            onClick={runGenerateTest}
+            disabled={gen?.running || list.length === 0}
+            className="mt-4 inline-flex items-center gap-2 rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
+          >
+            <FlaskConical className="h-4 w-4" />
+            {gen?.running ? "Generating…" : "Run generate test"}
+          </button>
+
+          {gen?.error && (
+            <p className="mt-4 rounded-md bg-error/10 px-3 py-2 text-sm text-error">Error: {gen.error}</p>
+          )}
+
+          {gen && !gen.error && !gen.running && (
+            <div className="mt-5 space-y-4 text-sm">
+              <p className="text-xs text-foreground/60">
+                Wig: <span className="font-medium text-foreground">{gen.wigName}</span> · Photo: {gen.source}
+              </p>
+              <div>
+                <p className="font-mono text-xs uppercase tracking-wider text-foreground/50">Stored path</p>
+                <p className="mt-1 break-all font-mono text-foreground">{gen.path}</p>
+              </div>
+              <div>
+                <p className="font-mono text-xs uppercase tracking-wider text-foreground/50">Signed URL</p>
+                <p className="mt-1 break-all font-mono text-xs text-foreground/80">{gen.signedUrl}</p>
+              </div>
+              <div>
+                <p className="font-mono text-xs uppercase tracking-wider text-foreground/50">Generated image</p>
+                {gen.signedUrl && (
+                  <img
+                    src={gen.signedUrl}
+                    alt="generated try-on result"
+                    className="mt-2 w-full max-w-sm rounded-lg border border-border"
+                  />
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </section>
       {/* ===================== END TEMPORARY TEST BLOCK ====================== */}
     </div>
