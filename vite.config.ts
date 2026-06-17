@@ -12,4 +12,12 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
+  vite: {
+    optimizeDeps: {
+      // Vite can briefly serve stale optimized dependency URLs after a
+      // re-optimization pass; ignore them so the client reload can recover
+      // instead of surfacing 504 "Outdated Optimize Dep" as a blank preview.
+      ignoreOutdatedRequests: true,
+    },
+  },
 });
