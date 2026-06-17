@@ -60,6 +60,10 @@ export function AuthForm({ mode }: { mode: Mode }) {
     setError(null);
     setBusy(true);
     try {
+      // Stash redirect for /auth/callback to consume after OAuth round-trip.
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem("wigsmi:postAuthRedirect", redirectTo);
+      }
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: `${window.location.origin}/auth/callback`,
       });
@@ -69,7 +73,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         return;
       }
       if (result.redirected) return;
-      navigate({ to: "/app" });
+      navigate({ to: redirectTo });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-in failed.");
       setBusy(false);
