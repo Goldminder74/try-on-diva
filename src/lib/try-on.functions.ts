@@ -35,13 +35,13 @@ Strict requirements, in priority order:
 Output only the final composited image.`;
 // Gemini image-generation model candidates, tried in order until one returns an
 // image. Swapping the backend later only touches callGeminiImageAPI below.
-// Note: gemini-1.5-flash and imagen-3.0-generate-002 are unlikely to succeed via
-// this generateContent call (1.5-flash returns text, not an inline image; Imagen
-// uses a different :predict endpoint), so gemini-2.0-flash-exp is the real target.
+// Current Nano Banana image models in the Gemini 3 family, verified against
+// https://ai.google.dev/gemini-api/docs/models (updated 2026-06-15):
+//   gemini-3.1-flash-image = Nano Banana 2 (stable)
+//   gemini-3-pro-image     = Nano Banana Pro (stable)
 const GEMINI_MODELS = [
-  "gemini-2.0-flash-exp",
-  "gemini-1.5-flash",
-  "imagen-3.0-generate-002",
+  "gemini-3.1-flash-image",
+  "gemini-3-pro-image",
 ] as const;
 
 // Build a Supabase client for use inside server functions.
@@ -509,3 +509,27 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
       .slice(0, 10);
     const count = prof && prof.try_on_month_reset >= monthStart ? prof.try_on_count_this_month : 0;
 
+    const { data: subRows } = await supabase
+      .from("subscriptions")
+      .select("plan, status, current_period_end")
+      .eq("profile_id", userId)
+      .eq("customer_type", "consumer")
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const subRow = subRows?.[0];
+    const stillValid =
+      !!subRow &&
+      ((["active", "trialing", "past_due"].includes(subRow.status) &&
+        (!subRow.current_period_end || new Date(subRow.current_period_end) > new Date())) ||
+        (subRow.status === "canceled" &&
+          subRow.current_period_end &&
+          new Date(subRow.current_period_end) > new Date()));
+    const isPaid = Boolean(stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro"));
+
+    return {
+      isPaid,
+      used: count,
+      quota: FREE_QUOTA,
+      remaining: isPaid ? null : Math.max(0, FREE_QUOTA - count),
+    };
+  });
