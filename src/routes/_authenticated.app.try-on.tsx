@@ -4,8 +4,10 @@ import { Upload, RefreshCw, FlaskConical } from "lucide-react";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
 import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
 import { useServerFn } from "@tanstack/react-start";
-import { recordTryOn, getTryOnQuota, uploadTryOnResult, generateTryOn } from "@/lib/try-on.functions";
+import { getTryOnQuota, uploadTryOnResult, generateTryOn } from "@/lib/try-on.functions";
 import { Link } from "@tanstack/react-router";
+// Apply-wig generation logic lives in a hook outside this Lovable-managed file.
+import { useApplyWig, blobToBase64 } from "@/hooks/useApplyWig";
 // TEMP: placeholder selfie for the generate test (same-origin bundled asset). Remove with the panel.
 import heroModel from "@/assets/hero-model.jpg";
 
@@ -20,19 +22,6 @@ export const Route = createFileRoute("/_authenticated/app/try-on")({
 // 1x1 transparent PNG, base64 (no data-URL prefix).
 const TINY_PNG =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
-
-// TEMP: read a Blob/File as base64 (strips the data-URL prefix). Remove with the panel.
-function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
-      resolve(result.slice(result.indexOf(",") + 1));
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 
 // TEMP: state shape for the storage self-test. Remove with the panel before launch.
 type StorageTest = {
@@ -63,19 +52,17 @@ function AppTryOn() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ remaining: number | null; isPaid: boolean } | null>(null);
-  const [blocked, setBlocked] = useState(false);
-  const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
-  const [applying, setApplying] = useState(false);
 
-  const record = useServerFn(recordTryOn);
+  // Apply-wig flow (gate + selfie conversion + generateTryOn) lives in the hook.
+  const { applying, error: applyError, resultUrl, blocked, remaining, applyWig, reset: resetApply } =
+    useApplyWig(wig, photo);
+
   const fetchQuota = useServerFn(getTryOnQuota);
-  const runGenerate = useServerFn(generateTryOn);
 
-  // TEMP: storage self-test wiring. Remove before launch.
+  // TEMP: storage + generate self-test wiring. Remove before launch.
   const runUpload = useServerFn(uploadTryOnResult);
+  const runGenerate = useServerFn(generateTryOn);
   const [test, setTest] = useState<StorageTest | null>(null);
-
-  // TEMP: Gemini generate-test wiring. Remove before launch.
   const [gen, setGen] = useState<GenerateTest | null>(null);
 
   useEffect(() => {
@@ -87,53 +74,12 @@ function AppTryOn() {
     fetchQuota().then((q) => setQuota({ remaining: q.remaining, isPaid: q.isPaid }));
   }, [fetchQuota, search.wig]);
 
-  const onTryOn = async () => {
-    if (!wig || !photo) {
-      setError(!photo ? "Upload a selfie first." : "Pick a wig first.");
-      return;
-    }
-    setError(null);
-    setApplying(true);
-    try {
-      const res = await record({ data: { wigId: wig.id } });
-      if (!res.allowed) {
-        setBlocked(true);
-        setApplying(false);
-        return;
-      }
-      setQuota((q) => (q ? { ...q, remaining: res.remaining } : q));
-
-      if (!wig.images?.[0]) throw new Error("This wig has no image.");
-      const userPhotoBase64 = await blobToBase64(photo);
-      const userPhotoMimeType = photo.type as "image/jpeg" | "image/png" | "image/webp";
-      const wigImageUrl = new URL(wig.images[0], window.location.origin).href;
-
-      const out = await runGenerate({
-        data: {
-          userPhotoBase64,
-          userPhotoMimeType,
-          wigId: wig.id,
-          wigImageUrl,
-          wigName: wig.name,
-          wigStyleType: wig.style_type || "wig",
-          wigColour: wig.colors?.[0] || "natural",
-        },
-      });
-      setGeneratedUrl(out.signedUrl);
-    } catch (err) {
-      setGeneratedUrl(null);
-      setError(err instanceof Error ? err.message : "Try-on generation failed.");
-    } finally {
-      setApplying(false);
-    }
-  };
-
   const onFile = (f: File | undefined) => {
     if (!f) return;
     if (f.size > 10 * 1024 * 1024) return setError("File too large — max 10MB.");
     if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) return setError("Use JPEG, PNG or WebP.");
     setError(null);
-    setGeneratedUrl(null);
+    resetApply();
     setPhoto(f);
   };
 
@@ -168,15 +114,15 @@ function AppTryOn() {
     }
   };
 
-  // TEMP: fires generateTryOn end to end with the first catalogue wig and either
-  // the uploaded selfie or a placeholder photo, then renders the result. Remove
+  // TEMP: fires generateTryOn end to end with the selected wig and either the
+  // uploaded selfie or a placeholder photo, then renders the result. Remove
   // before launch.
   const runGenerateTest = async () => {
     setGen({ running: true });
     try {
-      const testWig = list[0];
-      if (!testWig) throw new Error("No wig in the catalogue yet.");
-      if (!testWig.images?.[0]) throw new Error("First wig has no product image.");
+      const testWig = wig ?? list[0];
+      if (!testWig) throw new Error("No wig selected.");
+      if (!testWig.images?.[0]) throw new Error("Selected wig has no product image.");
 
       // Photo: uploaded selfie if present, else the bundled hero image (same-origin).
       let userPhotoBase64: string;
@@ -230,7 +176,7 @@ function AppTryOn() {
         </div>
         {quota && !quota.isPaid && (
           <p className="text-xs text-muted-foreground">
-            <span className="font-mono text-gold-dark">{quota.remaining ?? 0}</span> free try-ons left this month
+            <span className="font-mono text-gold-dark">{(remaining ?? quota.remaining) ?? 0}</span> free try-ons left this month
           </p>
         )}
       </div>
@@ -245,9 +191,9 @@ function AppTryOn() {
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         <div>
-          {generatedUrl ? (
+          {resultUrl ? (
             <div className="overflow-hidden rounded-xl border border-border bg-card">
-              <img src={generatedUrl} alt="Your try-on result" className="w-full object-contain" />
+              <img src={resultUrl} alt="Your try-on result" className="w-full object-contain" />
             </div>
           ) : (
             <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
@@ -260,9 +206,9 @@ function AppTryOn() {
             >
               <Upload className="h-4 w-4" /> {photo ? "Change photo" : "Upload selfie"}
             </button>
-            {(photo || generatedUrl) && (
+            {(photo || resultUrl) && (
               <button
-                onClick={() => { setPhoto(null); setGeneratedUrl(null); setError(null); }}
+                onClick={() => { setPhoto(null); setError(null); resetApply(); }}
                 disabled={applying}
                 className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany disabled:opacity-50"
               >
@@ -270,7 +216,7 @@ function AppTryOn() {
               </button>
             )}
             <button
-              onClick={onTryOn}
+              onClick={() => applyWig()}
               disabled={!wig || !photo || blocked || applying}
               className="inline-flex items-center gap-2 rounded-md bg-gold px-4 py-2 text-sm font-medium text-mahogany hover:bg-gold-dark hover:text-cream disabled:opacity-50"
             >
@@ -285,7 +231,7 @@ function AppTryOn() {
               onChange={(e) => onFile(e.target.files?.[0])}
             />
           </div>
-          {error && <p className="mt-3 text-sm text-error">{error}</p>}
+          {(error || applyError) && <p className="mt-3 text-sm text-error">{error || applyError}</p>}
         </div>
 
         <aside>
@@ -306,7 +252,7 @@ function AppTryOn() {
       </div>
 
       {/* ===================================================================== */}
-      {/* TEMPORARY — Storage self-test. Remove this whole block before launch.  */}
+      {/* TEMPORARY — Storage + generate self-tests. Remove this block before launch. */}
       {/* ===================================================================== */}
       <section className="mt-12 rounded-xl border-2 border-dashed border-gold/50 bg-gold/5 p-5">
         <div className="flex items-center gap-2">
@@ -382,14 +328,14 @@ function AppTryOn() {
         <div className="mt-8 border-t border-gold/30 pt-6">
           <h2 className="font-display text-2xl text-mahogany">Gemini generate test</h2>
           <p className="mt-1 text-sm text-foreground/70">
-            Calls <code>generateTryOn</code> with the first catalogue wig and your uploaded selfie
+            Calls <code>generateTryOn</code> with the selected wig and your uploaded selfie
             (or a placeholder photo if none). The generated image renders below. This is where we
             check skin tone is preserved and the wig is faithful.
           </p>
 
           <button
             onClick={runGenerateTest}
-            disabled={gen?.running || list.length === 0}
+            disabled={gen?.running || (!wig && list.length === 0)}
             className="mt-4 inline-flex items-center gap-2 rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
           >
             <FlaskConical className="h-4 w-4" />
@@ -428,8 +374,7 @@ function AppTryOn() {
           )}
         </div>
       </section>
+      {/* ===================== END TEMPORARY TEST BLOCK ====================== */}
     </div>
   );
 }
-
-         
