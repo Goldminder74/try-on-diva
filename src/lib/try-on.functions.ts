@@ -28,8 +28,8 @@ Task: produce a single photorealistic image of the SAME person from IMAGE 1 now 
 Strict requirements, in priority order:
 1. Preserve the person's identity completely: same face, same features, same expression, same body, same background.
 2. Preserve the person's skin tone EXACTLY as it appears in IMAGE 1. Do not lighten, brighten, warm, cool, or otherwise alter the skin. Match the original luminance and undertone precisely. This is critical and non-negotiable.
-3. Reproduce the wig from IMAGE 2 faithfully: the same length, shape, parting, colour, and texture, including the specific pattern of any braids, locs, or curls. Do not substitute a generic or stylised version. The customer is buying this exact product.
-4. Fit the wig naturally with a realistic hairline and natural edges. Replace existing hair.
+3. Reproduce the wig from IMAGE 2 faithfully: the same length, shape, parting, colour, and texture, including the specific pattern of any braids, locs, or curls. Do not substitute a generic or stylised version. The customer is buying this exact product. The wig colour and highlights must match IMAGE 2 exactly, including any balayage, ombre, or multi-tone colouring. Do not default to black.
+4. Fit the wig naturally with a realistic hairline and natural edges. Replace existing hair.Blend the hairline seamlessly into the forehead with no visible lace strip or translucent band.
 5. Match the lighting and shadow of IMAGE 1 so the wig looks photographed on this person.
 
 Output only the final composited image.`;
