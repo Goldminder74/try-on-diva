@@ -386,4 +386,12 @@ function AppTryOn() {
                   />
                 )}
               </div>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
          
