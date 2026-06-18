@@ -52,6 +52,9 @@ function Onboarding() {
         setForm((f) => ({
           ...f,
           business_name: ctx.retailer!.business_name ?? "",
+          legal_business_name:
+            (ctx.retailer as { legal_business_name?: string | null })
+              .legal_business_name ?? "",
           display_name: ctx.retailer!.display_name ?? "",
           website: ctx.retailer!.website ?? "",
           country: ctx.retailer!.country ?? "",
