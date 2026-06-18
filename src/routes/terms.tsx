@@ -80,12 +80,12 @@ function TermsPage() {
 
           <section>
             <h2 className="font-display text-2xl text-mahogany">5. Payments, refunds, and cancellation</h2>
-            <ul className="list-disc space-y-2 pl-6">
-              <li>Retailer subscriptions are billed in advance by our payment processor.</li>
-              <li>You may cancel at any time from your billing portal; access continues until the end of the paid period.</li>
-              <li>Except where required by law, fees already paid are non-refundable.</li>
-              <li>UK consumer cancellation rights under the Consumer Contracts Regulations 2013 apply where relevant; by starting to use the Service you agree any 14-day cooling-off period for digital services may end when use begins.</li>
-            </ul>
+            <div className="mt-3 space-y-3">
+              <p>All payments are processed by Paddle (paddle.com), who acts as the merchant of record for transactions on Wigsmi. Your payment contract is with Paddle, and Paddle's terms apply to all billing matters.</p>
+              <p>Retailer subscriptions are billed monthly or yearly in advance and auto-renew until cancelled. You may cancel at any time from your billing portal; access continues until the end of the paid period.</p>
+              <p>Consumer paid plans are billed monthly and auto-renew until cancelled. You may cancel at any time from your account settings.</p>
+              <p>Refunds: you may request a full refund within 30 days of any purchase by emailing support@wigsmi.com. After 30 days, fees are non-refundable except where required by law.</p>
+            </div>
           </section>
 
           <section>
