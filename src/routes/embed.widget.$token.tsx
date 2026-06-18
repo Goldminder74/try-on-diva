@@ -114,7 +114,7 @@ function EmbedWidget() {
           {data.wigs.map((w) => (
             <a
               key={w.id}
-              href={w.product_url || "#"}
+              href={`/try-on?widget=${token}&wig=${w.id}`}
               target="_top"
               rel="noopener noreferrer"
               className="group block overflow-hidden rounded-xl border border-neutral-200 bg-white transition-shadow hover:shadow-md"
