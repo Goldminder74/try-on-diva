@@ -15,6 +15,7 @@ type Step = 1 | 2 | 3 | 4 | 5;
 
 interface Form {
   business_name: string;
+  legal_business_name: string;
   display_name: string;
   website: string;
   country: string;
@@ -35,6 +36,7 @@ function Onboarding() {
 
   const [form, setForm] = useState<Form>({
     business_name: "",
+    legal_business_name: "",
     display_name: "",
     website: "",
     country: "",
@@ -50,6 +52,9 @@ function Onboarding() {
         setForm((f) => ({
           ...f,
           business_name: ctx.retailer!.business_name ?? "",
+          legal_business_name:
+            (ctx.retailer as { legal_business_name?: string | null })
+              .legal_business_name ?? "",
           display_name: ctx.retailer!.display_name ?? "",
           website: ctx.retailer!.website ?? "",
           country: ctx.retailer!.country ?? "",
@@ -82,7 +87,10 @@ function Onboarding() {
   };
 
   const canNext: Record<Step, boolean> = {
-    1: form.business_name.length >= 2 && form.display_name.length >= 2,
+    1:
+      form.business_name.length >= 2 &&
+      form.legal_business_name.length >= 2 &&
+      form.display_name.length >= 2,
     2: form.website.length === 0 || /^https?:\/\//i.test(form.website),
     3: true,
     4: true,
@@ -110,14 +118,27 @@ function Onboarding() {
               kicker="Tell us about your business"
               title="Your shop, in your words."
             />
-            <Field label="Legal business name">
+            <Field label="Business name">
               <input
                 required
                 value={form.business_name}
                 onChange={(e) => set("business_name", e.target.value)}
                 className={inputCls}
+                placeholder="e.g. Sienna Hair"
+              />
+            </Field>
+            <Field label="Legal business name (for payment processing)">
+              <input
+                required
+                value={form.legal_business_name}
+                onChange={(e) => set("legal_business_name", e.target.value)}
+                className={inputCls}
                 placeholder="e.g. Sienna Hair Co. Ltd"
               />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Your registered legal entity name. Required for billing and tax
+                compliance. Not shown to shoppers.
+              </p>
             </Field>
             <Field label="Display name (shown to shoppers)">
               <input

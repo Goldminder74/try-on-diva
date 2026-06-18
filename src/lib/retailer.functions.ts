@@ -33,6 +33,7 @@ export const getMyRetailerContext = createServerFn({ method: "GET" })
 
 const onboardingSchema = z.object({
   business_name: z.string().min(2).max(120),
+  legal_business_name: z.string().min(2).max(200),
   display_name: z.string().min(2).max(120),
   website: z.string().url().optional().or(z.literal("")),
   country: z.string().max(80).optional(),
@@ -67,6 +68,7 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
     const payload = {
       owner_id: userId,
       business_name: data.business_name,
+      legal_business_name: data.legal_business_name,
       display_name: data.display_name,
       website: data.website || null,
       country: data.country || null,
