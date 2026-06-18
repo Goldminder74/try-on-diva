@@ -114,6 +114,29 @@ function TryOn() {
     };
   }, [fetchAnonStatus]);
 
+  // After a result is generated, give the user a moment to enjoy it.
+  // Open the soft prompt after 4s OR on the first meaningful interaction.
+  useEffect(() => {
+    if (!resultUrl || user) return;
+    let opened = false;
+    const open = () => {
+      if (opened) return;
+      opened = true;
+      setPostPromptOpen(true);
+    };
+    const timer = window.setTimeout(open, 4000);
+    const onScroll = () => open();
+    const onClick = () => open();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("click", onClick, { capture: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("click", onClick, { capture: true } as any);
+    };
+  }, [resultUrl, user]);
+
+
   // Load catalogue based on URL scope (widget token, retailer slug, or full).
   useEffect(() => {
     let cancelled = false;
