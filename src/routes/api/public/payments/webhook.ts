@@ -205,13 +205,8 @@ async function handlePaymentFailed(data: any, env: PaddleEnv) {
     .eq("paddle_subscription_id", subId)
     .eq("environment", env)
     .maybeSingle();
-  if (!row?.user_id || row.customer_type !== "retailer") return;
+  if (!row?.user_id) return;
 
-  const { data: retailer } = await sb
-    .from("retailers")
-    .select("id, business_name, display_name")
-    .eq("owner_id", row.user_id)
-    .maybeSingle();
   const { data: profile } = await sb
     .from("profiles")
     .select("email, display_name")
@@ -219,22 +214,41 @@ async function handlePaymentFailed(data: any, env: PaddleEnv) {
     .maybeSingle();
   if (!profile?.email) return;
 
-  await serverSendTransactionalEmail({
-    baseUrl: "https://wigsmi.com",
-    templateName: "retailer-payment-failed",
-    recipientEmail: profile.email,
-    // Use the transaction id so each failed attempt is its own send.
-    idempotencyKey: `payment-failed-${data?.id ?? subId}-${Date.now().toString(36)}`,
-    templateData: {
-      name: profile.display_name ?? retailer?.display_name,
-      businessName: retailer?.business_name,
-      billingUrl: "https://wigsmi.com/portal/billing",
-    },
-  });
+  if (row.customer_type === "retailer") {
+    const { data: retailer } = await sb
+      .from("retailers")
+      .select("id, business_name, display_name")
+      .eq("owner_id", row.user_id)
+      .maybeSingle();
+    await serverSendTransactionalEmail({
+      baseUrl: "https://wigsmi.com",
+      templateName: "retailer-payment-failed",
+      recipientEmail: profile.email,
+      idempotencyKey: `payment-failed-${data?.id ?? subId}-${Date.now().toString(36)}`,
+      templateData: {
+        name: profile.display_name ?? retailer?.display_name,
+        businessName: retailer?.business_name,
+        billingUrl: "https://wigsmi.com/portal/billing",
+      },
+    });
+  } else {
+    await serverSendTransactionalEmail({
+      baseUrl: "https://wigsmi.com",
+      templateName: "consumer-payment-failed",
+      recipientEmail: profile.email,
+      idempotencyKey: `payment-failed-${data?.id ?? subId}-${Date.now().toString(36)}`,
+      templateData: {
+        name: profile.display_name,
+        billingUrl: "https://wigsmi.com/pricing",
+      },
+    });
+  }
 }
 
-async function handleWebhook(req: Request, env: PaddleEnv) {
-  const event = await verifyWebhook(req, env);
+async function handleWebhook(req: Request) {
+  const signature = req.headers.get("paddle-signature");
+  const body = await req.text();
+  const { event, env } = await verifyWebhookAutoEnv(signature, body);
   switch (event.eventType) {
     case EventName.SubscriptionCreated:
       await handleSubscriptionCreated(event.data, env);
@@ -257,10 +271,8 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const url = new URL(request.url);
-        const env = (url.searchParams.get("env") || "sandbox") as PaddleEnv;
         try {
-          await handleWebhook(request, env);
+          await handleWebhook(request);
           return Response.json({ received: true });
         } catch (e) {
           console.error("Paddle webhook error:", e);
