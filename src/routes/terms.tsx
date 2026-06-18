@@ -60,7 +60,7 @@ function TermsPage() {
             <p>
               The consumer Service includes browsing the wig catalog, uploading
               selfies for AI try-on, and saving favourites. Free accounts have a
-              monthly try-on quota; paid tiers (when available) lift the quota.
+              monthly try-on quota; paid tiers (Plus and Pro) lift the quota.
               Try-on results are AI-generated previews and may not exactly match the
               physical product.
             </p>
