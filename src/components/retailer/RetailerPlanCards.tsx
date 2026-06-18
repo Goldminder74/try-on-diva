@@ -139,7 +139,7 @@ export function RetailerPlanCards({
               ) : (
                 <button
                   type="button"
-                  onClick={() => onChoose(p.id, priceId)}
+                  onClick={() => onChoose(p.id, priceId, p.name)}
                   disabled={busyHere}
                   className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-mahogany py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
                 >
