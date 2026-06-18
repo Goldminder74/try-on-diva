@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Code2, TrendingUp, ShieldCheck, Sparkles } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
+import { RetailerPlanCards } from "@/components/retailer/RetailerPlanCards";
 
 export const Route = createFileRoute("/retailer")({
   head: () => ({
