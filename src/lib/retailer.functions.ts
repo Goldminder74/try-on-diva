@@ -223,7 +223,7 @@ async function getRetailerEntitlement(
       (sub.status === "canceled" &&
         sub.current_period_end &&
         new Date(sub.current_period_end) > new Date()));
-  const hasPaidSub = !!subValid && (sub!.plan === "growth" || sub!.plan === "scale");
+  const hasPaidSub = !!subValid && (sub!.plan === "starter" || sub!.plan === "growth" || sub!.plan === "scale");
   const trialActive =
     !!retailer.trial_ends_at && new Date(retailer.trial_ends_at) > new Date();
   const effectivePlan = hasPaidSub ? sub!.plan : trialActive ? "starter" : "expired";

@@ -1,17 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 import { supabase } from "@/integrations/supabase/client";
 import { getPaddleEnvironment } from "@/lib/paddle";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  changeSubscriptionPlan,
   createPortalSession,
   listInvoices,
 } from "@/lib/subscription.functions";
-import { CheckCircle2, Sparkles, Loader2, ExternalLink, FileText } from "lucide-react";
+import { Loader2, ExternalLink, FileText, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { RetailerPlanCards } from "@/components/retailer/RetailerPlanCards";
+import type { RetailerPlanId } from "@/lib/retailer-plans";
 
 interface Invoice {
   id: string;
@@ -31,44 +31,6 @@ export const Route = createFileRoute("/portal/billing")({
   component: BillingPage,
 });
 
-type Interval = "monthly" | "yearly";
-
-const RETAILER_PLANS: {
-  id: string;
-  name: string;
-  prices: { monthly: string; yearly: string };
-  priceIds: { monthly: string | null; yearly: string | null };
-  desc: string;
-  badge?: string;
-  features: string[];
-}[] = [
-  {
-    id: "starter",
-    name: "Starter (Trial)",
-    prices: { monthly: "Free", yearly: "Free" },
-    priceIds: { monthly: null, yearly: null },
-    desc: "Get started with up to 30 wigs.",
-    features: ["Up to 30 wigs", "Basic analytics", "Email support"],
-  },
-  {
-    id: "growth",
-    name: "Growth",
-    prices: { monthly: "£149", yearly: "£1,162.20" },
-    priceIds: { monthly: "retailer_growth_monthly", yearly: "retailer_growth_yearly" },
-    desc: "Up to 150 wigs and full analytics.",
-    badge: "Most popular",
-    features: ["Up to 150 wigs", "Full analytics", "Priority email"],
-  },
-  {
-    id: "scale",
-    name: "Scale",
-    prices: { monthly: "£399", yearly: "£3,112.20" },
-    priceIds: { monthly: "retailer_scale_monthly", yearly: "retailer_scale_yearly" },
-    desc: "Unlimited wigs, premium support.",
-    features: ["Unlimited wigs", "Multi-store", "Priority phone support"],
-  },
-];
-
 interface CurrentSub {
   plan: string;
   status: string;
@@ -77,15 +39,14 @@ interface CurrentSub {
   billing_interval: string | null;
 }
 
+const PAID_PLAN_IDS: RetailerPlanId[] = ["starter", "growth", "scale"];
+
 function BillingPage() {
   const { user } = useAuth();
-  const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
-  const changePlan = useServerFn(changeSubscriptionPlan);
   const portal = useServerFn(createPortalSession);
   const invoicesFn = useServerFn(listInvoices);
   const [sub, setSub] = useState<CurrentSub | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
-  const [interval, setBillingInterval] = useState<Interval>("monthly");
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
 
   const refetch = () => {
@@ -131,33 +92,9 @@ function BillingPage() {
   const isPaidActive =
     !!sub &&
     ["active", "trialing", "past_due"].includes(sub.status) &&
-    (sub.plan === "growth" || sub.plan === "scale");
+    PAID_PLAN_IDS.includes(sub.plan as RetailerPlanId);
 
-  const currentPlanId = isPaidActive ? sub!.plan : "starter";
-
-  const onChoose = async (priceId: string | null, planId: string) => {
-    if (!priceId || !user) return;
-    setBusy(planId);
-    try {
-      if (isPaidActive && sub?.paddle_subscription_id) {
-        await changePlan({
-          data: { newPriceId: priceId, environment: getPaddleEnvironment() },
-        });
-        toast.success("Plan updated.");
-        return;
-      }
-      await openCheckout({
-        priceId,
-        customerEmail: user.email ?? undefined,
-        customData: { userId: user.id, plan: planId },
-        successUrl: `${window.location.origin}/portal/billing`,
-      });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not start checkout");
-    } finally {
-      setBusy(null);
-    }
-  };
+  const currentPlanId = isPaidActive ? (sub!.plan as RetailerPlanId) : null;
 
   const onManage = async () => {
     setBusy("portal");
@@ -175,105 +112,45 @@ function BillingPage() {
     <div>
       <div className="mb-8">
         <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Billing</p>
-        <h1 className="mt-1 font-display text-3xl text-mahogany">Your plan</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Current plan: <span className="font-medium capitalize text-foreground">{currentPlanId}</span>
-          {sub?.billing_interval === "year" && <span className="capitalize text-foreground"> · Yearly</span>}
-          {sub?.billing_interval === "month" && <span className="capitalize text-foreground"> · Monthly</span>}
-          {sub?.status && (
-            <>
-              {" "}· Status: <span className="capitalize">{sub.status}</span>
-            </>
-          )}
-        </p>
-        {sub?.status === "past_due" && (
-          <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
-            Your last payment failed. Please update your card to keep your account active.
-          </div>
-        )}
-        {isPaidActive && (
-          <button
-            onClick={onManage}
-            disabled={busy === "portal"}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-mahogany px-3 py-1.5 text-xs text-mahogany hover:bg-mahogany hover:text-cream disabled:opacity-50"
-          >
-            {busy === "portal" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
-            Manage subscription
-          </button>
-        )}
-      </div>
-
-      <div className="mb-6 inline-flex rounded-full border border-border bg-card p-1">
-        <button
-          onClick={() => setBillingInterval("monthly")}
-          className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-            interval === "monthly" ? "bg-mahogany text-cream" : "text-foreground/70"
-          }`}
-        >
-          Monthly
-        </button>
-        <button
-          onClick={() => setBillingInterval("yearly")}
-          className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-            interval === "yearly" ? "bg-mahogany text-cream" : "text-foreground/70"
-          }`}
-        >
-          Yearly <span className="ml-1 text-gold">-35%</span>
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-        {RETAILER_PLANS.map((p) => {
-          const isCurrent = p.id === currentPlanId;
-          const busyHere = busy === p.id || (busy === null && checkoutLoading);
-          const priceId = p.priceIds[interval];
-          const periodLabel = p.id === "starter" ? "for 3 months" : interval === "monthly" ? "per month" : "per year";
-          return (
-            <div
-              key={p.id}
-              className={`relative rounded-xl border bg-card p-6 ${
-                p.badge ? "border-gold ring-1 ring-gold" : "border-border"
-              }`}
+        <h1 className="mt-1 font-display text-3xl text-mahogany">
+          {isPaidActive ? "Your plan" : "Subscribe to a plan"}
+        </h1>
+        {isPaidActive ? (
+          <>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Current plan: <span className="font-medium capitalize text-foreground">{currentPlanId}</span>
+              {sub?.billing_interval === "year" && <span className="capitalize text-foreground"> · Yearly</span>}
+              {sub?.billing_interval === "month" && <span className="capitalize text-foreground"> · Monthly</span>}
+              {sub?.status && (
+                <>
+                  {" "}· Status: <span className="capitalize">{sub.status}</span>
+                </>
+              )}
+            </p>
+            {sub?.status === "past_due" && (
+              <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+                Your last payment failed. Please update your card to keep your account active.
+              </div>
+            )}
+            <button
+              onClick={onManage}
+              disabled={busy === "portal"}
+              className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-mahogany px-3 py-1.5 text-xs text-mahogany hover:bg-mahogany hover:text-cream disabled:opacity-50"
             >
-              {p.badge && (
-                <span className="absolute -top-3 left-6 rounded-full bg-gold px-3 py-0.5 font-mono text-[10px] uppercase tracking-wider text-mahogany">
-                  {p.badge}
-                </span>
-              )}
-              <p className="font-display text-xl text-mahogany">{p.name}</p>
-              <p className="mt-3 font-mono text-3xl">{p.prices[interval]}</p>
-              <p className="text-xs text-muted-foreground">{periodLabel}</p>
-              <p className="mt-3 text-sm">{p.desc}</p>
-              <ul className="mt-4 space-y-2">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              {isCurrent ? (
-                <div className="mt-6 rounded-md border border-mahogany/20 bg-mahogany/5 py-2 text-center text-xs font-mono uppercase tracking-wider text-mahogany">
-                  Current plan
-                </div>
-              ) : priceId ? (
-                <button
-                  onClick={() => onChoose(priceId, p.id)}
-                  disabled={busyHere}
-                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-mahogany py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
-                >
-                  {busyHere ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-                  {isPaidActive ? `Switch to ${p.name}` : "Upgrade"}
-                </button>
-              ) : (
-                <div className="mt-6 text-center text-xs text-muted-foreground">
-                  Free trial active
-                </div>
-              )}
-            </div>
-          );
-        })}
+              {busy === "portal" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
+              Manage subscription
+            </button>
+          </>
+        ) : (
+          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+            You don't have an active subscription yet. Pick a plan below to
+            keep your wigs published and your widget live after your trial
+            ends. <Sparkles className="inline h-3.5 w-3.5 text-gold" />
+          </p>
+        )}
       </div>
+
+      <RetailerPlanCards currentPlanId={currentPlanId} />
 
       {invoices && invoices.length > 0 && (
         <div className="mt-10">

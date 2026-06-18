@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Clock, Lock } from "lucide-react";
 import { useRetailerStatus } from "@/hooks/use-retailer-status";
+import { RetailerPlanCards } from "@/components/retailer/RetailerPlanCards";
 
 /**
  * Banner shown above the portal when the retailer's trial is ending in
@@ -30,8 +31,8 @@ export function TrialEndingBanner() {
  */
 export function TrialExpiredPaywall() {
   return (
-    <div className="mx-auto max-w-2xl py-12">
-      <div className="rounded-2xl border border-border bg-card p-10 text-center shadow-[var(--shadow-card)]">
+    <div className="mx-auto max-w-5xl py-10">
+      <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-[var(--shadow-card)] md:p-10">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-mahogany/10 text-mahogany">
           <Lock className="h-5 w-5" />
         </div>
@@ -43,16 +44,25 @@ export function TrialExpiredPaywall() {
           republish everything automatically — no re-uploading, no
           reconfiguration.
         </p>
-        <Link
-          to="/portal/billing"
-          className="mt-7 inline-flex rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
-        >
-          Choose a plan
-        </Link>
-        <p className="mt-6 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-          Your catalog is safe — nothing is deleted.
-        </p>
       </div>
+
+      <div className="mt-8">
+        <RetailerPlanCards
+          successUrl={
+            typeof window !== "undefined"
+              ? `${window.location.origin}/portal?checkout=success`
+              : undefined
+          }
+        />
+      </div>
+
+      <p className="mt-6 text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+        Your catalog is safe — nothing is deleted.{" "}
+        <Link to="/portal/billing" className="text-mahogany underline">
+          Manage billing
+        </Link>
+      </p>
     </div>
   );
 }
+
