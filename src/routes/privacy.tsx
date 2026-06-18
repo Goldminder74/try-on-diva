@@ -83,7 +83,7 @@ function PrivacyPage() {
             <p>We share data only with processors that help us run the Service:</p>
             <ul className="list-disc space-y-2 pl-6">
               <li>Cloud hosting and database providers.</li>
-              <li>Payment processors (for retailer subscriptions).</li>
+              <li>Paddle (paddle.com) — our payment processor and merchant of record, who handles all billing for retailer and consumer subscriptions. Paddle is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See paddle.com/privacy.</li>
               <li>AI model providers used for the try-on engine.</li>
               <li>Email delivery providers.</li>
               <li>Analytics providers (aggregated, where possible).</li>
