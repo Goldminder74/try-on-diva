@@ -18,10 +18,11 @@ export interface SubscriptionRow {
   billing_interval: string | null;
 }
 
-export function useSubscription() {
+export function useSubscription(opts?: { customerType?: "consumer" | "retailer" }) {
   const { user } = useAuth();
   const [subscription, setSubscription] = useState<SubscriptionRow | null>(null);
   const [loading, setLoading] = useState(true);
+  const customerType = opts?.customerType;
 
   useEffect(() => {
     if (!user) {
@@ -33,11 +34,13 @@ export function useSubscription() {
     const env = getPaddleEnvironment();
 
     const fetch = async () => {
-      const { data } = await supabase
+      let q = supabase
         .from("subscriptions")
         .select("*")
         .eq("user_id", user.id)
-        .eq("environment", env)
+        .eq("environment", env);
+      if (customerType) q = q.eq("customer_type", customerType);
+      const { data } = await q
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -48,7 +51,7 @@ export function useSubscription() {
     fetch();
 
     const channel = supabase
-      .channel(`subs-${user.id}`)
+      .channel(`subs-${user.id}-${customerType ?? "any"}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "subscriptions", filter: `user_id=eq.${user.id}` },
@@ -60,7 +63,7 @@ export function useSubscription() {
       active = false;
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, customerType]);
 
   const isActive =
     !!subscription &&
