@@ -1,53 +1,69 @@
+# Rebuild Paddle from scratch
 
-# Gate "Apply wig" on the public /try-on page
+## Goal
 
-## Problem
+Get checkout working on `/portal/billing` by replacing the current orphaned Paddle sandbox account (which we can't log into) with a fresh one tied to `info@wigsmi.com`.
 
-`/try-on` is the public preview. Today it renders the AR preview engine but has no "Apply wig" action, so visitors can't try generation at all — they only see a static overlay. The protected version (`/app/try-on`) is gated by `_authenticated`, so an unauthenticated visitor who reaches it just gets bounced to `/auth`.
+## Important caveats before we start
 
-Goal: on the public `/try-on` page, add an "Apply wig" button that, for signed-out visitors, opens a friendly sign-up prompt instead of generating. Signed-in visitors get sent through to the real generator at `/app/try-on` with their wig selection preserved.
+1. **The new sandbox account will still be auto-provisioned under your Lovable login email (`ayo.m.ayeni@gmail.com`)**, not `info@wigsmi.com`. Lovable derives the Paddle account owner from your Lovable account. To make `info@wigsmi.com` the actual login email on the Paddle account, you'd need to either:
+   - Transfer your Lovable workspace to `info@wigsmi.com` first (Lovable docs: invite as admin → transfer project → delete old account), OR
+   - After the rebuild, log into the new Paddle sandbox via password reset and add `info@wigsmi.com` as an additional team member inside Paddle.
+2. **Existing test subscription rows in the DB will be orphaned** — they reference Paddle IDs from the old sandbox. No real customers affected (sandbox only). We can leave them or clean them up.
+3. **Live environment is untouched** — this is sandbox-only. The published app's live Paddle account is separate and already verified-ready.
 
-## Changes (single file: `src/routes/try-on.tsx`)
+## Steps
 
-1. Read auth state with `useAuth()` from `@/contexts/auth-context`.
-2. Add an **Apply wig** button next to "Upload selfie" / "Reset", styled with the existing gold token (same classes as the `/app/try-on` button) so it sits naturally in the toolbar. Always visible to everyone.
-3. Click handler:
-   - If `user` is null → open an `<AlertDialog>` (already in the UI kit, used elsewhere in the app) with:
-     - Title: "Create a free account to try this wig on."
-     - Body: "You get 5 free try-ons every month, no card needed."
-     - Two actions:
-       - **Create account** → `navigate({ to: "/auth/signup", search: { redirect: `/try-on?wig=${wig.id}` } })`
-       - **Log in** → `navigate({ to: "/auth/login", search: { redirect: `/try-on?wig=${wig.id}` } })`
-     - Cancel option to close the dialog.
-   - If `user` is present → `navigate({ to: "/app/try-on", search: { wig: wig.id } })` so they land on the real generator with the same wig pre-selected.
-4. Disable the button only when no wig is chosen (never gate on auth — the prompt is the whole point of the button for guests).
-5. Replace the existing "AR engine is in preview mode" gold note with a softer one-liner since the button now drives the real action.
+### You do (manual, can't be automated)
 
-## Auth flow round-trip
+1. Open the Payments dashboard → three-dots menu (top right) → **Disconnect Paddle**.
+2. Tell me when done.
 
-`AuthForm` currently hard-codes `navigate({ to: "/app" })` after login. To honor the `redirect` search param we:
+### I do (after you confirm disconnect)
 
-- Extend `auth.login` and `auth.signup` route `validateSearch` to accept `redirect?: string`.
-- In `AuthForm`, read the redirect via `useSearch({ strict: false })` and, on successful login (and on the post-confirm path after signup), `navigate({ to: redirect ?? "/app" })`. Only allow same-origin relative paths starting with `/` to avoid open-redirects.
-- Google OAuth: pass the `redirect` along by appending it to the `redirect_uri` already pointing at `/auth/callback`, or store it in `sessionStorage` keyed `wigsmi:postAuthRedirect` and consume it in `auth.callback.tsx`. SessionStorage is simpler and avoids changing the OAuth URL contract.
+3. Re-enable Paddle payments → provisions a fresh sandbox account.
+4. Recreate the full product catalog using `create_product` / `create_price`. All 10 SKUs with their existing human-readable IDs so no frontend code needs to change:
 
-This makes the round-trip generic — useful for any future "sign in to continue" prompts.
+| external_id | Amount | Interval |
+|---|---|---|
+| consumer_plus_monthly | £4.99 | month |
+| consumer_plus_yearly | £38.92 | year |
+| consumer_pro_monthly | £9.99 | month |
+| consumer_pro_yearly | £77.92 | year |
+| retailer_starter_monthly | £49.00 | month |
+| retailer_starter_yearly | £382.20 | year |
+| retailer_growth_monthly | £149.00 | month |
+| retailer_growth_yearly | £1,162.20 | year |
+| retailer_scale_monthly | £399.00 | month |
+| retailer_scale_yearly | £3,112.20 | year |
 
-## What is preserved across the round-trip
+5. Verify all 10 prices resolve via `gatewayFetch` and the new sandbox credentials are in place.
+6. Optionally clean up orphaned `subscriptions` rows from the old sandbox (your call — happy to skip).
 
-- **Wig selection**: yes, via the `?wig=<id>` search param that `/try-on` and `/app/try-on` both already accept.
-- **Uploaded selfie**: no. Browser `File` objects don't survive a full-page redirect / OAuth round-trip, and stashing the image bytes in storage is overkill for v1. Acceptable per the brief ("preserved if possible, or at minimum returned to the try-on page"). The user lands on `/app/try-on` with the wig ready and the upload button highlighted.
+### You do (after rebuild)
 
-## Out of scope
+7. Reset password at https://sandbox-login.paddle.com/forgot-password using `ayo.m.ayeni@gmail.com` (the new account is under your Lovable email).
+8. Log in, go to **Checkout settings → Default payment link → Approved domains**, add:
+   ```
+   id-preview--1afe14c8-cf3c-462b-9216-e596233413f8.lovable.app
+   ```
+9. (Optional) In Paddle **Team settings**, invite `info@wigsmi.com` as a team member so you can manage Paddle from your business email going forward.
 
-- No changes to `/app/try-on` itself, the apply hook, the gating in `recordTryOn`, or the design system.
-- No new components beyond local JSX in `try-on.tsx` (reusing `AlertDialog` from `@/components/ui/alert-dialog`).
+### We verify
 
-## Files touched
+10. You click Subscribe on `/portal/billing` → Paddle overlay opens → complete checkout with test card `4242 4242 4242 4242` → success page renders → subscription row appears in DB.
 
-- `src/routes/try-on.tsx` — add button + dialog + auth check + navigate.
-- `src/components/auth/AuthForm.tsx` — honor `redirect` search param after login / Google OAuth.
-- `src/routes/auth.login.tsx`, `src/routes/auth.signup.tsx` — add `validateSearch` for `redirect`.
-- `src/routes/auth.callback.tsx` — consume `sessionStorage` redirect after OAuth.
+## Technical details
 
-Approve and I'll ship it.
+- No frontend code changes needed. `RETAILER_PLANS` in `src/lib/retailer-plans.ts` already uses human-readable IDs (`retailer_starter_monthly` etc.) which are stable across the rebuild.
+- No webhook handler changes — `enable_paddle_payments` re-registers webhooks with new secrets, which auto-overwrite the existing `PAYMENTS_SANDBOX_WEBHOOK_SECRET` and `PADDLE_SANDBOX_API_KEY` secrets.
+- `VITE_PAYMENTS_CLIENT_TOKEN` in `.env.development` is auto-rotated by the enable tool.
+- The "Approved Domains" step in Paddle is still required after the rebuild — re-enabling doesn't auto-allowlist the preview URL.
+
+## What this plan does NOT do
+
+- Does not touch live products/prices (separate account, already configured).
+- Does not migrate any existing test subscriptions to the new sandbox.
+- Does not change your Lovable login email — that's a separate manual flow if you want it later.
+
+Reply "go" once you've disconnected Paddle from the dashboard and I'll start the rebuild.
