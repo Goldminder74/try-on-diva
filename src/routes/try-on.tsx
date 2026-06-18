@@ -440,30 +440,40 @@ function TryOn() {
         </div>
       </div>
 
-      {/* Post-result soft prompt (dismissible) */}
-      <AlertDialog open={postPromptOpen} onOpenChange={setPostPromptOpen}>
-        <AlertDialogContent className="bg-cream">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-display text-2xl text-mahogany">
-              Love what you see?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-foreground/75">
-              Create a free account for 5 try-ons every month. No card needed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="border-border">Maybe later</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() =>
-                navigate({ to: "/auth/signup", search: { redirect: redirectTarget } })
-              }
-              className="bg-mahogany text-cream hover:bg-mahogany-soft"
-            >
-              Create free account
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Post-result soft prompt — bottom sheet that does NOT cover the result */}
+      {postPromptOpen && !user && resultUrl && (
+        <div
+          role="dialog"
+          aria-label="Create a free account"
+          className="fixed inset-x-0 bottom-0 z-40 animate-slide-in-bottom border-t border-gold/40 bg-cream/95 px-5 py-4 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.25)] backdrop-blur-md"
+        >
+          <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-display text-lg text-mahogany">Love what you see?</p>
+              <p className="text-sm text-foreground/75">
+                Create a free account for 5 try-ons every month. No card needed.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPostPromptOpen(false)}
+                className="rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany"
+              >
+                Maybe later
+              </button>
+              <button
+                onClick={() =>
+                  navigate({ to: "/auth/signup", search: { redirect: redirectTarget } })
+                }
+                className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream hover:bg-mahogany-soft"
+              >
+                Create free account
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Hard wall on second anonymous attempt */}
       <AlertDialog open={wallPromptOpen} onOpenChange={setWallPromptOpen}>
