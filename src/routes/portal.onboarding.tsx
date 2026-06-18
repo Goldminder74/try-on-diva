@@ -15,6 +15,7 @@ type Step = 1 | 2 | 3 | 4 | 5;
 
 interface Form {
   business_name: string;
+  legal_business_name: string;
   display_name: string;
   website: string;
   country: string;
