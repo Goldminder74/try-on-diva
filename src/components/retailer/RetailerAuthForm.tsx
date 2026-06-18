@@ -11,7 +11,7 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const navigate = useNavigate();
+  
 
   // Resume plan selection after signup/login: if the user arrived from
   // /retailer with ?plan=&interval=, send them back to /portal/billing with
