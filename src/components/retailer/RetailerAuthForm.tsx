@@ -13,18 +13,39 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
 
+  // Resume plan selection after signup/login: if the user arrived from
+  // /retailer with ?plan=&interval=, send them back to /portal/billing with
+  // the same params so checkout opens automatically.
+  const getPostAuthRedirect = (): string => {
+    if (typeof window === "undefined") return "/portal";
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get("plan");
+    const interval = params.get("interval");
+    if (plan) {
+      const qp = new URLSearchParams({ plan });
+      if (interval) qp.set("interval", interval);
+      return `/portal/billing?${qp.toString()}`;
+    }
+    return "/portal";
+  };
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     setInfo(null);
     setBusy(true);
     try {
+      const redirectPath = getPostAuthRedirect();
       if (mode === "signup") {
+        // Stash for the post-confirmation callback path too.
+        try {
+          sessionStorage.setItem("wigsmi:postAuthRedirect", redirectPath);
+        } catch { /* ignore */ }
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=/portal`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`,
             data: {
               display_name: business || email.split("@")[0],
               role: "retailer",
@@ -36,7 +57,7 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate({ to: "/portal" });
+        navigate({ to: redirectPath });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
