@@ -214,7 +214,8 @@ function TryOn() {
       }
       setResultUrl(out.signedUrl);
       setAnonUsed(true);
-      setPostPromptOpen(true);
+      // Don't open the prompt immediately — let the user see their result first.
+      // The prompt is opened by a 4s timer or any user interaction (see effect below).
     } catch (err) {
       setError(err instanceof Error ? err.message : "Try-on generation failed.");
     } finally {
