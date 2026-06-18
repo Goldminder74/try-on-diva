@@ -18,7 +18,7 @@ export const getPublicWidgetData = createServerFn({ method: "GET" })
 
     const { data: retailer } = await supabaseAdmin
       .from("retailers")
-      .select("display_name, brand_primary, widget_cta_text, logo_url, currency")
+      .select("id, slug, display_name, brand_primary, widget_cta_text, logo_url, currency")
       .eq("id", widget.retailer_id)
       .maybeSingle();
 
