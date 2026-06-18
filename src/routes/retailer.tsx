@@ -115,29 +115,24 @@ function RetailerLanding() {
         <div className="mx-auto w-full max-w-7xl px-5 py-20">
           <h2 className="font-display text-3xl text-mahogany md:text-4xl">Retailer pricing.</h2>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">All plans start with a 3-month free trial. No card required.</p>
-          <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { name: "Starter", price: "£49", limit: "30 wigs", best: "Solo founders" },
-              { name: "Growth", price: "£149", limit: "150 wigs", best: "Growing brands", highlight: true },
-              { name: "Pro", price: "£399", limit: "Unlimited wigs", best: "Multi-store retailers" },
-              { name: "Enterprise", price: "Custom", limit: "Multi-region, white-label", best: "Established chains" },
-            ].map(p => (
-              <div
-                key={p.name}
-                className={`rounded-xl border bg-card p-6 shadow-[var(--shadow-card)] ${p.highlight ? "border-gold ring-1 ring-gold" : "border-border"}`}
-              >
-                <p className="font-display text-xl text-mahogany">{p.name}</p>
-                <p className="mt-3 font-mono text-3xl">{p.price}{p.price !== "Custom" && <span className="text-sm text-muted-foreground">/mo</span>}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{p.best}</p>
-                <p className="mt-4 text-sm">{p.limit}</p>
-                <button className="mt-6 w-full rounded-md border border-mahogany py-2 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream">
-                  {p.price === "Custom" ? "Contact us" : "Start trial"}
-                </button>
-              </div>
-            ))}
+          <div className="mt-10">
+            <RetailerPlanCards requireSignup />
+          </div>
+          <div className="mt-8 rounded-xl border border-border bg-card p-6 md:flex md:items-center md:justify-between">
+            <div>
+              <p className="font-display text-xl text-mahogany">Enterprise</p>
+              <p className="mt-1 text-sm text-muted-foreground">Multi-region, white-label, custom integrations.</p>
+            </div>
+            <a
+              href="mailto:hello@wigsmi.com"
+              className="mt-4 inline-flex rounded-md border border-mahogany px-5 py-2 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream md:mt-0"
+            >
+              Contact us
+            </a>
           </div>
         </div>
       </section>
+
 
       {/* CTA */}
       <section className="bg-mahogany text-cream">
