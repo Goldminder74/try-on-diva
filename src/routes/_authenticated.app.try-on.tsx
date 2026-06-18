@@ -40,7 +40,7 @@ function AppTryOn() {
       const initial = (search.wig && items.find((w) => w.id === search.wig)) || items[0] || null;
       setWig(initial);
     });
-    fetchQuota().then((q) => setQuota({ remaining: q.remaining, isPaid: q.isPaid }));
+    fetchQuota({ data: {} }).then((q) => setQuota({ remaining: q.remaining, isPaid: q.isPaid }));
   }, [fetchQuota, search.wig]);
 
   const onFile = (f: File | undefined) => {

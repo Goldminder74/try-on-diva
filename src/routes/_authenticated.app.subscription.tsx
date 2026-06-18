@@ -79,7 +79,7 @@ function SubscriptionPage() {
   const onManage = async () => {
     setPortalBusy(true);
     try {
-      const { url } = await portal({ data: { environment: getPaddleEnvironment() } });
+      const { url } = await portal({ data: { environment: getPaddleEnvironment(), customerType: "consumer" } });
       window.open(url, "_blank", "noopener");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't open billing portal");

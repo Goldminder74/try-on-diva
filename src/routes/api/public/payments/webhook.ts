@@ -99,8 +99,8 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
     priceId = priceId ?? item?.price?.id ?? "unknown_price";
   }
 
-  const plan = planFromProduct(productId);
-  const ctype = customerType(productId);
+  const plan = planFromProduct(productId ?? undefined);
+  const ctype = customerType(productId ?? undefined);
   const billing_interval = intervalFromItem(item);
   await getSupabase()
     .from("subscriptions")
