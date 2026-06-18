@@ -28,18 +28,21 @@ function PrivacyPage() {
         <div className="prose-legal mt-10 space-y-8 text-foreground">
           <section>
             <p>
-              This policy explains how Wigsmi ("we", "us", "our") collects and uses your
-              personal data when you use our website, mobile app, or virtual try-on
-              service (the "Service"). We act as a data controller under the UK General
-              Data Protection Regulation (UK GDPR) and the Data Protection Act 2018.
+              This policy explains how{" "}
+              <strong>SHERWOOD CONSULTING SERVICES LTD</strong>, trading as Wigsmi
+              ("we", "us", "our"), collects and uses your personal data when you use
+              our website, mobile app, or virtual try-on service (the "Service"). We
+              act as a data controller under the UK General Data Protection Regulation
+              (UK GDPR) and the Data Protection Act 2018.
             </p>
           </section>
 
           <section>
             <h2 className="font-display text-2xl text-mahogany">1. Who we are</h2>
             <p>
-              Wigsmi is operated from the United Kingdom. If you have any questions
-              about this policy or your data, contact us at{" "}
+              Wigsmi is operated by <strong>SHERWOOD CONSULTING SERVICES LTD</strong>{" "}
+              from the United Kingdom. If you have any questions about this policy or
+              your data, contact us at{" "}
               <a className="underline" href="mailto:privacy@wigsmi.com">privacy@wigsmi.com</a>.
             </p>
           </section>

@@ -28,8 +28,9 @@ function TermsPage() {
         <div className="mt-10 space-y-8 text-foreground">
           <section>
             <p>
-              These terms ("Terms") form a binding agreement between you and Wigsmi
-              ("we", "us", "our") and govern your use of the Wigsmi website, app, and
+              These terms ("Terms") form a binding agreement between you and{" "}
+              <strong>SHERWOOD CONSULTING SERVICES LTD</strong>, trading as Wigsmi
+              ("we", "us", "our"), and govern your use of the Wigsmi website, app, and
               services (the "Service"). By creating an account or using the Service
               you agree to these Terms. If you do not agree, do not use the Service.
             </p>
