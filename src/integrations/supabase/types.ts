@@ -203,6 +203,7 @@ export type Database = {
           display_name: string
           id: string
           is_active: boolean
+          legal_business_name: string | null
           logo_url: string | null
           onboarding_completed: boolean
           owner_id: string | null
@@ -224,6 +225,7 @@ export type Database = {
           display_name: string
           id?: string
           is_active?: boolean
+          legal_business_name?: string | null
           logo_url?: string | null
           onboarding_completed?: boolean
           owner_id?: string | null
@@ -245,6 +247,7 @@ export type Database = {
           display_name?: string
           id?: string
           is_active?: boolean
+          legal_business_name?: string | null
           logo_url?: string | null
           onboarding_completed?: boolean
           owner_id?: string | null
