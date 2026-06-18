@@ -29,7 +29,7 @@ Strict requirements, in priority order:
 1. Preserve the person's identity completely: same face, same features, same expression, same body, same background.
 2. Preserve the person's skin tone EXACTLY as it appears in IMAGE 1. Do not lighten, brighten, warm, cool, or otherwise alter the skin. Match the original luminance and undertone precisely. This is critical and non-negotiable.
 3. Reproduce the wig from IMAGE 2 faithfully: the same length, shape, parting, colour, and texture, including the specific pattern of any braids, locs, or curls. Do not substitute a generic or stylised version. The customer is buying this exact product. The wig colour and highlights must match IMAGE 2 exactly, including any balayage, ombre, or multi-tone colouring. Do not default to black.
-4. Fit the wig naturally with a realistic hairline and natural edges. Replace existing hair.Blend the hairline seamlessly into the forehead with no visible lace strip or translucent band.
+4.Fit the wig to the correct anatomical position.Fit the wig naturally with a realistic hairline and natural edges. Replace existing hair. The hairline must sit at the natural hairline position on the forehead, approximately 5 to 7cm above the eyebrows. The wig must never cover the eyebrows or sit above the natural hairline. For bob styles and styles with a fringe, the fringe must fall between mid-forehead and just above the eyebrows, not over them. The wig should sit flush to the head with natural volume, not raised or floating above the scalp.
 5. Match the lighting and shadow of IMAGE 1 so the wig looks photographed on this person.
 
 Output only the final composited image.`;
