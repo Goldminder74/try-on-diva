@@ -15,7 +15,12 @@ function getSupabase(): any {
 export const Route = createFileRoute("/api/public/hooks/quota-reset")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
+        const provided = request.headers.get("apikey") ?? request.headers.get("x-cron-key");
+        if (!expected || provided !== expected) {
+          return new Response("Unauthorized", { status: 401 });
+        }
         const sb = getSupabase();
         // Reset try-on quotas for consumers whose month_reset is stale.
         const { data, error } = await sb.rpc("reset_stale_try_on_quotas");
