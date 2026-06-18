@@ -46,6 +46,13 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // Only callable by pg_cron / trusted schedulers that present the
+        // Supabase publishable key in the apikey header. Public callers 401.
+        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
+        const provided = request.headers.get("apikey") ?? request.headers.get("x-cron-key");
+        if (!expected || provided !== expected) {
+          return new Response("Unauthorized", { status: 401 });
+        }
         const sb = getSupabase();
         const url = new URL(request.url);
         const baseUrl = `${url.protocol}//${url.host}`;
