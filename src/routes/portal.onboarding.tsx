@@ -87,7 +87,10 @@ function Onboarding() {
   };
 
   const canNext: Record<Step, boolean> = {
-    1: form.business_name.length >= 2 && form.display_name.length >= 2,
+    1:
+      form.business_name.length >= 2 &&
+      form.legal_business_name.length >= 2 &&
+      form.display_name.length >= 2,
     2: form.website.length === 0 || /^https?:\/\//i.test(form.website),
     3: true,
     4: true,
