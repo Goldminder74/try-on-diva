@@ -74,7 +74,7 @@ function PrivacyPage() {
               Photos you upload are processed by our AI try-on engine to generate a
               preview. They are stored in encrypted cloud storage. You can delete any
               saved photo from your account at any time. We do not use your photos to
-              train third-party AI models, and we do not sell them.
+              train third-party AI models, and we do not sell them. Try-on photos are sent to Google LLC's Gemini image API for processing and are not retained by Google after the result is generated.
             </p>
           </section>
 
@@ -83,8 +83,8 @@ function PrivacyPage() {
             <p>We share data only with processors that help us run the Service:</p>
             <ul className="list-disc space-y-2 pl-6">
               <li>Cloud hosting and database providers.</li>
-              <li>Payment processors (for retailer subscriptions).</li>
-              <li>AI model providers used for the try-on engine.</li>
+              <li>Paddle (paddle.com) — our payment processor and merchant of record, who handles all billing for retailer and consumer subscriptions. Paddle is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See paddle.com/privacy.</li>
+              <li>Google LLC (Gemini image API) — processes selfie photos you upload solely to generate your virtual try-on result. Google is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See policies.google.com/privacy. Photos are not retained by Google beyond the processing request.</li>
               <li>Email delivery providers.</li>
               <li>Analytics providers (aggregated, where possible).</li>
             </ul>
