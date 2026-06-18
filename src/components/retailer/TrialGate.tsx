@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Clock, Lock } from "lucide-react";
 import { useRetailerStatus } from "@/hooks/use-retailer-status";
+import { RetailerPlanCards } from "@/components/retailer/RetailerPlanCards";
 
 /**
  * Banner shown above the portal when the retailer's trial is ending in
