@@ -171,3 +171,36 @@ export async function fetchRelatedWigs(styleType: string, excludeId: string, lim
   if (error) throw error;
   return mapWigsWithRetailers(data);
 }
+
+export type RetailerPublic = {
+  id: string;
+  slug: string | null;
+  display_name: string;
+  logo_url: string | null;
+  website: string | null;
+  brand_primary: string | null;
+};
+
+export async function fetchRetailerBySlug(slug: string): Promise<RetailerPublic | null> {
+  const { data, error } = await supabase
+    .from("retailers_public" as never)
+    .select("id, slug, display_name, logo_url, website, brand_primary")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data as unknown as RetailerPublic;
+}
+
+export async function fetchWigsByRetailerId(retailerId: string, limit = 24): Promise<Wig[]> {
+  const { data, error } = await supabase
+    .from("wigs")
+    .select(SELECT)
+    .eq("is_published", true)
+    .is("deleted_at", null)
+    .eq("retailer_id", retailerId)
+    .order("is_featured", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return mapWigsWithRetailers(data);
+}
