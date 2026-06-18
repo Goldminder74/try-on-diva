@@ -202,16 +202,14 @@ function TryOn() {
           </div>
         )}
 
-        {!scoped && (search.widget || search.r) && retailerScope === null && showAll && (
+        {!scoped && (search.widget || search.r) && (
           <div className="mb-6">
-            <Link
-              to="/try-on"
-              search={{ widget: search.widget, r: search.r }}
-              onClick={(e) => { e.preventDefault(); setShowAll(false); }}
+            <button
+              onClick={() => setShowAll(false)}
               className="text-xs text-mahogany underline-offset-4 hover:underline"
             >
               ← Back to the retailer's styles
-            </Link>
+            </button>
           </div>
         )}
 
