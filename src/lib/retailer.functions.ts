@@ -33,6 +33,7 @@ export const getMyRetailerContext = createServerFn({ method: "GET" })
 
 const onboardingSchema = z.object({
   business_name: z.string().min(2).max(120),
+  legal_business_name: z.string().min(2).max(200),
   display_name: z.string().min(2).max(120),
   website: z.string().url().optional().or(z.literal("")),
   country: z.string().max(80).optional(),
