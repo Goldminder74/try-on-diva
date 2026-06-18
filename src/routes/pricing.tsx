@@ -150,7 +150,9 @@ function Pricing() {
     try {
       if (isConsumerSub) {
         const env = getPaddleEnvironment();
-        const p = await preview({ data: { newPriceId: priceId, environment: env } });
+        const p = await preview({
+          data: { newPriceId: priceId, environment: env, customerType: "consumer" },
+        });
         setPreviewState({
           planKey,
           planName,
@@ -166,7 +168,7 @@ function Pricing() {
         priceId,
         customerEmail: user.email ?? undefined,
         customData: { userId: user.id, plan: planName },
-        successUrl: `${window.location.origin}/checkout/success`,
+        successUrl: `${window.location.origin}/checkout/success?type=consumer`,
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Something went wrong");
@@ -180,7 +182,11 @@ function Pricing() {
     setConfirmingSwitch(true);
     try {
       await changePlan({
-        data: { newPriceId: previewState.priceId, environment: getPaddleEnvironment() },
+        data: {
+          newPriceId: previewState.priceId,
+          environment: getPaddleEnvironment(),
+          customerType: "consumer",
+        },
       });
       toast.success("Plan updated. Your account will refresh in a few seconds.");
       setPreviewState(null);
@@ -194,7 +200,9 @@ function Pricing() {
   const onConfirmCancel = async () => {
     setBusyId("cancel");
     try {
-      await cancelSub({ data: { environment: getPaddleEnvironment() } });
+      await cancelSub({
+        data: { environment: getPaddleEnvironment(), customerType: "consumer" },
+      });
       toast.success("Subscription cancelled. You keep access until the end of your billing period.");
       setConfirmCancel(false);
     } catch (e) {
@@ -207,7 +215,9 @@ function Pricing() {
   const onManage = async () => {
     setBusyId("portal");
     try {
-      const { url } = await portal({ data: { environment: getPaddleEnvironment() } });
+      const { url } = await portal({
+        data: { environment: getPaddleEnvironment(), customerType: "consumer" },
+      });
       window.open(url, "_blank", "noopener");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't open portal");

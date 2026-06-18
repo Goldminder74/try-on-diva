@@ -2,6 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+// Monthly widget API call caps per plan tier. Scale = unlimited.
+const WIDGET_CALL_CAPS: Record<string, number> = {
+  starter: 5_000,
+  growth: 50_000,
+  scale: Number.POSITIVE_INFINITY,
+};
+
 export const getPublicWidgetData = createServerFn({ method: "GET" })
   .inputValidator((d: { token: string }) =>
     z.object({ token: z.string().uuid() }).parse(d),
@@ -18,9 +25,43 @@ export const getPublicWidgetData = createServerFn({ method: "GET" })
 
     const { data: retailer } = await supabaseAdmin
       .from("retailers")
-      .select("id, slug, display_name, brand_primary, widget_cta_text, logo_url, currency")
+      .select("id, slug, display_name, brand_primary, widget_cta_text, logo_url, currency, plan, widget_calls_this_month, widget_calls_month_reset")
       .eq("id", widget.retailer_id)
       .maybeSingle();
+
+    if (!retailer) return { notFound: true as const };
+
+    // Roll the monthly counter forward if the stored reset date is older
+    // than the current month boundary.
+    const today = new Date();
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+      .toISOString()
+      .slice(0, 10);
+    const storedReset = (retailer as any).widget_calls_month_reset as string | null;
+    let calls = ((retailer as any).widget_calls_this_month as number | null) ?? 0;
+    if (!storedReset || storedReset < monthStart) {
+      calls = 0;
+      await supabaseAdmin
+        .from("retailers")
+        .update({
+          widget_calls_this_month: 0,
+          widget_calls_month_reset: monthStart,
+        } as never)
+        .eq("id", retailer.id);
+    }
+
+    const planId = ((retailer as any).plan as string) ?? "starter";
+    const cap = WIDGET_CALL_CAPS[planId] ?? WIDGET_CALL_CAPS.starter;
+    if (Number.isFinite(cap) && calls >= cap) {
+      return { rateLimited: true as const, cap };
+    }
+
+    // Increment counter (fire-and-forget — we don't want a counter race to
+    // block a legitimate impression).
+    await supabaseAdmin
+      .from("retailers")
+      .update({ widget_calls_this_month: calls + 1 } as never)
+      .eq("id", retailer.id);
 
     const { data: wigs } = await supabaseAdmin
       .from("wigs")

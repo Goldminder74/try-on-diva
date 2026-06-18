@@ -143,9 +143,14 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
             </Link>
           </>
         ) : (
-          <Link to="/retailer/login" className="hover:text-mahogany">
-            Already have an account? Log in
-          </Link>
+          <>
+            <Link to="/auth/forgot-password" className="hover:text-mahogany">
+              Forgot password?
+            </Link>
+            <Link to="/retailer/login" className="hover:text-mahogany">
+              Already have an account? Log in
+            </Link>
+          </>
         )}
       </div>
     </div>

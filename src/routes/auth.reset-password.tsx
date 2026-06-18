@@ -16,11 +16,9 @@ function ResetPassword() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Supabase delivers the recovery token in the URL hash and emits a PASSWORD_RECOVERY event.
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") setReady(true);
     });
-    // Fallback: if a session exists already (auto-handled), allow update too.
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setReady(true);
     });
@@ -32,9 +30,24 @@ function ResetPassword() {
     setBusy(true);
     setError(null);
     const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      setBusy(false);
+      setError(error.message);
+      return;
+    }
+    // Route by role: retailers go to /portal, consumers to /app.
+    const { data: userRes } = await supabase.auth.getUser();
+    const uid = userRes.user?.id;
+    let isRetailer = false;
+    if (uid) {
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid);
+      isRetailer = (roles ?? []).some((r) => r.role === "retailer");
+    }
     setBusy(false);
-    if (error) setError(error.message);
-    else navigate({ to: "/app" });
+    navigate({ to: isRetailer ? "/portal" : "/app" });
   };
 
   return (

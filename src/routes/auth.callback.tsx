@@ -63,9 +63,9 @@ async function maybeSendWelcome(session: { user: { id: string; email?: string | 
   }
 }
 
-function safeRedirect(r: string | null | undefined): string {
-  if (!r) return "/app";
-  if (!r.startsWith("/") || r.startsWith("//")) return "/app";
+function safeRedirect(r: string | null | undefined, fallback: string): string {
+  if (!r) return fallback;
+  if (!r.startsWith("/") || r.startsWith("//")) return fallback;
   return r;
 }
 
@@ -81,15 +81,24 @@ function Callback() {
     if (typeof window !== "undefined") {
       window.sessionStorage.removeItem("wigsmi:postAuthRedirect");
     }
-    const target = safeRedirect(next ?? stashed);
     const t = setTimeout(() => {
-      supabase.auth.getSession().then(({ data }) => {
+      supabase.auth.getSession().then(async ({ data }) => {
         if (!data.session) {
           navigate({ to: "/auth/login" });
           return;
         }
-        // Fire-and-forget welcome (won't delay redirect).
         void maybeSendWelcome(data.session as never);
+
+        // Role-aware default destination: retailers go to /portal, everyone
+        // else to /app. An explicit ?next= or stashed redirect always wins
+        // (so /portal/billing?plan=... resume works).
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.session.user.id);
+        const isRetailer = (roles ?? []).some((r) => r.role === "retailer");
+        const fallback = isRetailer ? "/portal" : "/app";
+        const target = safeRedirect(next ?? stashed, fallback);
         navigate({ to: target as "/app" });
       });
     }, 200);

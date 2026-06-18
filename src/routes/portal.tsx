@@ -25,6 +25,16 @@ export const Route = createFileRoute("/portal")({
         search: { redirect: location.href },
       });
     }
+    // Role guard: only retailers (or admins) can enter the portal.
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id);
+    const isRetailer = (roles ?? []).some((r) => r.role === "retailer");
+    const isAdmin = (roles ?? []).some((r) => r.role === "admin");
+    if (!isRetailer && !isAdmin) {
+      throw redirect({ to: "/retailer/signup" });
+    }
   },
   component: PortalLayout,
 });
@@ -55,7 +65,7 @@ function PortalLayout() {
 
   return (
     <div className="min-h-screen bg-cream">
-      <PastDueBanner />
+      <PastDueBanner customerType="retailer" />
       <TrialEndingBanner />
       <header className="sticky top-0 z-40 border-b border-border bg-cream/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5">

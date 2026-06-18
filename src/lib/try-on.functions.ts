@@ -479,13 +479,19 @@ export const recordTryOn = createServerFn({ method: "POST" })
     if (insErr) throw insErr;
 
     const newCount = count + 1;
+    // Use upsert so a missing consumer_profiles row (edge case: trigger
+    // failed, manual user creation) doesn't silently allow unlimited
+    // try-ons. The auth trigger normally creates this row on signup.
     const { error: upErr } = await supabase
       .from("consumer_profiles")
-      .update({
-        try_on_count_this_month: newCount,
-        try_on_month_reset: monthStart,
-      })
-      .eq("user_id", userId);
+      .upsert(
+        {
+          user_id: userId,
+          try_on_count_this_month: newCount,
+          try_on_month_reset: monthStart,
+        },
+        { onConflict: "user_id" },
+      );
     if (upErr) throw upErr;
 
     return {
@@ -496,7 +502,10 @@ export const recordTryOn = createServerFn({ method: "POST" })
 
 export const getTryOnQuota = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d: { environment?: "sandbox" | "live" }) =>
+    z.object({ environment: z.enum(["sandbox", "live"]).optional() }).parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: prof } = await supabase
       .from("consumer_profiles")
@@ -508,11 +517,18 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
       .toISOString()
       .slice(0, 10);
     const count = prof && prof.try_on_month_reset >= monthStart ? prof.try_on_count_this_month : 0;
-    const { data: subRow } = await supabase
+    let subQuery = supabase
       .from("subscriptions")
       .select("plan, status, current_period_end")
       .eq("user_id", userId)
-      .maybeSingle();
+      .eq("customer_type", "consumer")
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (data?.environment) {
+      subQuery = subQuery.eq("environment", data.environment);
+    }
+    const { data: subRows } = await subQuery;
+    const subRow = subRows?.[0];
     const stillValid =
       subRow &&
       (subRow.status === "active" || subRow.status === "trialing") &&
