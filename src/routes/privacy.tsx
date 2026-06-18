@@ -74,7 +74,7 @@ function PrivacyPage() {
               Photos you upload are processed by our AI try-on engine to generate a
               preview. They are stored in encrypted cloud storage. You can delete any
               saved photo from your account at any time. We do not use your photos to
-              train third-party AI models, and we do not sell them.
+              train third-party AI models, and we do not sell them. Try-on photos are sent to Google LLC's Gemini image API for processing and are not retained by Google after the result is generated.
             </p>
           </section>
 
