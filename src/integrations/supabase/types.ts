@@ -246,6 +246,8 @@ export type Database = {
           trial_ends_at: string | null
           updated_at: string
           website: string | null
+          widget_calls_month_reset: string
+          widget_calls_this_month: number
           widget_cta_text: string | null
         }
         Insert: {
@@ -268,6 +270,8 @@ export type Database = {
           trial_ends_at?: string | null
           updated_at?: string
           website?: string | null
+          widget_calls_month_reset?: string
+          widget_calls_this_month?: number
           widget_cta_text?: string | null
         }
         Update: {
@@ -290,6 +294,8 @@ export type Database = {
           trial_ends_at?: string | null
           updated_at?: string
           website?: string | null
+          widget_calls_month_reset?: string
+          widget_calls_this_month?: number
           widget_cta_text?: string | null
         }
         Relationships: []
@@ -311,8 +317,6 @@ export type Database = {
           product_id: string | null
           profile_id: string
           status: string
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
           trial_ends_at: string | null
           updated_at: string
           user_id: string | null
@@ -333,8 +337,6 @@ export type Database = {
           product_id?: string | null
           profile_id: string
           status?: string
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
           user_id?: string | null
@@ -355,8 +357,6 @@ export type Database = {
           product_id?: string | null
           profile_id?: string
           status?: string
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
           user_id?: string | null

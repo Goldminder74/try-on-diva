@@ -2,8 +2,12 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle } from "lucide-react";
 
-export function PastDueBanner() {
-  const { subscription } = useSubscription();
+interface PastDueBannerProps {
+  customerType?: "consumer" | "retailer";
+}
+
+export function PastDueBanner({ customerType }: PastDueBannerProps) {
+  const { subscription } = useSubscription({ customerType });
   if (!subscription || subscription.status !== "past_due") return null;
   const isRetailer = subscription.customer_type === "retailer";
   return (

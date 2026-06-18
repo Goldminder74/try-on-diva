@@ -22,6 +22,7 @@ import { template as retailerTrialEnded } from "./retailer-trial-ended";
 import { template as retailerSubscribed } from "./retailer-subscribed";
 import { template as retailerPaymentFailed } from "./retailer-payment-failed";
 import { template as consumerWelcome } from "./consumer-welcome";
+import { template as consumerPaymentFailed } from "./consumer-payment-failed";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "retailer-welcome": retailerWelcome,
@@ -30,4 +31,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "retailer-subscribed": retailerSubscribed,
   "retailer-payment-failed": retailerPaymentFailed,
   "consumer-welcome": consumerWelcome,
+  "consumer-payment-failed": consumerPaymentFailed,
 };

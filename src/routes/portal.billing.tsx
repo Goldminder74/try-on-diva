@@ -120,7 +120,7 @@ function BillingPage() {
 
   useEffect(() => {
     if (!user) return;
-    invoicesFn({ data: { environment: getPaddleEnvironment() } })
+    invoicesFn({ data: { environment: getPaddleEnvironment(), customerType: "retailer" } })
       .then(setInvoices)
       .catch(() => setInvoices([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,7 +151,7 @@ function BillingPage() {
       priceId,
       customerEmail: user.email ?? undefined,
       customData: { userId: user.id, plan: planId },
-      successUrl: `${window.location.origin}/portal/billing?checkout=success`,
+      successUrl: `${window.location.origin}/checkout/success?type=retailer`,
     }).catch((e) => toast.error(e instanceof Error ? e.message : "Could not start checkout"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isPaidActive]);
@@ -159,7 +159,9 @@ function BillingPage() {
   const onManage = async () => {
     setBusy("portal");
     try {
-      const { url } = await portal({ data: { environment: getPaddleEnvironment() } });
+      const { url } = await portal({
+        data: { environment: getPaddleEnvironment(), customerType: "retailer" },
+      });
       window.open(url, "_blank", "noopener");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't open portal");
@@ -172,7 +174,9 @@ function BillingPage() {
     setPreviewBusy(planId);
     try {
       const env = getPaddleEnvironment();
-      const p = await preview({ data: { newPriceId: priceId, environment: env } });
+      const p = await preview({
+        data: { newPriceId: priceId, environment: env, customerType: "retailer" },
+      });
       setSwitchPreview({
         planId,
         planName,
@@ -194,7 +198,11 @@ function BillingPage() {
     setConfirmingSwitch(true);
     try {
       await changePlan({
-        data: { newPriceId: switchPreview.priceId, environment: getPaddleEnvironment() },
+        data: {
+          newPriceId: switchPreview.priceId,
+          environment: getPaddleEnvironment(),
+          customerType: "retailer",
+        },
       });
       toast.success("Plan updated. Your account will refresh in a few seconds.");
       setSwitchPreview(null);

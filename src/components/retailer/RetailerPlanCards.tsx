@@ -66,7 +66,7 @@ export function RetailerPlanCards({
         customData: { userId: user.id, plan: planId },
         successUrl:
           successUrl ||
-          `${window.location.origin}/portal/billing?checkout=success`,
+          `${window.location.origin}/checkout/success?type=retailer`,
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not start checkout");
@@ -106,7 +106,7 @@ export function RetailerPlanCards({
         {RETAILER_PLANS.map((p) => {
           const isCurrent = p.id === currentPlanId;
           const priceId = p.priceIds[interval];
-          const busyHere = busy === p.id || (busy === null && checkoutLoading && busy === p.id);
+          const busyHere = busy === p.id || (busy === null && checkoutLoading);
           const periodLabel = interval === "monthly" ? "per month" : "per year";
           return (
             <div

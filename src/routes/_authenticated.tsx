@@ -15,6 +15,16 @@ export const Route = createFileRoute("/_authenticated")({
         search: { redirect: location.href },
       });
     }
+    // Role guard: retailers belong in /portal, not the consumer app.
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id);
+    const isRetailer = (roles ?? []).some((r) => r.role === "retailer");
+    const isAdmin = (roles ?? []).some((r) => r.role === "admin");
+    if (isRetailer && !isAdmin) {
+      throw redirect({ to: "/portal" });
+    }
   },
   component: AuthenticatedLayout,
 });
@@ -43,7 +53,7 @@ function AuthenticatedLayout() {
 
   return (
     <div className="min-h-screen bg-cream">
-      <PastDueBanner />
+      <PastDueBanner customerType="consumer" />
       <header className="sticky top-0 z-40 border-b border-border bg-cream/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5">
           <Link to="/app" className="flex items-center"><Wordmark size="md" /></Link>

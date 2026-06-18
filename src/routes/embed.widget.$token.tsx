@@ -76,6 +76,25 @@ function EmbedWidget() {
     );
   }
 
+  if ("rateLimited" in data) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-6 text-center">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-wider text-neutral-400">
+            Limit reached
+          </p>
+          <p className="mt-2 text-sm text-neutral-600">
+            This widget has reached its monthly view limit. Please try again next month.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!("ok" in data)) {
+    return null;
+  }
+
   const accent = data.widget.accent_color;
   const cta = data.retailer?.cta_text || "Try it on";
 

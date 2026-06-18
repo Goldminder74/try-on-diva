@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getPaddleClient, gatewayFetch, type PaddleEnv } from "@/lib/paddle.server";
 
 const envSchema = z.enum(["sandbox", "live"]);
+const customerTypeSchema = z.enum(["consumer", "retailer"]);
 
 async function resolvePaddlePriceId(env: PaddleEnv, externalId: string): Promise<string> {
   const r = await gatewayFetch(env, `/prices?external_id=${encodeURIComponent(externalId)}`);
@@ -18,8 +19,8 @@ async function resolvePaddlePriceId(env: PaddleEnv, externalId: string): Promise
  */
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { environment: "sandbox" | "live" }) =>
-    z.object({ environment: envSchema }).parse(d),
+  .inputValidator((d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+    z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -28,6 +29,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
       .select("paddle_customer_id, paddle_subscription_id, environment")
       .eq("user_id", userId)
       .eq("environment", data.environment)
+      .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -47,11 +49,12 @@ export const createPortalSession = createServerFn({ method: "POST" })
  */
 export const changeSubscriptionPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { newPriceId: string; environment: "sandbox" | "live" }) =>
+  .inputValidator((d: { newPriceId: string; environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
     z
       .object({
         newPriceId: z.string().min(1).max(120),
         environment: envSchema,
+        customerType: customerTypeSchema,
       })
       .parse(d),
   )
@@ -62,6 +65,7 @@ export const changeSubscriptionPlan = createServerFn({ method: "POST" })
       .select("paddle_subscription_id, status")
       .eq("user_id", userId)
       .eq("environment", data.environment)
+      .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -85,8 +89,12 @@ export const changeSubscriptionPlan = createServerFn({ method: "POST" })
  */
 export const previewPlanChange = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { newPriceId: string; environment: "sandbox" | "live" }) =>
-    z.object({ newPriceId: z.string().min(1).max(120), environment: envSchema }).parse(d),
+  .inputValidator((d: { newPriceId: string; environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+    z.object({
+      newPriceId: z.string().min(1).max(120),
+      environment: envSchema,
+      customerType: customerTypeSchema,
+    }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -95,6 +103,7 @@ export const previewPlanChange = createServerFn({ method: "POST" })
       .select("paddle_subscription_id, status")
       .eq("user_id", userId)
       .eq("environment", data.environment)
+      .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -116,7 +125,6 @@ export const previewPlanChange = createServerFn({ method: "POST" })
     const j = await r.json();
     if (!r.ok) throw new Error(j?.error?.detail || "Preview failed");
 
-    // immediate_transaction shows what is billed today; next_transaction shows next renewal.
     const immediate = j.data?.immediate_transaction;
     const next = j.data?.next_transaction;
     return {
@@ -136,8 +144,8 @@ export const previewPlanChange = createServerFn({ method: "POST" })
  */
 export const cancelSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { environment: "sandbox" | "live" }) =>
-    z.object({ environment: envSchema }).parse(d),
+  .inputValidator((d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+    z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -146,6 +154,7 @@ export const cancelSubscription = createServerFn({ method: "POST" })
       .select("paddle_subscription_id, status")
       .eq("user_id", userId)
       .eq("environment", data.environment)
+      .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -175,8 +184,8 @@ interface InvoiceRow {
  */
 export const listInvoices = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { environment: "sandbox" | "live" }) =>
-    z.object({ environment: envSchema }).parse(d),
+  .inputValidator((d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+    z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
   .handler(async ({ data, context }): Promise<InvoiceRow[]> => {
     const { supabase, userId } = context;
@@ -185,6 +194,7 @@ export const listInvoices = createServerFn({ method: "GET" })
       .select("paddle_customer_id")
       .eq("user_id", userId)
       .eq("environment", data.environment)
+      .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -207,7 +217,6 @@ export const listInvoices = createServerFn({ method: "GET" })
       invoiceUrl: null,
     }));
 
-    // Fetch invoice PDF URLs for completed transactions in parallel.
     await Promise.all(
       rows.map(async (row) => {
         if (row.status !== "completed" && row.status !== "billed" && row.status !== "paid") return;

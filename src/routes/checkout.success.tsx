@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -16,40 +16,36 @@ export const Route = createFileRoute("/checkout/success")({
 
 function CheckoutSuccess() {
   const { user } = useAuth();
-  const { isActive, subscription } = useSubscription();
-  const [waited, setWaited] = useState(0);
   const navigate = useNavigate();
+
+  // The customer type is passed through the success URL so we don't have
+  // to guess from the (possibly not-yet-written) subscription row.
+  const customerType = useMemo<"consumer" | "retailer">(() => {
+    if (typeof window === "undefined") return "consumer";
+    const t = new URLSearchParams(window.location.search).get("type");
+    return t === "retailer" ? "retailer" : "consumer";
+  }, []);
+
+  const { isActive } = useSubscription({ customerType });
+  const [waited, setWaited] = useState(0);
 
   useEffect(() => {
     const t = setInterval(() => setWaited((w) => w + 1), 1000);
     return () => clearInterval(t);
   }, []);
 
-  // Auto-redirect once the webhook has landed (or after 15s).
+  const destination = customerType === "retailer" ? "/portal/billing" : "/app";
+
+  // Auto-redirect once the webhook has landed.
   useEffect(() => {
     if (isActive) {
-      const t = setTimeout(() => {
-        if (subscription?.customer_type === "retailer") {
-          navigate({ to: "/portal/billing" });
-        } else {
-          navigate({ to: "/app" });
-        }
-      }, 1200);
+      const t = setTimeout(() => navigate({ to: destination }), 1200);
       return () => clearTimeout(t);
     }
-  }, [isActive, subscription, navigate]);
-
-  // Hard fallback: if the webhook still hasn't landed after 15s, navigate
-  // anyway. The subscription banner / billing page will reflect status once
-  // the row arrives.
-  useEffect(() => {
-    if (waited >= 15 && !isActive) {
-      const dest = subscription?.customer_type === "retailer" ? "/portal/billing" : "/app";
-      navigate({ to: dest });
-    }
-  }, [waited, isActive, subscription, navigate]);
+  }, [isActive, destination, navigate]);
 
   const stillWaiting = !!user && !isActive && waited < 15;
+  const timedOut = !!user && !isActive && waited >= 15;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-cream px-5">
@@ -63,22 +59,18 @@ function CheckoutSuccess() {
             </span>
           ) : isActive ? (
             "Your subscription is active. Redirecting…"
+          ) : timedOut ? (
+            "Your payment was received and your subscription is being set up. We'll email you the moment it's live — you can head to your account in the meantime."
           ) : (
             "Your subscription is being processed. It may take a few seconds to update."
           )}
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
           <Link
-            to="/app"
+            to={destination}
             className="rounded-md bg-mahogany px-5 py-2.5 text-sm font-medium text-cream hover:bg-mahogany-soft"
           >
-            Go to my app
-          </Link>
-          <Link
-            to="/portal"
-            className="rounded-md border border-mahogany px-5 py-2.5 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream"
-          >
-            Retailer portal
+            {customerType === "retailer" ? "Go to billing" : "Go to my app"}
           </Link>
         </div>
       </div>
