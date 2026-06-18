@@ -137,12 +137,16 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
 async function syncRetailerPlanFromSub(subId: string, env: PaddleEnv) {
   const { data: row } = await getSupabase()
     .from("subscriptions")
-    .select("user_id, plan, status, customer_type")
+    .select("user_id, plan, status, customer_type, current_period_end")
     .eq("paddle_subscription_id", subId)
     .eq("environment", env)
     .maybeSingle();
   if (!row || row.customer_type !== "retailer" || !row.user_id) return;
-  const newPlan = row.status === "canceled" ? "starter" : row.plan;
+  // Keep the paid plan name during the cancellation grace period — only
+  // drop to "starter" once the paid window has actually ended.
+  const periodEnd = row.current_period_end ? new Date(row.current_period_end) : null;
+  const inGrace = periodEnd ? periodEnd > new Date() : false;
+  const newPlan = row.status === "canceled" && !inGrace ? "starter" : row.plan;
   await getSupabase()
     .from("retailers")
     .update({ plan: newPlan, updated_at: new Date().toISOString() })
