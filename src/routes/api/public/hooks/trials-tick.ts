@@ -58,20 +58,20 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
         const baseUrl = `${url.protocol}//${url.host}`;
 
         const now = new Date();
-        const in3Days = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+        const in7Days = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-        // --- 1) Trial ending in 3 days reminder ---
+        // --- 1) Trial ending within 7 days reminder ---
         const { data: endingSoon } = await sb
           .from("retailers")
           .select("id, owner_id, business_name, display_name, trial_ends_at, is_active")
           .eq("is_active", true)
           .gt("trial_ends_at", now.toISOString())
-          .lt("trial_ends_at", in3Days.toISOString());
+          .lt("trial_ends_at", in7Days.toISOString());
 
         let endingSoonSent = 0;
         for (const r of endingSoon ?? []) {
           if (await hasActiveSub(r.owner_id)) continue;
-          const ok = await recordEvent(r.id, "trial_ending_3d");
+          const ok = await recordEvent(r.id, "trial_ending_7d");
           if (!ok) continue;
           const { data: profile } = await sb
             .from("profiles")
