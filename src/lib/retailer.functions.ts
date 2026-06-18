@@ -68,6 +68,7 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
     const payload = {
       owner_id: userId,
       business_name: data.business_name,
+      legal_business_name: data.legal_business_name,
       display_name: data.display_name,
       website: data.website || null,
       country: data.country || null,
