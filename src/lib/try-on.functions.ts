@@ -525,3 +525,169 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
       isPaid,
     };
   });
+
+// ---------------------------------------------------------------------------
+// Anonymous one-free try-on (no account required)
+//
+// Lets a first-time visitor complete exactly one full try-on, then prompts
+// for signup. Enforcement combines a client-issued deviceId (localStorage)
+// with a browser fingerprint hash and a server-hashed IP. Uniqueness on both
+// device_id and fingerprint_hash in `anonymous_tryons` blocks clearing
+// cookies as an escape hatch. Authenticated try-ons are unaffected.
+// ---------------------------------------------------------------------------
+
+async function sha256HexServer(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function getClientIPServer(): string {
+  const req = getRequest();
+  const h = req?.headers;
+  if (!h) return "unknown";
+  const xff = h.get("x-forwarded-for") ?? "";
+  const first = xff.split(",")[0]?.trim();
+  return first || h.get("cf-connecting-ip") || h.get("x-real-ip") || "unknown";
+}
+
+export const getAnonymousTryOnStatus = createServerFn({ method: "POST" })
+  .inputValidator((d: { deviceId: string; fingerprintHash: string }) =>
+    z
+      .object({
+        deviceId: z.string().min(8).max(128),
+        fingerprintHash: z.string().min(8).max(128),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("anonymous_tryons")
+      .select("id")
+      .or(
+        `device_id.eq.${data.deviceId},fingerprint_hash.eq.${data.fingerprintHash}`,
+      )
+      .limit(1)
+      .maybeSingle();
+    return { used: Boolean(row) };
+  });
+
+export const generateAnonymousTryOn = createServerFn({ method: "POST" })
+  .inputValidator(
+    (d: {
+      deviceId: string;
+      fingerprintHash: string;
+      userPhotoBase64: string;
+      userPhotoMimeType: string;
+      wigId: string;
+      wigImageUrl: string;
+      wigName: string;
+      wigStyleType: string;
+      wigColour: string;
+    }) =>
+      z
+        .object({
+          deviceId: z.string().min(8).max(128),
+          fingerprintHash: z.string().min(8).max(128),
+          userPhotoBase64: z.string().min(1),
+          userPhotoMimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+          wigId: z.string().uuid(),
+          wigImageUrl: z.string().url(),
+          wigName: z.string().min(1),
+          wigStyleType: z.string().min(1),
+          wigColour: z.string().min(1),
+        })
+        .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // 1. Refuse if this device or fingerprint already used its one free try-on.
+    const { data: existing } = await supabaseAdmin
+      .from("anonymous_tryons")
+      .select("id")
+      .or(
+        `device_id.eq.${data.deviceId},fingerprint_hash.eq.${data.fingerprintHash}`,
+      )
+      .limit(1)
+      .maybeSingle();
+    if (existing) {
+      return { alreadyUsed: true as const };
+    }
+
+    // 2. Fetch the wig product image for Gemini.
+    const wigRes = await fetch(data.wigImageUrl);
+    if (!wigRes.ok) throw new Error(`Could not fetch wig image (${wigRes.status}).`);
+    const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
+    const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
+
+    // 3. Generate try-on image.
+    const prompt = buildTryOnPrompt({
+      name: data.wigName,
+      styleType: data.wigStyleType,
+      colour: data.wigColour,
+    });
+    const generated = await callGeminiImageAPI({
+      prompt,
+      userPhotoBase64: data.userPhotoBase64,
+      userPhotoMimeType: data.userPhotoMimeType,
+      wigImageBase64,
+      wigImageMimeType,
+    });
+
+    // 4. Upload to anon folder in `tryons` bucket via service-role client.
+    const objectId = crypto.randomUUID();
+    const path = `anon/${objectId}.png`;
+    const bytes = decodeBase64Image(generated.imageBase64);
+    const { error: upErr } = await supabaseAdmin.storage
+      .from(TRYONS_BUCKET)
+      .upload(path, bytes, { contentType: generated.mimeType, upsert: false });
+    if (upErr) throw upErr;
+
+    // 5. Record the anonymous usage. Unique indexes on device_id and
+    //    fingerprint_hash double-guard against concurrent attempts.
+    const ipHash = await sha256HexServer(getClientIPServer());
+    const userAgent = getRequest()?.headers?.get("user-agent") ?? null;
+    const { error: insErr } = await supabaseAdmin.from("anonymous_tryons").insert({
+      device_id: data.deviceId,
+      fingerprint_hash: data.fingerprintHash,
+      ip_hash: ipHash,
+      wig_id: data.wigId,
+      result_path: path,
+      user_agent: userAgent,
+    });
+    if (insErr) {
+      // Race lost — treat as already used.
+      return { alreadyUsed: true as const };
+    }
+
+    // 6. Analytics event (mirrors recordTryOn shape, source = "anon").
+    const { data: wig } = await supabaseAdmin
+      .from("wigs")
+      .select("retailer_id")
+      .eq("id", data.wigId)
+      .maybeSingle();
+    await supabaseAdmin.from("try_on_events").insert({
+      user_id: null,
+      wig_id: data.wigId,
+      retailer_id: wig?.retailer_id ?? null,
+      source: "anon",
+    });
+
+    // 7. Signed URL for the result.
+    const { data: signed, error: signError } = await supabaseAdmin.storage
+      .from(TRYONS_BUCKET)
+      .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+    if (signError) throw signError;
+
+    return {
+      alreadyUsed: false as const,
+      path,
+      signedUrl: signed.signedUrl,
+      expiresIn: SIGNED_URL_TTL_SECONDS,
+      model: generated.model,
+    };
+  });
+
