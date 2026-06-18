@@ -114,6 +114,29 @@ function TryOn() {
     };
   }, [fetchAnonStatus]);
 
+  // After a result is generated, give the user a moment to enjoy it.
+  // Open the soft prompt after 4s OR on the first meaningful interaction.
+  useEffect(() => {
+    if (!resultUrl || user) return;
+    let opened = false;
+    const open = () => {
+      if (opened) return;
+      opened = true;
+      setPostPromptOpen(true);
+    };
+    const timer = window.setTimeout(open, 4000);
+    const onScroll = () => open();
+    const onClick = () => open();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("click", onClick, { capture: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("click", onClick, { capture: true } as any);
+    };
+  }, [resultUrl, user]);
+
+
   // Load catalogue based on URL scope (widget token, retailer slug, or full).
   useEffect(() => {
     let cancelled = false;
@@ -214,7 +237,8 @@ function TryOn() {
       }
       setResultUrl(out.signedUrl);
       setAnonUsed(true);
-      setPostPromptOpen(true);
+      // Don't open the prompt immediately — let the user see their result first.
+      // The prompt is opened by a 4s timer or any user interaction (see effect below).
     } catch (err) {
       setError(err instanceof Error ? err.message : "Try-on generation failed.");
     } finally {
@@ -314,32 +338,6 @@ function TryOn() {
             {resultUrl ? (
               <div className="relative overflow-hidden rounded-xl border border-border bg-card">
                 <img src={resultUrl} alt="Your try-on result" className="w-full object-contain" />
-                {!user && (
-                  <div className="border-t border-gold/30 bg-gold/10 p-4">
-                    <p className="font-display text-lg text-mahogany">
-                      Love what you see?
-                    </p>
-                    <p className="mt-1 text-sm text-foreground/80">
-                      Create a free account for 5 try-ons every month. No card needed.
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <button
-                        onClick={() =>
-                          navigate({ to: "/auth/signup", search: { redirect: redirectTarget } })
-                        }
-                        className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream hover:bg-mahogany-soft"
-                      >
-                        Create free account
-                      </button>
-                      <button
-                        onClick={() => setPostPromptOpen(false)}
-                        className="rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany"
-                      >
-                        Maybe later
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             ) : (
               <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
@@ -442,30 +440,40 @@ function TryOn() {
         </div>
       </div>
 
-      {/* Post-result soft prompt (dismissible) */}
-      <AlertDialog open={postPromptOpen} onOpenChange={setPostPromptOpen}>
-        <AlertDialogContent className="bg-cream">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-display text-2xl text-mahogany">
-              Love what you see?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-foreground/75">
-              Create a free account for 5 try-ons every month. No card needed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="border-border">Maybe later</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() =>
-                navigate({ to: "/auth/signup", search: { redirect: redirectTarget } })
-              }
-              className="bg-mahogany text-cream hover:bg-mahogany-soft"
-            >
-              Create free account
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Post-result soft prompt — bottom sheet that does NOT cover the result */}
+      {postPromptOpen && !user && resultUrl && (
+        <div
+          role="dialog"
+          aria-label="Create a free account"
+          className="fixed inset-x-0 bottom-0 z-40 animate-slide-in-bottom border-t border-gold/40 bg-cream/95 px-5 py-4 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.25)] backdrop-blur-md"
+        >
+          <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-display text-lg text-mahogany">Love what you see?</p>
+              <p className="text-sm text-foreground/75">
+                Create a free account for 5 try-ons every month. No card needed.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPostPromptOpen(false)}
+                className="rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany"
+              >
+                Maybe later
+              </button>
+              <button
+                onClick={() =>
+                  navigate({ to: "/auth/signup", search: { redirect: redirectTarget } })
+                }
+                className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream hover:bg-mahogany-soft"
+              >
+                Create free account
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Hard wall on second anonymous attempt */}
       <AlertDialog open={wallPromptOpen} onOpenChange={setWallPromptOpen}>

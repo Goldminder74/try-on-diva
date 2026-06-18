@@ -33,7 +33,7 @@ export function Header() {
                 Log in
               </Link>
               <Link
-                to="/auth/signup"
+                to="/try-on"
                 className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
               >
                 Try free
