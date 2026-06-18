@@ -36,6 +36,7 @@ function Onboarding() {
 
   const [form, setForm] = useState<Form>({
     business_name: "",
+    legal_business_name: "",
     display_name: "",
     website: "",
     country: "",
