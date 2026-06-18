@@ -49,6 +49,39 @@ export type Database = {
           },
         ]
       }
+      anonymous_tryons: {
+        Row: {
+          created_at: string
+          device_id: string
+          fingerprint_hash: string
+          id: string
+          ip_hash: string | null
+          result_path: string
+          user_agent: string | null
+          wig_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          fingerprint_hash: string
+          id?: string
+          ip_hash?: string | null
+          result_path: string
+          user_agent?: string | null
+          wig_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          fingerprint_hash?: string
+          id?: string
+          ip_hash?: string | null
+          result_path?: string
+          user_agent?: string | null
+          wig_id?: string | null
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           created_at: string
