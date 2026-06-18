@@ -118,14 +118,27 @@ function Onboarding() {
               kicker="Tell us about your business"
               title="Your shop, in your words."
             />
-            <Field label="Legal business name">
+            <Field label="Business name">
               <input
                 required
                 value={form.business_name}
                 onChange={(e) => set("business_name", e.target.value)}
                 className={inputCls}
+                placeholder="e.g. Sienna Hair"
+              />
+            </Field>
+            <Field label="Legal business name (for payment processing)">
+              <input
+                required
+                value={form.legal_business_name}
+                onChange={(e) => set("legal_business_name", e.target.value)}
+                className={inputCls}
                 placeholder="e.g. Sienna Hair Co. Ltd"
               />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Your registered legal entity name. Required for billing and tax
+                compliance. Not shown to shoppers.
+              </p>
             </Field>
             <Field label="Display name (shown to shoppers)">
               <input
