@@ -61,3 +61,28 @@ export async function verifyWebhook(req: Request, env: PaddleEnv) {
   const paddle = getPaddleClient(env);
   return await paddle.webhooks.unmarshal(body, secret, signature);
 }
+
+/**
+ * Verify a Paddle webhook without trusting a caller-supplied env hint.
+ * Tries sandbox first, then live. The winning env is returned alongside
+ * the event so the handler writes to the correct rows.
+ */
+export async function verifyWebhookAutoEnv(
+  signature: string | null,
+  body: string,
+): Promise<{ event: any; env: PaddleEnv }> {
+  if (!signature || !body) throw new Error("Missing signature or body");
+  const envs: PaddleEnv[] = ["sandbox", "live"];
+  let lastErr: unknown = null;
+  for (const env of envs) {
+    try {
+      const secret = getWebhookSecret(env);
+      const paddle = getPaddleClient(env);
+      const event = await paddle.webhooks.unmarshal(body, secret, signature);
+      return { event, env };
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr ?? new Error("Webhook signature did not match any environment");
+}

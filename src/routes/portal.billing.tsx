@@ -7,11 +7,28 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   createPortalSession,
   listInvoices,
+  previewPlanChange,
+  changeSubscriptionPlan,
 } from "@/lib/subscription.functions";
+import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 import { Loader2, ExternalLink, FileText, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { RetailerPlanCards } from "@/components/retailer/RetailerPlanCards";
-import type { RetailerPlanId } from "@/lib/retailer-plans";
+import {
+  type RetailerPlanId,
+  getPlanDisplayName,
+  getPlanById,
+} from "@/lib/retailer-plans";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Invoice {
   id: string;
@@ -27,6 +44,10 @@ function formatMoney(amountMinor: number, currency: string) {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(amountMinor / 100);
 }
 
+function formatGBP(amountMinor: number) {
+  return formatMoney(amountMinor, "GBP");
+}
+
 export const Route = createFileRoute("/portal/billing")({
   component: BillingPage,
 });
@@ -39,15 +60,31 @@ interface CurrentSub {
   billing_interval: string | null;
 }
 
+interface SwitchPreview {
+  planId: RetailerPlanId;
+  planName: string;
+  priceId: string;
+  currency: string;
+  immediateAmount: number;
+  nextAmount: number;
+  nextBilledAt: string | null;
+}
+
 const PAID_PLAN_IDS: RetailerPlanId[] = ["starter", "growth", "scale"];
 
 function BillingPage() {
   const { user } = useAuth();
   const portal = useServerFn(createPortalSession);
   const invoicesFn = useServerFn(listInvoices);
+  const preview = useServerFn(previewPlanChange);
+  const changePlan = useServerFn(changeSubscriptionPlan);
+  const { openCheckout } = usePaddleCheckout();
   const [sub, setSub] = useState<CurrentSub | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
+  const [switchPreview, setSwitchPreview] = useState<SwitchPreview | null>(null);
+  const [confirmingSwitch, setConfirmingSwitch] = useState(false);
+  const [previewBusy, setPreviewBusy] = useState<string | null>(null);
 
   const refetch = () => {
     if (!user) return;
@@ -96,6 +133,29 @@ function BillingPage() {
 
   const currentPlanId = isPaidActive ? (sub!.plan as RetailerPlanId) : null;
 
+  // Auto-open checkout when arriving from /retailer with ?plan=&interval=
+  // (and no existing paid subscription). Runs once per mount.
+  useEffect(() => {
+    if (!user || isPaidActive) return;
+    const params = new URLSearchParams(window.location.search);
+    const planId = params.get("plan") as RetailerPlanId | null;
+    const interval = (params.get("interval") || "monthly") as "monthly" | "yearly";
+    if (!planId) return;
+    const plan = getPlanById(planId);
+    if (!plan) return;
+    const priceId = plan.priceIds[interval] ?? plan.priceIds.monthly;
+    // Strip the params so refresh doesn't reopen checkout.
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState(null, "", cleanUrl);
+    openCheckout({
+      priceId,
+      customerEmail: user.email ?? undefined,
+      customData: { userId: user.id, plan: planId },
+      successUrl: `${window.location.origin}/portal/billing?checkout=success`,
+    }).catch((e) => toast.error(e instanceof Error ? e.message : "Could not start checkout"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isPaidActive]);
+
   const onManage = async () => {
     setBusy("portal");
     try {
@@ -105,6 +165,43 @@ function BillingPage() {
       toast.error(e instanceof Error ? e.message : "Couldn't open portal");
     } finally {
       setBusy(null);
+    }
+  };
+
+  const onSwitchPlan = async (planId: RetailerPlanId, priceId: string, planName: string) => {
+    setPreviewBusy(planId);
+    try {
+      const env = getPaddleEnvironment();
+      const p = await preview({ data: { newPriceId: priceId, environment: env } });
+      setSwitchPreview({
+        planId,
+        planName,
+        priceId,
+        currency: p.currency,
+        immediateAmount: p.immediateAmount,
+        nextAmount: p.nextAmount,
+        nextBilledAt: p.nextBilledAt,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not preview plan change");
+    } finally {
+      setPreviewBusy(null);
+    }
+  };
+
+  const onConfirmSwitch = async () => {
+    if (!switchPreview) return;
+    setConfirmingSwitch(true);
+    try {
+      await changePlan({
+        data: { newPriceId: switchPreview.priceId, environment: getPaddleEnvironment() },
+      });
+      toast.success("Plan updated. Your account will refresh in a few seconds.");
+      setSwitchPreview(null);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not update plan");
+    } finally {
+      setConfirmingSwitch(false);
     }
   };
 
@@ -118,9 +215,9 @@ function BillingPage() {
         {isPaidActive ? (
           <>
             <p className="mt-2 text-sm text-muted-foreground">
-              Current plan: <span className="font-medium capitalize text-foreground">{currentPlanId}</span>
-              {sub?.billing_interval === "year" && <span className="capitalize text-foreground"> · Yearly</span>}
-              {sub?.billing_interval === "month" && <span className="capitalize text-foreground"> · Monthly</span>}
+              Current plan: <span className="font-medium text-foreground">{getPlanDisplayName(currentPlanId)}</span>
+              {sub?.billing_interval === "year" && <span className="text-foreground"> · Yearly</span>}
+              {sub?.billing_interval === "month" && <span className="text-foreground"> · Monthly</span>}
               {sub?.status && (
                 <>
                   {" "}· Status: <span className="capitalize">{sub.status}</span>
@@ -150,7 +247,15 @@ function BillingPage() {
         )}
       </div>
 
-      <RetailerPlanCards currentPlanId={currentPlanId} />
+      <RetailerPlanCards
+        currentPlanId={currentPlanId}
+        onSwitch={onSwitchPlan}
+      />
+      {previewBusy && (
+        <p className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
+          <Loader2 className="h-3 w-3 animate-spin" /> Calculating proration…
+        </p>
+      )}
 
       {invoices && invoices.length > 0 && (
         <div className="mt-10">
@@ -198,6 +303,57 @@ function BillingPage() {
         </Link>
         .
       </p>
+
+      <AlertDialog
+        open={!!switchPreview}
+        onOpenChange={(open) => !open && setSwitchPreview(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Switch to {switchPreview?.planName}?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm">
+                {switchPreview && switchPreview.immediateAmount > 0 && (
+                  <p>
+                    You'll be charged{" "}
+                    <span className="font-medium text-foreground">
+                      {formatGBP(switchPreview.immediateAmount)}
+                    </span>{" "}
+                    today (prorated).
+                  </p>
+                )}
+                {switchPreview && switchPreview.immediateAmount < 0 && (
+                  <p>
+                    You'll receive a credit of{" "}
+                    <span className="font-medium text-foreground">
+                      {formatGBP(Math.abs(switchPreview.immediateAmount))}
+                    </span>{" "}
+                    toward your next invoice.
+                  </p>
+                )}
+                {switchPreview && switchPreview.immediateAmount === 0 && (
+                  <p>No charge today.</p>
+                )}
+                {switchPreview?.nextBilledAt && (
+                  <p className="text-muted-foreground">
+                    Next renewal: {formatGBP(switchPreview.nextAmount)} on{" "}
+                    {new Date(switchPreview.nextBilledAt).toLocaleDateString("en-GB", {
+                      day: "numeric", month: "long", year: "numeric",
+                    })}.
+                  </p>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={confirmingSwitch}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirmSwitch} disabled={confirmingSwitch}>
+              {confirmingSwitch && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Confirm switch
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

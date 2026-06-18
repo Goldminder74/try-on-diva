@@ -22,6 +22,10 @@ interface RetailerPlanCardsProps {
   requireSignup?: boolean;
   /** Path to send unauthenticated users to for the trial signup. */
   signupHref?: string;
+  /** Called when a signed-in user with an existing subscription clicks a
+   * different plan. Lets the parent show a prorated preview dialog and
+   * call changeSubscriptionPlan instead of opening a new checkout. */
+  onSwitch?: (planId: RetailerPlanId, priceId: string, planName: string) => void;
 }
 
 /**
@@ -35,17 +39,23 @@ export function RetailerPlanCards({
   ctaLabel,
   requireSignup,
   signupHref = "/retailer/signup",
+  onSwitch,
 }: RetailerPlanCardsProps) {
   const { user } = useAuth();
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [busy, setBusy] = useState<string | null>(null);
 
-  const onChoose = async (planId: RetailerPlanId, priceId: string) => {
+  const onChoose = async (planId: RetailerPlanId, priceId: string, planName: string) => {
     if (requireSignup || !user) {
       // Marketing page flow — send to retailer signup with the chosen plan.
       const url = `${signupHref}?plan=${planId}&interval=${interval}`;
       window.location.href = url;
+      return;
+    }
+    // Existing subscription → delegate to prorated in-place switch flow.
+    if (currentPlanId && onSwitch) {
+      onSwitch(planId, priceId, planName);
       return;
     }
     setBusy(planId);
@@ -129,7 +139,7 @@ export function RetailerPlanCards({
               ) : (
                 <button
                   type="button"
-                  onClick={() => onChoose(p.id, priceId)}
+                  onClick={() => onChoose(p.id, priceId, p.name)}
                   disabled={busyHere}
                   className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-mahogany py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
                 >

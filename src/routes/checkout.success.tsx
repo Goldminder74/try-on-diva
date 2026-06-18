@@ -39,6 +39,16 @@ function CheckoutSuccess() {
     }
   }, [isActive, subscription, navigate]);
 
+  // Hard fallback: if the webhook still hasn't landed after 15s, navigate
+  // anyway. The subscription banner / billing page will reflect status once
+  // the row arrives.
+  useEffect(() => {
+    if (waited >= 15 && !isActive) {
+      const dest = subscription?.customer_type === "retailer" ? "/portal/billing" : "/app";
+      navigate({ to: dest });
+    }
+  }, [waited, isActive, subscription, navigate]);
+
   const stillWaiting = !!user && !isActive && waited < 15;
 
   return (

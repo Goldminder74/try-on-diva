@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
-import { verifyWebhook, EventName, type PaddleEnv } from "@/lib/paddle.server";
+import { verifyWebhookAutoEnv, EventName, type PaddleEnv } from "@/lib/paddle.server";
 import { serverSendTransactionalEmail } from "@/lib/email/server-send";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
@@ -137,12 +137,16 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
 async function syncRetailerPlanFromSub(subId: string, env: PaddleEnv) {
   const { data: row } = await getSupabase()
     .from("subscriptions")
-    .select("user_id, plan, status, customer_type")
+    .select("user_id, plan, status, customer_type, current_period_end")
     .eq("paddle_subscription_id", subId)
     .eq("environment", env)
     .maybeSingle();
   if (!row || row.customer_type !== "retailer" || !row.user_id) return;
-  const newPlan = row.status === "canceled" ? "starter" : row.plan;
+  // Keep the paid plan name during the cancellation grace period — only
+  // drop to "starter" once the paid window has actually ended.
+  const periodEnd = row.current_period_end ? new Date(row.current_period_end) : null;
+  const inGrace = periodEnd ? periodEnd > new Date() : false;
+  const newPlan = row.status === "canceled" && !inGrace ? "starter" : row.plan;
   await getSupabase()
     .from("retailers")
     .update({ plan: newPlan, updated_at: new Date().toISOString() })
@@ -201,13 +205,8 @@ async function handlePaymentFailed(data: any, env: PaddleEnv) {
     .eq("paddle_subscription_id", subId)
     .eq("environment", env)
     .maybeSingle();
-  if (!row?.user_id || row.customer_type !== "retailer") return;
+  if (!row?.user_id) return;
 
-  const { data: retailer } = await sb
-    .from("retailers")
-    .select("id, business_name, display_name")
-    .eq("owner_id", row.user_id)
-    .maybeSingle();
   const { data: profile } = await sb
     .from("profiles")
     .select("email, display_name")
@@ -215,22 +214,41 @@ async function handlePaymentFailed(data: any, env: PaddleEnv) {
     .maybeSingle();
   if (!profile?.email) return;
 
-  await serverSendTransactionalEmail({
-    baseUrl: "https://wigsmi.com",
-    templateName: "retailer-payment-failed",
-    recipientEmail: profile.email,
-    // Use the transaction id so each failed attempt is its own send.
-    idempotencyKey: `payment-failed-${data?.id ?? subId}-${Date.now().toString(36)}`,
-    templateData: {
-      name: profile.display_name ?? retailer?.display_name,
-      businessName: retailer?.business_name,
-      billingUrl: "https://wigsmi.com/portal/billing",
-    },
-  });
+  if (row.customer_type === "retailer") {
+    const { data: retailer } = await sb
+      .from("retailers")
+      .select("id, business_name, display_name")
+      .eq("owner_id", row.user_id)
+      .maybeSingle();
+    await serverSendTransactionalEmail({
+      baseUrl: "https://wigsmi.com",
+      templateName: "retailer-payment-failed",
+      recipientEmail: profile.email,
+      idempotencyKey: `payment-failed-${data?.id ?? subId}-${Date.now().toString(36)}`,
+      templateData: {
+        name: profile.display_name ?? retailer?.display_name,
+        businessName: retailer?.business_name,
+        billingUrl: "https://wigsmi.com/portal/billing",
+      },
+    });
+  } else {
+    await serverSendTransactionalEmail({
+      baseUrl: "https://wigsmi.com",
+      templateName: "consumer-payment-failed",
+      recipientEmail: profile.email,
+      idempotencyKey: `payment-failed-${data?.id ?? subId}-${Date.now().toString(36)}`,
+      templateData: {
+        name: profile.display_name,
+        billingUrl: "https://wigsmi.com/pricing",
+      },
+    });
+  }
 }
 
-async function handleWebhook(req: Request, env: PaddleEnv) {
-  const event = await verifyWebhook(req, env);
+async function handleWebhook(req: Request) {
+  const signature = req.headers.get("paddle-signature");
+  const body = await req.text();
+  const { event, env } = await verifyWebhookAutoEnv(signature, body);
   switch (event.eventType) {
     case EventName.SubscriptionCreated:
       await handleSubscriptionCreated(event.data, env);
@@ -253,10 +271,8 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const url = new URL(request.url);
-        const env = (url.searchParams.get("env") || "sandbox") as PaddleEnv;
         try {
-          await handleWebhook(request, env);
+          await handleWebhook(request);
           return Response.json({ received: true });
         } catch (e) {
           console.error("Paddle webhook error:", e);
