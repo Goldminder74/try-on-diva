@@ -55,3 +55,9 @@ export const RETAILER_PLANS: RetailerPlan[] = [
 export function getPlanById(id: string): RetailerPlan | undefined {
   return RETAILER_PLANS.find((p) => p.id === id);
 }
+
+/** Display name for a stored plan id (e.g. "scale" -> "Pro"). */
+export function getPlanDisplayName(id?: string | null): string {
+  if (!id) return "";
+  return getPlanById(id)?.name ?? id.charAt(0).toUpperCase() + id.slice(1);
+}
