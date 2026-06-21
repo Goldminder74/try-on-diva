@@ -22,7 +22,7 @@ interface Props {
 const RetailerWelcomeEmail = ({ name, businessName, portalUrl }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Welcome to Wigsmi — your 3-month trial has started.</Preview>
+    <Preview>Welcome to Wigsmi — your 1-month trial has started.</Preview>
     <Body style={main}>
       <Section style={outer}>
         <Container style={container}>
