@@ -250,7 +250,7 @@ function Onboarding() {
               </select>
             </Field>
             <p className="rounded-md border border-gold/30 bg-gold/10 p-4 text-sm text-gold-dark">
-              You're starting a free 3-month trial. No card required. Add up to 30 wigs
+              You're starting a free 1-month trial. No card required. Add up to 30 wigs
               on the Starter plan.
             </p>
           </>

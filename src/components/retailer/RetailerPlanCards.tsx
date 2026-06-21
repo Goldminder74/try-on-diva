@@ -164,7 +164,7 @@ export function RetailerPlanCards({
 
       {(requireSignup || !user) && (
         <p className="mt-4 font-mono text-xs text-muted-foreground">
-          All plans start with a 3-month free trial. No card required upfront.{" "}
+          All plans start with a 1-month free trial. No card required upfront.{" "}
           <Link to="/retailer/login" className="text-mahogany underline">
             Already have an account?
           </Link>

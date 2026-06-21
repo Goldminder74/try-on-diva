@@ -1,0 +1,1 @@
+ALTER TABLE public.retailers ALTER COLUMN trial_ends_at SET DEFAULT (now() + interval '30 days');
