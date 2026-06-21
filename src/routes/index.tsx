@@ -48,11 +48,11 @@ function Landing() {
               Try every wig <em className="italic text-sienna">before</em> you buy it.
             </h1>
             <p className="mt-6 max-w-md text-lg text-foreground/75">
-              Built for Black women. Powered by AI. Works on every shade — from fair to rich.
+              See how locs, knotless braids, bobs and waves actually look on your skin tone, before you spend a penny.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link to="/try-on" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm transition-all hover:bg-mahogany-soft hover:shadow-md">
-                Try for free
+                Upload a selfie. See yourself in 5 wigs free.
               </Link>
               <Link to="/retailer" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">
                 I'm a retailer →
