@@ -26,8 +26,34 @@ export async function watermarkImage(
   if (!ctx) throw new Error("Canvas not supported.");
   ctx.drawImage(img, 0, 0, w, h);
 
-  // Watermark sizing: binary-fit so "wigsmi." spans ~13% of image width.
+  // Auto-pick a corner: sample both bottom corners and prefer whichever has
+  // the higher variance-to-darkness ratio (i.e. more "background", less hair).
+  // Falls back to bottom-right when the choice is ambiguous.
   const padding = Math.round(w * 0.025);
+  const markBoxW = Math.round(w * 0.13);
+  const markBoxH = Math.round(markBoxW * 0.45);
+  const sampleCorner = (xStart: number) => {
+    const sx = Math.max(0, xStart);
+    const sy = Math.max(0, h - padding - markBoxH);
+    const sw = Math.min(markBoxW, w - sx);
+    const sh = Math.min(markBoxH, h - sy);
+    try {
+      const { data } = ctx.getImageData(sx, sy, sw, sh);
+      let sum = 0;
+      const n = data.length / 4;
+      for (let i = 0; i < data.length; i += 4) {
+        sum += (data[i] + data[i + 1] + data[i + 2]) / 3;
+      }
+      return sum / n; // mean brightness 0–255
+    } catch {
+      return 255; // CORS-tainted canvas → assume background, keep BR
+    }
+  };
+  const brBrightness = sampleCorner(w - padding - markBoxW);
+  const blBrightness = sampleCorner(padding);
+  // Prefer the brighter corner (background, not hair). Bias toward BR.
+  let position: "br" | "bl" = opts.position
+    ?? (blBrightness - brBrightness > 25 ? "bl" : "br");
   const targetW = w * 0.13;
   const fontFamily = `Georgia, "Times New Roman", serif`;
   const measure = (size: number) => {
