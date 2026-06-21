@@ -77,7 +77,7 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
       <p className="mt-3 text-sm text-muted-foreground">
         {mode === "login"
           ? "Log in to your retailer dashboard."
-          : "Free 3-month trial. No card required."}
+          : "Free 1-month trial. No card required."}
       </p>
 
       <form onSubmit={onSubmit} className="mt-7 space-y-3">
