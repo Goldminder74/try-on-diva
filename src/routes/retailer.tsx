@@ -35,7 +35,7 @@ function RetailerLanding() {
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link to="/retailer/signup" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft">
-              Start 3-month free trial
+              Start 1-month free trial
             </Link>
             <Link to="/retailer/login" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">
               Retailer login →
