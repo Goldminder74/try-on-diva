@@ -113,7 +113,7 @@ function RetailerLanding() {
       <section id="pricing" className="border-y border-border bg-sand/40">
         <div className="mx-auto w-full max-w-7xl px-5 py-20">
           <h2 className="font-display text-3xl text-mahogany md:text-4xl">Retailer pricing.</h2>
-          <p className="mt-2 max-w-md text-sm text-muted-foreground">All plans start with a 3-month free trial. No card required.</p>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">All plans start with a 1-month free trial. No card required.</p>
           <div className="mt-10">
             <RetailerPlanCards requireSignup />
           </div>
