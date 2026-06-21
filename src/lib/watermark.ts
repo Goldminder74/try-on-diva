@@ -76,7 +76,6 @@ export async function watermarkImage(
   const dotMetrics = ctx.measureText(dot);
   const totalW = textMetrics.width + dotMetrics.width;
 
-  const position = opts.position ?? "br";
   const x = position === "br" ? w - padding - totalW : padding;
   const y = h - padding;
 
