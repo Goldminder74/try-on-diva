@@ -30,7 +30,7 @@ const RetailerWelcomeEmail = ({ name, businessName, portalUrl }: Props) => (
           <Heading style={h1}>Welcome{name ? `, ${name}` : ""}.</Heading>
           <Text style={text}>
             {businessName ? `${businessName} is` : "You're"} all set up on Wigsmi.
-            Your 3-month free trial has started — no card needed.
+            Your 1-month free trial has started — no card needed.
           </Text>
           <Text style={text}>Three quick steps to get live:</Text>
           <Text style={{ ...text, paddingLeft: 12 }}>
