@@ -5,6 +5,7 @@ import { Upload, RefreshCw, Sparkles } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
+import { TryOnResultActions } from "@/components/try-on/TryOnResultActions";
 import {
   fetchFeaturedWigs,
   fetchRetailerBySlug,
@@ -336,9 +337,12 @@ function TryOn() {
         <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
           <div>
             {resultUrl ? (
-              <div className="relative overflow-hidden rounded-xl border border-border bg-card">
-                <img src={resultUrl} alt="Your try-on result" className="w-full object-contain" />
-              </div>
+              <>
+                <div className="relative overflow-hidden rounded-xl border border-border bg-card">
+                  <img src={resultUrl} alt="Your try-on result" className="w-full object-contain" />
+                </div>
+                <TryOnResultActions resultUrl={resultUrl} wigName={wig?.name} />
+              </>
             ) : (
               <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
             )}

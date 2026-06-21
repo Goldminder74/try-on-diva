@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Upload, RefreshCw } from "lucide-react";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
+import { TryOnResultActions } from "@/components/try-on/TryOnResultActions";
 import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
 import { useServerFn } from "@tanstack/react-start";
 import { getTryOnQuota } from "@/lib/try-on.functions";
@@ -78,9 +79,12 @@ function AppTryOn() {
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         <div>
           {resultUrl ? (
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-              <img src={resultUrl} alt="Your try-on result" className="w-full object-contain" />
-            </div>
+            <>
+              <div className="overflow-hidden rounded-xl border border-border bg-card">
+                <img src={resultUrl} alt="Your try-on result" className="w-full object-contain" />
+              </div>
+              <TryOnResultActions resultUrl={resultUrl} wigName={wig?.name} />
+            </>
           ) : (
             <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
           )}
