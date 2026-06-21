@@ -8,9 +8,9 @@ export const Route = createFileRoute("/retailer")({
   head: () => ({
     meta: [
       { title: "For Retailers — Wigsmi" },
-      { name: "description", content: "Add the virtual try-on built for Black wig buyers to your store. Reduce returns, lift conversion. Free 3-month trial." },
+      { name: "description", content: "Add the virtual try-on built for Black wig buyers to your store. Reduce returns, lift conversion. Free 1-month trial." },
       { property: "og:title", content: "Wigsmi for Retailers" },
-      { property: "og:description", content: "Virtual try-on for wig retailers. Free 3-month trial." },
+      { property: "og:description", content: "Virtual try-on for wig retailers. Free 1-month trial." },
     ],
   }),
   component: RetailerLanding,
