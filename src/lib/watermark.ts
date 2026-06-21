@@ -26,13 +26,22 @@ export async function watermarkImage(
   if (!ctx) throw new Error("Canvas not supported.");
   ctx.drawImage(img, 0, 0, w, h);
 
-  // Watermark sizing: target ~13% of image width.
-  const targetW = Math.round(w * 0.13);
+  // Watermark sizing: binary-fit so "wigsmi." spans ~13% of image width.
   const padding = Math.round(w * 0.025);
-  // Font sized so "wigsmi." fits roughly the target width (~6.4 chars × 0.55em).
-  const fontSize = Math.round(targetW / 3.2);
-
-  ctx.font = `500 ${fontSize}px Georgia, "Times New Roman", serif`;
+  const targetW = w * 0.13;
+  const fontFamily = `Georgia, "Times New Roman", serif`;
+  const measure = (size: number) => {
+    ctx.font = `500 ${size}px ${fontFamily}`;
+    return ctx.measureText("wigsmi.").width;
+  };
+  let lo = 8, hi = 200;
+  for (let i = 0; i < 18; i++) {
+    const mid = (lo + hi) >> 1;
+    if (measure(mid) < targetW) lo = mid + 1;
+    else hi = mid - 1;
+  }
+  const fontSize = lo;
+  ctx.font = `500 ${fontSize}px ${fontFamily}`;
   ctx.textBaseline = "alphabetic";
 
   const text = "wigsmi";
