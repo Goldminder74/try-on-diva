@@ -23,57 +23,56 @@ function RetailerLanding() {
 
       {/* Hero */}
       <section className="border-b border-border">
-        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-5 py-16 md:grid-cols-2 md:py-24">
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-mahogany/30 bg-mahogany/5 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-mahogany">
-              For wig retailers
-            </span>
-            <h1 className="mt-5 font-display text-5xl leading-[1.05] text-mahogany md:text-6xl">
-              Give your customers <em className="italic text-sienna">the confidence</em> to buy.
-            </h1>
-            <p className="mt-5 max-w-md text-lg text-foreground/75">
-              Add Wigsmi's virtual try-on to your store in minutes. Built for Black wig buyers.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link to="/retailer/signup" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft">
-                Start 3-month free trial
-              </Link>
-              <Link to="/retailer/login" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">
-                Retailer login →
-              </Link>
-              <a href="#pricing" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">See pricing →</a>
-            </div>
-            <p className="mt-3 font-mono text-xs text-muted-foreground">No card needed. Cancel any time.</p>
+        <div className="mx-auto w-full max-w-7xl px-5 py-16 md:py-24">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-mahogany/30 bg-mahogany/5 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-mahogany">
+            For wig retailers
+          </span>
+          <h1 className="mt-5 max-w-3xl font-display text-5xl leading-[1.05] text-mahogany md:text-6xl">
+            Fewer returns. More confident buyers. More sales.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg text-foreground/75">
+            When customers can see exactly how a wig looks on their own skin tone before buying, they buy with confidence, and they keep what they buy.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <Link to="/retailer/signup" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft">
+              Start 3-month free trial
+            </Link>
+            <Link to="/retailer/login" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">
+              Retailer login →
+            </Link>
+            <a href="#pricing" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">See pricing →</a>
           </div>
+          <p className="mt-3 font-mono text-xs text-muted-foreground">No card needed. Cancel any time.</p>
+        </div>
+      </section>
 
-          {/* Mock embed preview */}
-          <div className="rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-card-hover)]">
-            <div className="flex items-center gap-1.5 border-b border-border pb-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-error/60"></span>
-              <span className="h-2.5 w-2.5 rounded-full bg-gold"></span>
-              <span className="h-2.5 w-2.5 rounded-full bg-success/60"></span>
-              <span className="ml-3 font-mono text-[11px] text-muted-foreground">yourshop.co.uk/products/amara</span>
+      {/* Outcome points */}
+      <section className="mx-auto w-full max-w-7xl px-5 py-20">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {[
+            {
+              title: "Fewer returns",
+              body: "Customers who try on before buying are far less likely to return a wig that did not meet their expectations.",
+            },
+            {
+              title: "Higher conversion",
+              body: "Reduce the hesitation that stops a browser becoming a buyer.",
+            },
+            {
+              title: "Built for your exact customer",
+              body: "The only try-on technology designed and validated for darker skin tones and natural Black hairstyles.",
+            },
+          ].map((item, i) => (
+            <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+              <h3 className="font-display text-xl text-mahogany">{item.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{item.body}</p>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="aspect-square rounded-md bg-sand"></div>
-              <div>
-                <p className="font-display text-xl text-foreground">Amara Body Wave 22"</p>
-                <p className="mt-1 font-mono text-sm text-mahogany">£189</p>
-                <button className="mt-4 w-full rounded-md bg-mahogany py-2 text-xs font-medium text-cream">Add to bag</button>
-                <button className="mt-2 w-full rounded-md border border-gold bg-gold/10 py-2 text-xs font-medium text-mahogany">
-                  ✨ Try it on with Wigsmi
-                </button>
-              </div>
-            </div>
-            <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-wider text-gold-dark">
-              ↑ The Wigsmi widget on your product page
-            </p>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* Stats */}
-      <section className="border-b border-border bg-mahogany text-cream">
+      <section className="border-y border-border bg-mahogany text-cream">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-5 py-14 md:grid-cols-3">
           {[
             ["Up to 300%", "more conversion"],
