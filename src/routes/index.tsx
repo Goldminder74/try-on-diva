@@ -131,19 +131,11 @@ function Landing() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="mx-auto w-full max-w-7xl px-5 py-20">
-        <h2 className="font-display text-3xl text-mahogany md:text-4xl">Loved by Black wig buyers</h2>
-        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <figure key={t.name} className="rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]">
-              <blockquote className="font-display text-lg italic leading-snug text-foreground">"{t.quote}"</blockquote>
-              <figcaption className="mt-5 flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-mahogany font-mono text-xs text-cream">{t.initials}</span>
-                <span className="text-sm text-muted-foreground">{t.name}</span>
-              </figcaption>
-            </figure>
-          ))}
+      {/* First voices */}
+      <section className="mx-auto w-full max-w-7xl px-5 py-20 text-center">
+        <div className="rounded-xl border border-dashed border-border bg-sand/40 px-6 py-16">
+          <p className="font-display text-2xl text-mahogany">Be one of our first try-ons.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Your story could be here.</p>
         </div>
       </section>
 
