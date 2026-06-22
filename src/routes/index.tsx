@@ -136,7 +136,7 @@ function Landing() {
             { quote: "Returns cost everyone — the buyer who waited weeks, the retailer who eats the cost, and the product that ends up in landfill." },
           ].map((t, i) => (
             <figure key={i} className="rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]">
-              <blockquote className="font-display text-lg italic leading-snug text-foreground">"{t.quote}"</blockquote>
+              <blockquote className="font-display text-lg italic leading-snug text-foreground">{t.quote}</blockquote>
             </figure>
           ))}
         </div>
