@@ -25,6 +25,7 @@ export function Footer() {
           <p className="mb-3 font-mono text-xs uppercase tracking-wider text-gold-dark">Company</p>
           <ul className="space-y-2 text-sm">
             <li><Link to="/retailer" className="hover:text-mahogany">For retailers</Link></li>
+            <li><Link to="/faq" className="hover:text-mahogany">FAQ</Link></li>
             <li><Link to="/privacy" className="hover:text-mahogany">Privacy</Link></li>
             <li><Link to="/terms" className="hover:text-mahogany">Terms</Link></li>
           </ul>
