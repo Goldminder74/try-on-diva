@@ -126,11 +126,19 @@ function Landing() {
         </div>
       </section>
 
-      {/* First voices */}
-      <section className="mx-auto w-full max-w-7xl px-5 py-20 text-center">
-        <div className="rounded-xl border border-dashed border-border bg-sand/40 px-6 py-16">
-          <p className="font-display text-2xl text-mahogany">Be one of our first try-ons.</p>
-          <p className="mt-2 text-sm text-muted-foreground">Your story could be here.</p>
+      {/* What we built this for */}
+      <section className="mx-auto w-full max-w-7xl px-5 py-20">
+        <h2 className="font-display text-3xl text-mahogany md:text-4xl">What we built this for</h2>
+        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
+          {[
+            { quote: "We kept hearing the same story: a wig that looked perfect online, returned because it didn't match the wearer's skin or face shape." },
+            { quote: "Most try-on tools were built for lighter skin tones. The colour matching came out washed out or completely off." },
+            { quote: "Returns cost everyone — the buyer who waited weeks, the retailer who eats the cost, and the product that ends up in landfill." },
+          ].map((t, i) => (
+            <figure key={i} className="rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]">
+              <blockquote className="font-display text-lg italic leading-snug text-foreground">"{t.quote}"</blockquote>
+            </figure>
+          ))}
         </div>
       </section>
 
