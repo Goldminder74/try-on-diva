@@ -133,6 +133,22 @@ function RetailerLanding() {
       </section>
 
 
+      {/* FAQ teaser */}
+      <section className="border-y border-border bg-sand/40">
+        <div className="mx-auto w-full max-w-3xl px-5 py-14 text-center">
+          <p className="font-display text-xl text-mahogany">Questions before you start?</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            See answers to common retailer questions.
+          </p>
+          <Link
+            to="/faq"
+            className="mt-4 inline-flex rounded-md border border-mahogany px-5 py-2 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream"
+          >
+            Read retailer FAQ
+          </Link>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-mahogany text-cream">
         <div className="mx-auto w-full max-w-4xl px-5 py-20 text-center">
