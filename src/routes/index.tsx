@@ -26,11 +26,6 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const TESTIMONIALS = [
-  { initials: "AO", name: "Adaobi O.", quote: "I've ordered three wigs that looked perfect online and ended up donating them. Wigsmi is the first thing that actually shows me the wig on my skin." },
-  { initials: "TM", name: "Tasha M.", quote: "The deep wave I tried on looked exactly like it did when it arrived. Game changer for online shopping." },
-  { initials: "FK", name: "Fola K.", quote: "Finally a try-on that gets dark skin right. The colour matching is unreal." },
-];
 
 function Landing() {
   return (
