@@ -58,7 +58,7 @@ function Landing() {
                 I'm a retailer →
               </Link>
             </div>
-            <p className="mt-4 font-mono text-xs text-muted-foreground">No card needed. 3 free try-ons.</p>
+            <p className="mt-4 font-mono text-xs text-muted-foreground">No card needed. 5 free try-ons every month.</p>
           </div>
 
           <div className="relative">
