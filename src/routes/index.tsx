@@ -26,11 +26,6 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const TESTIMONIALS = [
-  { initials: "AO", name: "Adaobi O.", quote: "I've ordered three wigs that looked perfect online and ended up donating them. Wigsmi is the first thing that actually shows me the wig on my skin." },
-  { initials: "TM", name: "Tasha M.", quote: "The deep wave I tried on looked exactly like it did when it arrived. Game changer for online shopping." },
-  { initials: "FK", name: "Fola K.", quote: "Finally a try-on that gets dark skin right. The colour matching is unreal." },
-];
 
 function Landing() {
   return (
@@ -131,17 +126,17 @@ function Landing() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* What we built this for */}
       <section className="mx-auto w-full max-w-7xl px-5 py-20">
-        <h2 className="font-display text-3xl text-mahogany md:text-4xl">Loved by Black wig buyers</h2>
+        <h2 className="font-display text-3xl text-mahogany md:text-4xl">What we built this for</h2>
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <figure key={t.name} className="rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]">
+          {[
+            { quote: "We kept hearing the same story: a wig that looked perfect online, returned because it didn't match the wearer's skin or face shape." },
+            { quote: "Most try-on tools were built for lighter skin tones. The colour matching came out washed out or completely off." },
+            { quote: "Returns cost everyone — the buyer who waited weeks, the retailer who eats the cost, and the product that ends up in landfill." },
+          ].map((t, i) => (
+            <figure key={i} className="rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]">
               <blockquote className="font-display text-lg italic leading-snug text-foreground">"{t.quote}"</blockquote>
-              <figcaption className="mt-5 flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-mahogany font-mono text-xs text-cream">{t.initials}</span>
-                <span className="text-sm text-muted-foreground">{t.name}</span>
-              </figcaption>
             </figure>
           ))}
         </div>
