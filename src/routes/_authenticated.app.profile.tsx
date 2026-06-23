@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/app/profile")({
-  head: () => ({ meta: [{ title: "Profile — Wigsmi" }] }),
+  head: () => ({ meta: [{ title: "Profile - Wigsmi" }] }),
   component: Profile,
 });
 

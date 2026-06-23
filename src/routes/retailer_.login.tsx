@@ -5,7 +5,7 @@ import { RetailerAuthForm } from "@/components/retailer/RetailerAuthForm";
 export const Route = createFileRoute("/retailer_/login")({
   head: () => ({
     meta: [
-      { title: "Retailer login — Wigsmi" },
+      { title: "Retailer login - Wigsmi" },
       { name: "description", content: "Log in to your Wigsmi retailer dashboard." },
     ],
   }),

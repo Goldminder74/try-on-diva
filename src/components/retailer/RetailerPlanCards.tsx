@@ -11,7 +11,7 @@ import {
 import { toast } from "sonner";
 
 interface RetailerPlanCardsProps {
-  /** Currently active paid plan, if any — used to render a "Current plan" pill. */
+  /** Currently active paid plan, if any - used to render a "Current plan" pill. */
   currentPlanId?: RetailerPlanId | null;
   /** Where to redirect after successful Paddle checkout. */
   successUrl?: string;
@@ -48,7 +48,7 @@ export function RetailerPlanCards({
 
   const onChoose = async (planId: RetailerPlanId, priceId: string, planName: string) => {
     if (requireSignup || !user) {
-      // Marketing page flow — send to retailer signup with the chosen plan.
+      // Marketing page flow - send to retailer signup with the chosen plan.
       const url = `${signupHref}?plan=${planId}&interval=${interval}`;
       window.location.href = url;
       return;
@@ -154,7 +154,7 @@ export function RetailerPlanCards({
                       ? "Start free trial"
                       : currentPlanId
                         ? `Switch to ${p.name}`
-                        : `Subscribe — ${p.name}`}
+                        : `Subscribe - ${p.name}`}
                 </button>
               )}
             </div>

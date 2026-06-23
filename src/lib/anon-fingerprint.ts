@@ -1,5 +1,5 @@
 // Lightweight client-side fingerprint + persistent deviceId for the one-free
-// anonymous try-on flow. Not a security boundary on its own — the server also
+// anonymous try-on flow. Not a security boundary on its own - the server also
 // hashes the request IP and enforces uniqueness in `anonymous_tryons`.
 
 const DEVICE_KEY = "wigsmi:anonDeviceId";
@@ -13,7 +13,7 @@ export function getOrCreateDeviceId(): string {
     window.localStorage.setItem(DEVICE_KEY, id);
     return id;
   } catch {
-    // localStorage blocked — fall back to ephemeral id (server fingerprint/IP
+    // localStorage blocked - fall back to ephemeral id (server fingerprint/IP
     // still catches repeat use within the same session).
     return crypto.randomUUID();
   }
@@ -57,7 +57,7 @@ export async function computeFingerprint(): Promise<string> {
       parts.push(canvas.toDataURL().slice(-64));
     }
   } catch {
-    /* canvas blocked — ignore */
+    /* canvas blocked - ignore */
   }
 
   return sha256Hex(parts.join("|"));

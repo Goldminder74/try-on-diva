@@ -282,7 +282,7 @@ function BillingPage() {
                 {invoices.map((inv) => (
                   <tr key={inv.id} className="border-t border-border">
                     <td className="px-4 py-2">
-                      {inv.billedAt ? new Date(inv.billedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—"}
+                      {inv.billedAt ? new Date(inv.billedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-"}
                     </td>
                     <td className="px-4 py-2 font-mono">{formatMoney(inv.total, inv.currency)}</td>
                     <td className="px-4 py-2 capitalize text-muted-foreground">{inv.status}</td>
@@ -292,7 +292,7 @@ function BillingPage() {
                           <FileText className="h-3.5 w-3.5" /> PDF
                         </a>
                       ) : (
-                        <span className="text-muted-foreground">—</span>
+                        <span className="text-muted-foreground">-</span>
                       )}
                     </td>
                   </tr>

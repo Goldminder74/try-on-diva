@@ -6,7 +6,7 @@
  * helper but does not attach a Supabase auth header (the queue dispatcher
  * authenticates internally).
  *
- * Sends are idempotent on idempotencyKey — safe to retry.
+ * Sends are idempotent on idempotencyKey - safe to retry.
  */
 interface ServerSendParams {
   templateName: string;

@@ -26,7 +26,7 @@ function formatDate(iso?: string) {
 const RetailerTrialEndingEmail = ({ name, businessName, trialEndsAt, upgradeUrl }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your Wigsmi trial ends soon — pick a plan to keep your store live.</Preview>
+    <Preview>Your Wigsmi trial ends soon - pick a plan to keep your store live.</Preview>
     <Body style={main}>
       <Section style={outer}>
         <Container style={container}>

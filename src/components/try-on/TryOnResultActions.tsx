@@ -9,7 +9,7 @@ type Props = {
 
 const canNativeShareFiles = () => {
   if (typeof navigator === "undefined" || !("share" in navigator)) return false;
-  // canShare with files is the reliable detector — Web Share Level 2.
+  // canShare with files is the reliable detector - Web Share Level 2.
   const probe = new File([new Blob()], "probe.jpg", { type: "image/jpeg" });
   try {
     return Boolean((navigator as any).canShare?.({ files: [probe] }));
@@ -52,7 +52,7 @@ export function TryOnResultActions({ resultUrl, wigName }: Props) {
           });
           return;
         } catch (err) {
-          // User cancelled or share failed — fall back to direct download.
+          // User cancelled or share failed - fall back to direct download.
           if ((err as DOMException)?.name === "AbortError") return;
         }
       }

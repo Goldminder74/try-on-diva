@@ -11,14 +11,14 @@ import { useAsync } from "@/lib/use-async";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Wigsmi — Try every wig before you buy it" },
+      { title: "Wigsmi - Try every wig before you buy it" },
       { name: "description", content: "Virtual wig try-on built for Black women. Browse hundreds of styles, see them on your skin in seconds, then buy from the retailer you trust." },
-      { property: "og:title", content: "Wigsmi — Try every wig before you buy it" },
+      { property: "og:title", content: "Wigsmi - Try every wig before you buy it" },
       { property: "og:description", content: "Virtual wig try-on built for Black women." },
       { property: "og:image", content: "https://www.wigsmi.com/og-image.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@wigsmi" },
-      { name: "twitter:title", content: "Wigsmi — Try every wig before you buy it" },
+      { name: "twitter:title", content: "Wigsmi - Try every wig before you buy it" },
       { name: "twitter:description", content: "Virtual wig try-on built for Black women." },
       { name: "twitter:image", content: "https://www.wigsmi.com/og-image.jpg" },
     ],
@@ -76,7 +76,7 @@ function Landing() {
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
               { icon: Upload, title: "Upload your selfie", body: "A clear, well-lit photo is all we need." },
-              { icon: Palette, title: "Browse hundreds of styles", body: "Lace fronts, glueless, braids, bobs — filtered by your texture and budget." },
+              { icon: Palette, title: "Browse hundreds of styles", body: "Lace fronts, glueless, braids, bobs - filtered by your texture and budget." },
               { icon: Heart, title: "Find your perfect wig", body: "See it on you, save your favourites, buy from a retailer you trust." },
             ].map((s, i) => (
               <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
@@ -98,7 +98,7 @@ function Landing() {
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
           {[
             { icon: ShieldCheck, title: "Built for dark skin", body: "Trained on tones from Fitzpatrick I to VI. No washed-out previews, no off colour matching." },
-            { icon: Sparkles, title: "Afrocentric styles", body: "From kinky coily afros to knotless braids to body wave — the catalog reflects you." },
+            { icon: Sparkles, title: "Afrocentric styles", body: "From kinky coily afros to knotless braids to body wave - the catalog reflects you." },
             { icon: Heart, title: "Try before you buy", body: "Save the styles that work. Skip the styles that don't. Reduce returns and regret." },
           ].map((c, i) => (
             <div key={i} className="card-hover rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]">
@@ -133,7 +133,7 @@ function Landing() {
           {[
             { quote: "We kept hearing the same story: a wig that looked perfect online, returned because it didn't match the wearer's skin or face shape." },
             { quote: "Most try-on tools were built for lighter skin tones. The colour matching came out washed out or completely off." },
-            { quote: "Returns cost everyone — the buyer who waited weeks, the retailer who eats the cost, and the product that ends up in landfill." },
+            { quote: "Returns cost everyone - the buyer who waited weeks, the retailer who eats the cost, and the product that ends up in landfill." },
           ].map((t, i) => (
             <figure key={i} className="rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]">
               <blockquote className="font-display text-lg italic leading-snug text-foreground">{t.quote}</blockquote>

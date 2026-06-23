@@ -52,12 +52,12 @@ function ConsumersPage() {
             {rows?.length === 0 && <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">No consumers.</td></tr>}
             {rows?.map((p) => (
               <tr key={p.id} className="border-t border-border">
-                <td className="px-4 py-2">{p.display_name || "—"}</td>
-                <td className="px-4 py-2 font-mono text-xs">{p.email ?? "—"}</td>
-                <td className="px-4 py-2 text-muted-foreground">{p.country ?? "—"}</td>
+                <td className="px-4 py-2">{p.display_name || "-"}</td>
+                <td className="px-4 py-2 font-mono text-xs">{p.email ?? "-"}</td>
+                <td className="px-4 py-2 text-muted-foreground">{p.country ?? "-"}</td>
                 <td className="px-4 py-2 font-mono">{p.try_ons_month}</td>
                 <td className="px-4 py-2 font-mono">{p.wishlist_count}</td>
-                <td className="px-4 py-2">{p.quiz_completed ? "✓" : "—"}</td>
+                <td className="px-4 py-2">{p.quiz_completed ? "✓" : "-"}</td>
                 <td className="px-4 py-2 font-mono text-xs">{new Date(p.created_at).toLocaleDateString()}</td>
               </tr>
             ))}

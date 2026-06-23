@@ -87,9 +87,9 @@ function RetailersPage() {
                   <div className="font-medium">{r.business_name}</div>
                   <div className="font-mono text-xs text-muted-foreground">{r.slug}</div>
                 </td>
-                <td className="px-4 py-2 text-muted-foreground">{r.country ?? "—"}</td>
+                <td className="px-4 py-2 text-muted-foreground">{r.country ?? "-"}</td>
                 <td className="px-4 py-2 capitalize">{r.plan}</td>
-                <td className="px-4 py-2 font-mono text-xs">{r.trial_ends_at ? new Date(r.trial_ends_at).toLocaleDateString() : "—"}</td>
+                <td className="px-4 py-2 font-mono text-xs">{r.trial_ends_at ? new Date(r.trial_ends_at).toLocaleDateString() : "-"}</td>
                 <td className="px-4 py-2 font-mono">{r.wig_count}</td>
                 <td className="px-4 py-2 font-mono">{r.try_ons_30d}</td>
                 <td className="px-4 py-2">

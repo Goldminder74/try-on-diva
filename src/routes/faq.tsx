@@ -13,9 +13,9 @@ import {
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "FAQ — Wigsmi" },
+      { title: "FAQ - Wigsmi" },
       { name: "description", content: "Answers to common questions for wig buyers and retailers using Wigsmi." },
-      { property: "og:title", content: "FAQ — Wigsmi" },
+      { property: "og:title", content: "FAQ - Wigsmi" },
       { property: "og:description", content: "Answers to common questions for wig buyers and retailers using Wigsmi." },
     ],
   }),

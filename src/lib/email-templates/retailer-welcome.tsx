@@ -22,7 +22,7 @@ interface Props {
 const RetailerWelcomeEmail = ({ name, businessName, portalUrl }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Welcome to Wigsmi — your 1-month trial has started.</Preview>
+    <Preview>Welcome to Wigsmi - your 1-month trial has started.</Preview>
     <Body style={main}>
       <Section style={outer}>
         <Container style={container}>
@@ -30,7 +30,7 @@ const RetailerWelcomeEmail = ({ name, businessName, portalUrl }: Props) => (
           <Heading style={h1}>Welcome{name ? `, ${name}` : ""}.</Heading>
           <Text style={text}>
             {businessName ? `${businessName} is` : "You're"} all set up on Wigsmi.
-            Your 1-month free trial has started — no card needed.
+            Your 1-month free trial has started - no card needed.
           </Text>
           <Text style={text}>Three quick steps to get live:</Text>
           <Text style={{ ...text, paddingLeft: 12 }}>
@@ -46,7 +46,7 @@ const RetailerWelcomeEmail = ({ name, businessName, portalUrl }: Props) => (
           <div style={divider} />
           <Text style={muted}>
             We're here if you need a hand. Just reply to this email.
-            <br />— The Wigsmi team
+            <br />- The Wigsmi team
           </Text>
         </Container>
       </Section>
@@ -56,7 +56,7 @@ const RetailerWelcomeEmail = ({ name, businessName, portalUrl }: Props) => (
 
 export const template = {
   component: RetailerWelcomeEmail,
-  subject: "Welcome to Wigsmi — your trial has started",
+  subject: "Welcome to Wigsmi - your trial has started",
   displayName: "Retailer · Welcome",
   previewData: {
     name: "Ayo",

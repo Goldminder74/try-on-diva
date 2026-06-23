@@ -49,7 +49,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       (r: any) => r.is_active && (new Date(r.trial_ends_at || 0).getTime() > now || r.plan !== "starter"),
     ).length;
 
-    // MRR — convert yearly to monthly equivalent.
+    // MRR - convert yearly to monthly equivalent.
     const planMonthly: Record<string, number> = { growth: 149, scale: 399, enterprise: 999 };
     let mrr = 0;
     for (const s of subs.data ?? []) {

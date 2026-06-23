@@ -7,7 +7,7 @@ import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig } from "@/lib/wigs";
 import { useAsync } from "@/lib/use-async";
 
 export const Route = createFileRoute("/_authenticated/app/catalog")({
-  head: () => ({ meta: [{ title: "Catalog — Wigsmi" }] }),
+  head: () => ({ meta: [{ title: "Catalog - Wigsmi" }] }),
   component: AppCatalog,
 });
 

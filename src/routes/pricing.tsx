@@ -33,9 +33,9 @@ function formatGBP(pence: number) {
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Wigsmi" },
+      { title: "Pricing - Wigsmi" },
       { name: "description", content: "Wigsmi pricing for consumers. Start free with 5 try-ons a month, or go unlimited from £4.99/month." },
-      { property: "og:title", content: "Pricing — Wigsmi" },
+      { property: "og:title", content: "Pricing - Wigsmi" },
       { property: "og:description", content: "Free, Plus and Pro plans for Wigsmi consumers." },
     ],
   }),

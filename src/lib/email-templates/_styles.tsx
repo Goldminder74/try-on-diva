@@ -1,6 +1,6 @@
 import React from "react";
 
-// Shared Wigsmi email styling — mahogany + cream palette, serif headings,
+// Shared Wigsmi email styling - mahogany + cream palette, serif headings,
 // matches the in-app brand. Inline styles (React Email requirement).
 
 export const brand = {

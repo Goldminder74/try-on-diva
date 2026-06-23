@@ -1,5 +1,5 @@
 /**
- * WigTryOnEngine — PLACEHOLDER COMPONENT
+ * WigTryOnEngine - PLACEHOLDER COMPONENT
  * ----------------------------------------------------------------
  * This is a SIMULATED try-on engine. The real AR/computer-vision
  * wig overlay engine will be implemented by a freelancer and will
@@ -135,7 +135,7 @@ export function WigTryOnEngine({
     );
   }
 
-  // Result — overlay wig image at top of selfie
+  // Result - overlay wig image at top of selfie
   return (
     <div className={`${baseCard} ${className}`} ref={containerRef}>
       <img src={photoUrl} alt="Your selfie" className="h-full w-full object-cover" />

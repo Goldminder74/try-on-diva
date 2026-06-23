@@ -15,9 +15,9 @@ export const Route = createFileRoute("/wig/$id")({
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [
-      { title: `${loaderData.wig.name} — Wigsmi` },
+      { title: `${loaderData.wig.name} - Wigsmi` },
       { name: "description", content: loaderData.wig.description },
-      { property: "og:title", content: `${loaderData.wig.name} — Wigsmi` },
+      { property: "og:title", content: `${loaderData.wig.name} - Wigsmi` },
       { property: "og:description", content: loaderData.wig.description },
       { property: "og:image", content: loaderData.wig.images[0] },
     ] : [],

@@ -7,7 +7,7 @@ import { listMyWigs, getMyRetailerContext } from "@/lib/retailer.functions";
 type Wig = Awaited<ReturnType<typeof listMyWigs>>["wigs"][number];
 
 export const Route = createFileRoute("/portal/catalog/")({
-  head: () => ({ meta: [{ title: "Catalog — Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ title: "Catalog - Wigsmi Retailer" }] }),
   component: CatalogList,
 });
 
