@@ -43,7 +43,7 @@ function CatalogPage() {
     } finally { setBusy(null); }
   };
 
-  const retailerName = (id: string) => data?.retailers?.find((r: any) => r.id === id)?.business_name ?? "—";
+  const retailerName = (id: string) => data?.retailers?.find((r: any) => r.id === id)?.business_name ?? "-";
 
   return (
     <div>

@@ -11,9 +11,9 @@ import { useAsync } from "@/lib/use-async";
 export const Route = createFileRoute("/catalog")({
   head: () => ({
     meta: [
-      { title: "Wig Catalog — Wigsmi" },
+      { title: "Wig Catalog - Wigsmi" },
       { name: "description", content: "Browse hundreds of wigs from trusted Black-owned and Black-focused retailers. Filter by style, texture, length and price." },
-      { property: "og:title", content: "Wig Catalog — Wigsmi" },
+      { property: "og:title", content: "Wig Catalog - Wigsmi" },
       { property: "og:description", content: "Browse and try on hundreds of wigs." },
     ],
   }),
@@ -62,7 +62,7 @@ function Catalog() {
         <div className="w-full bg-[#F59E0B] px-5 py-[10px]">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
             <p className="mx-auto text-center text-sm font-medium text-[#1C1C1C]">
-              🧪 Beta Catalog — These are demo products for illustration purposes. Real retailer inventory coming soon.
+              🧪 Beta Catalog - These are demo products for illustration purposes. Real retailer inventory coming soon.
             </p>
             <button
               onClick={() => { setBannerVisible(false); sessionStorage.setItem("catalog-beta-banner-dismissed", "true"); }}

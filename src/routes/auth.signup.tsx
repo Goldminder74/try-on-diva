@@ -8,7 +8,7 @@ export const Route = createFileRoute("/auth/signup")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign up — Wigsmi" },
+      { title: "Sign up - Wigsmi" },
       { name: "description", content: "Create your free Wigsmi account in under a minute." },
     ],
   }),

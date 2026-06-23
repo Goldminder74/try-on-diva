@@ -8,7 +8,7 @@ import { getMyConsumerProfile } from "@/lib/consumer-profile.functions";
 import { useAuth } from "@/contexts/auth-context";
 
 export const Route = createFileRoute("/_authenticated/app/")({
-  head: () => ({ meta: [{ title: "For You — Wigsmi" }] }),
+  head: () => ({ meta: [{ title: "For You - Wigsmi" }] }),
   component: ForYou,
 });
 

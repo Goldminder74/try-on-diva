@@ -44,9 +44,9 @@ export const Route = createFileRoute("/try-on")({
   }),
   head: () => ({
     meta: [
-      { title: "Try a wig on — Wigsmi" },
+      { title: "Try a wig on - Wigsmi" },
       { name: "description", content: "Upload a selfie and see any wig on your skin in seconds. Free to try, no account needed." },
-      { property: "og:title", content: "Try a wig on — Wigsmi" },
+      { property: "og:title", content: "Try a wig on - Wigsmi" },
       { property: "og:description", content: "Free virtual wig try-on built for Black women." },
     ],
   }),
@@ -106,7 +106,7 @@ function TryOn() {
         });
         if (!cancelled) setAnonUsed(Boolean(status?.used));
       } catch {
-        /* non-fatal — apply will revalidate server-side */
+        /* non-fatal - apply will revalidate server-side */
       }
       if (!cancelled) setAnonReady(true);
     })();
@@ -203,7 +203,7 @@ function TryOn() {
 
   const onFile = (f: File | undefined) => {
     if (!f) return;
-    if (f.size > 10 * 1024 * 1024) { setError("File too large — max 10MB."); return; }
+    if (f.size > 10 * 1024 * 1024) { setError("File too large - max 10MB."); return; }
     if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) { setError("Use JPEG, PNG or WebP."); return; }
     setError(null);
     setResultUrl(null);
@@ -238,7 +238,7 @@ function TryOn() {
       }
       setResultUrl(out.signedUrl);
       setAnonUsed(true);
-      // Don't open the prompt immediately — let the user see their result first.
+      // Don't open the prompt immediately - let the user see their result first.
       // The prompt is opened by a 4s timer or any user interaction (see effect below).
     } catch (err) {
       setError(err instanceof Error ? err.message : "Try-on generation failed.");
@@ -437,14 +437,14 @@ function TryOn() {
               {user
                 ? "Tap Apply wig to generate your AI try-on."
                 : anonUsed
-                  ? "Create a free account to keep trying — 5 free try-ons every month."
+                  ? "Create a free account to keep trying - 5 free try-ons every month."
                   : "First try-on is free, no signup needed. Then 5 free try-ons every month with a free account."}
             </p>
           </aside>
         </div>
       </div>
 
-      {/* Post-result soft prompt — bottom sheet that does NOT cover the result */}
+      {/* Post-result soft prompt - bottom sheet that does NOT cover the result */}
       {postPromptOpen && !user && resultUrl && (
         <div
           role="dialog"
@@ -487,7 +487,7 @@ function TryOn() {
               Create a free account to keep going.
             </AlertDialogTitle>
             <AlertDialogDescription className="text-foreground/75">
-              You've used your free try-on. Create a free account for 5 try-ons every month — no card needed.
+              You've used your free try-on. Create a free account for 5 try-ons every month - no card needed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">

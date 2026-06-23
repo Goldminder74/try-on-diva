@@ -11,7 +11,7 @@ interface Props {
 const ConsumerWelcomeEmail = ({ name, appUrl }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Welcome to Wigsmi — try on every wig before you buy.</Preview>
+    <Preview>Welcome to Wigsmi - try on every wig before you buy.</Preview>
     <Body style={main}>
       <Section style={outer}>
         <Container style={container}>
@@ -19,14 +19,14 @@ const ConsumerWelcomeEmail = ({ name, appUrl }: Props) => (
           <Heading style={h1}>Welcome{name ? `, ${name}` : ""}.</Heading>
           <Text style={text}>
             You're in. Wigsmi is the easiest way to try on wigs before you buy
-            — built for Black wig buyers, on real hair textures.
+            - built for Black wig buyers, on real hair textures.
           </Text>
           <Text style={text}>Two quick things to do next:</Text>
           <Text style={{ ...text, paddingLeft: 12 }}>
             1. Take the 60-second style quiz so we can recommend wigs that
             suit you.
             <br />
-            2. Upload one clear photo of your face — it stays private and is
+            2. Upload one clear photo of your face - it stays private and is
             only used for try-on.
           </Text>
           <Button style={button} href={appUrl ?? "https://wigsmi.com/app"}>

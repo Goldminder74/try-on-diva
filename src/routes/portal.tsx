@@ -50,7 +50,7 @@ function PortalLayout() {
     navigate({ to: "/" });
   };
 
-  // Allow billing + settings + onboarding through even when paywalled — the
+  // Allow billing + settings + onboarding through even when paywalled - the
   // retailer needs to be able to subscribe, sign out, or finish onboarding.
   const paywallExempt =
     pathname.startsWith("/portal/billing") ||

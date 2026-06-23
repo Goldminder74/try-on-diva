@@ -22,7 +22,7 @@ import {
 export const Route = createFileRoute("/portal/api-keys")({
   head: () => ({
     meta: [
-      { title: "API keys — Wigsmi" },
+      { title: "API keys - Wigsmi" },
       { name: "description", content: "Manage API keys for headless Wigsmi access." },
     ],
   }),
@@ -108,7 +108,7 @@ function ApiKeysPage() {
         <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Portal</p>
         <h1 className="mt-1 font-display text-3xl text-mahogany md:text-4xl">API keys</h1>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Use API keys to access your Wigsmi catalog programmatically — from
+          Use API keys to access your Wigsmi catalog programmatically - from
           a custom storefront, a Shopify app, or any backend integration.
         </p>
       </header>
@@ -205,7 +205,7 @@ function ApiKeysPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Your new API key</AlertDialogTitle>
             <AlertDialogDescription>
-              Copy this now — for security, we won't show it to you again. If
+              Copy this now - for security, we won't show it to you again. If
               you lose it, you'll need to generate a new one.
             </AlertDialogDescription>
           </AlertDialogHeader>

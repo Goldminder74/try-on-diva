@@ -15,7 +15,7 @@ const TRYONS_BUCKET = "tryons";
 // Gemini try-on generation (Phase 1C)
 // ---------------------------------------------------------------------------
 
-// EDITABLE PROMPT — replace this placeholder with the real try-on prompt.
+// EDITABLE PROMPT - replace this placeholder with the real try-on prompt.
 // The following tokens are substituted at call time with the selected wig's
 // fields, so you can use them in the real prompt: {wigName}, {wigStyleType},
 // {wigColour}. Tokens that are not present are simply left out.
@@ -45,8 +45,8 @@ const GEMINI_MODELS = [
 ] as const;
 
 // Build a Supabase client for use inside server functions.
-// Lovable Cloud only exposes the publishable (anon) key server-side — there is no
-// service-role key — so all access runs under the publishable key. When an access
+// Lovable Cloud only exposes the publishable (anon) key server-side - there is no
+// service-role key - so all access runs under the publishable key. When an access
 // token is supplied the client carries the caller's JWT, so storage writes, row
 // inserts and signed-URL generation all execute under that user's RLS. With no token
 // the client operates in the anon context and the existing anon storage policy applies.
@@ -114,7 +114,7 @@ function buildTryOnPrompt(wig: { name: string; styleType: string; colour: string
  *
  * It takes a text prompt plus the user photo and wig product image (both as
  * base64 + mime type) and returns the generated image as base64. To move off
- * Gemini later, reimplement only this function — generateTryOn never references
+ * Gemini later, reimplement only this function - generateTryOn never references
  * the provider directly.
  *
  * GEMINI_API_KEY is read here from the server-side environment and is never
@@ -392,7 +392,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
       },
     });
 
-    // 4. Record the analytics event exactly like recordTryOn does — note that the
+    // 4. Record the analytics event exactly like recordTryOn does - note that the
     //    result path is intentionally NOT written to try_on_events.
     const { data: wig } = await supabase
       .from("wigs")
@@ -675,7 +675,7 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       user_agent: userAgent,
     });
     if (insErr) {
-      // Race lost — treat as already used.
+      // Race lost - treat as already used.
       return { alreadyUsed: true as const };
     }
 

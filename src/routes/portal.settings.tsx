@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getMyRetailerContext, updateRetailer } from "@/lib/retailer.functions";
 
 export const Route = createFileRoute("/portal/settings")({
-  head: () => ({ meta: [{ title: "Settings — Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ title: "Settings - Wigsmi Retailer" }] }),
   component: Settings,
 });
 

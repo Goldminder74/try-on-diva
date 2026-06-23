@@ -8,7 +8,7 @@ export const Route = createFileRoute("/auth/login")({
   }),
   head: () => ({
     meta: [
-      { title: "Log in — Wigsmi" },
+      { title: "Log in - Wigsmi" },
       { name: "description", content: "Log in to try wigs on, save favourites and get personalised picks." },
     ],
   }),

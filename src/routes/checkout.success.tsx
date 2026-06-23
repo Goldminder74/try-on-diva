@@ -7,7 +7,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 export const Route = createFileRoute("/checkout/success")({
   head: () => ({
     meta: [
-      { title: "Payment successful — Wigsmi" },
+      { title: "Payment successful - Wigsmi" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -60,7 +60,7 @@ function CheckoutSuccess() {
           ) : isActive ? (
             "Your subscription is active. Redirecting…"
           ) : timedOut ? (
-            "Your payment was received and your subscription is being set up. We'll email you the moment it's live — you can head to your account in the meantime."
+            "Your payment was received and your subscription is being set up. We'll email you the moment it's live - you can head to your account in the meantime."
           ) : (
             "Your subscription is being processed. It may take a few seconds to update."
           )}

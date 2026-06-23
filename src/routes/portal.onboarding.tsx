@@ -7,7 +7,7 @@ import {
 } from "@/lib/retailer.functions";
 
 export const Route = createFileRoute("/portal/onboarding")({
-  head: () => ({ meta: [{ title: "Onboarding — Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ title: "Onboarding - Wigsmi Retailer" }] }),
   component: Onboarding,
 });
 
@@ -184,12 +184,12 @@ function Onboarding() {
                 onChange={(e) => set("currency", e.target.value as Form["currency"])}
                 className={inputCls}
               >
-                <option value="GBP">GBP — British Pound</option>
-                <option value="USD">USD — US Dollar</option>
-                <option value="EUR">EUR — Euro</option>
-                <option value="NGN">NGN — Nigerian Naira</option>
-                <option value="ZAR">ZAR — South African Rand</option>
-                <option value="CAD">CAD — Canadian Dollar</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="NGN">NGN - Nigerian Naira</option>
+                <option value="ZAR">ZAR - South African Rand</option>
+                <option value="CAD">CAD - Canadian Dollar</option>
               </select>
             </Field>
             <p className="text-xs text-muted-foreground">
@@ -232,7 +232,7 @@ function Onboarding() {
           <>
             <Heading
               kicker="Almost done"
-              title="One last thing — how did you hear about us?"
+              title="One last thing - how did you hear about us?"
             />
             <Field label="Referral source (optional)">
               <select

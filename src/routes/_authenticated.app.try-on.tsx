@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/app/try-on")({
   validateSearch: (s: Record<string, unknown>) => ({
     wig: typeof s.wig === "string" ? s.wig : undefined,
   }),
-  head: () => ({ meta: [{ title: "Try on — Wigsmi" }] }),
+  head: () => ({ meta: [{ title: "Try on - Wigsmi" }] }),
   component: AppTryOn,
 });
 
@@ -46,7 +46,7 @@ function AppTryOn() {
 
   const onFile = (f: File | undefined) => {
     if (!f) return;
-    if (f.size > 10 * 1024 * 1024) return setError("File too large — max 10MB.");
+    if (f.size > 10 * 1024 * 1024) return setError("File too large - max 10MB.");
     if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) return setError("Use JPEG, PNG or WebP.");
     setError(null);
     resetApply();

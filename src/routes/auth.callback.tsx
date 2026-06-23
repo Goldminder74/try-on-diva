@@ -7,7 +7,7 @@ export const Route = createFileRoute("/auth/callback")({
   component: Callback,
 });
 
-// Send a welcome email once per user — keyed by user id so multiple logins
+// Send a welcome email once per user - keyed by user id so multiple logins
 // don't trigger duplicates. localStorage is enough here: the email queue
 // is itself idempotent on idempotencyKey, so even if this races, the
 // recipient gets one email.
@@ -58,7 +58,7 @@ async function maybeSendWelcome(session: { user: { id: string; email?: string | 
     }
     if (typeof window !== "undefined") window.localStorage.setItem(key, "1");
   } catch (err) {
-    // Welcome email is non-critical — never block login on send failures.
+    // Welcome email is non-critical - never block login on send failures.
     console.warn("[welcome-email] skipped:", err);
   }
 }

@@ -5,9 +5,9 @@ import { Footer } from "@/components/wigsmi/Footer";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — Wigsmi" },
+      { title: "Privacy Policy - Wigsmi" },
       { name: "description", content: "How Wigsmi collects, uses, and protects your personal data under UK GDPR and the Data Protection Act 2018." },
-      { property: "og:title", content: "Privacy Policy — Wigsmi" },
+      { property: "og:title", content: "Privacy Policy - Wigsmi" },
       { property: "og:description", content: "How Wigsmi handles your personal data." },
     ],
   }),
@@ -54,7 +54,7 @@ function PrivacyPage() {
               <li><strong>Profile data:</strong> optional preferences, style quiz answers, wishlist.</li>
               <li><strong>Photos:</strong> selfies you upload for try-on. Stored only as long as needed to render the result and any photos you choose to save.</li>
               <li><strong>Usage data:</strong> try-on counts, pages visited, device and browser info, IP address.</li>
-              <li><strong>Retailer data:</strong> business name, contact details, catalog content, payment metadata (handled by our payment processor — we do not store card numbers).</li>
+              <li><strong>Retailer data:</strong> business name, contact details, catalog content, payment metadata (handled by our payment processor - we do not store card numbers).</li>
             </ul>
           </section>
 
@@ -83,8 +83,8 @@ function PrivacyPage() {
             <p>We share data only with processors that help us run the Service:</p>
             <ul className="list-disc space-y-2 pl-6">
               <li>Cloud hosting and database providers.</li>
-              <li>Paddle (paddle.com) — our payment processor and merchant of record, who handles all billing for retailer and consumer subscriptions. Paddle is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See paddle.com/privacy.</li>
-              <li>Google LLC (Gemini image API) — processes selfie photos you upload solely to generate your virtual try-on result. Google is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See policies.google.com/privacy. Photos are not retained by Google beyond the processing request.</li>
+              <li>Paddle (paddle.com) - our payment processor and merchant of record, who handles all billing for retailer and consumer subscriptions. Paddle is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See paddle.com/privacy.</li>
+              <li>Google LLC (Gemini image API) - processes selfie photos you upload solely to generate your virtual try-on result. Google is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See policies.google.com/privacy. Photos are not retained by Google beyond the processing request.</li>
               <li>Email delivery providers.</li>
               <li>Analytics providers (aggregated, where possible).</li>
             </ul>

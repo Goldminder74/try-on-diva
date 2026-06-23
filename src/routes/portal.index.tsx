@@ -9,7 +9,7 @@ import {
 import { Plus, TrendingUp, Eye, MousePointerClick, Package, Check, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/portal/")({
-  head: () => ({ meta: [{ title: "Dashboard — Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ title: "Dashboard - Wigsmi Retailer" }] }),
   component: PortalIndex,
 });
 
@@ -133,7 +133,7 @@ function ActivationCard({ activation }: { activation: Activation }) {
       key: "wig",
       done: activation.hasWig,
       title: "Add your first wig",
-      helper: "Photos, price, style — at least one wig.",
+      helper: "Photos, price, style - at least one wig.",
       to: "/portal/catalog/new",
       cta: "Add a wig",
     },

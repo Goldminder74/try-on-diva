@@ -56,7 +56,7 @@ export const getPublicWidgetData = createServerFn({ method: "GET" })
       return { rateLimited: true as const, cap };
     }
 
-    // Increment counter (fire-and-forget — we don't want a counter race to
+    // Increment counter (fire-and-forget - we don't want a counter race to
     // block a legitimate impression).
     await supabaseAdmin
       .from("retailers")

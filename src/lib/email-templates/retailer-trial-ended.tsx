@@ -24,7 +24,7 @@ const RetailerTrialEndedEmail = ({ name, businessName, upgradeUrl }: Props) => (
             widget and catalog are paused for now.
           </Text>
           <Text style={text}>
-            Pick a plan and we'll republish your wigs automatically — no
+            Pick a plan and we'll republish your wigs automatically - no
             re-uploading, no reconfiguration.
           </Text>
           <Button style={button} href={upgradeUrl ?? "https://wigsmi.com/portal/billing"}>

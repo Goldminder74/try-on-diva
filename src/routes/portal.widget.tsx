@@ -10,7 +10,7 @@ import {
 import { Copy, Check, RefreshCw, AlertTriangle, X } from "lucide-react";
 
 export const Route = createFileRoute("/portal/widget")({
-  head: () => ({ meta: [{ title: "Widget — Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ title: "Widget - Wigsmi Retailer" }] }),
   component: WidgetPage,
 });
 
@@ -342,7 +342,7 @@ function WidgetPage() {
           <div className="rounded-2xl border border-border bg-card p-6">
             <h2 className="font-display text-xl text-mahogany">Install</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Paste this anywhere on your store — product pages, home page, or
+              Paste this anywhere on your store - product pages, home page, or
               a dedicated try-on page. Works with Shopify, WooCommerce, and
               static HTML.
             </p>

@@ -26,7 +26,7 @@ function FeaturedPage() {
 
   useEffect(() => { if (picker) searchFn({ data: { q } }).then(setResults); }, [picker, q, searchFn]);
 
-  const retailerName = (id: string) => retailers.find((r) => r.id === id)?.business_name ?? "—";
+  const retailerName = (id: string) => retailers.find((r) => r.id === id)?.business_name ?? "-";
 
   const move = (i: number, dir: -1 | 1) => {
     const next = [...wigs];

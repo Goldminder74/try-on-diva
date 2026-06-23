@@ -14,7 +14,7 @@ import { useAuth } from "@/contexts/auth-context";
 type Params = { wigId: string };
 
 export const Route = createFileRoute("/portal/catalog/$wigId")({
-  head: () => ({ meta: [{ title: "Edit wig — Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ title: "Edit wig - Wigsmi Retailer" }] }),
   component: WigEditor,
 });
 

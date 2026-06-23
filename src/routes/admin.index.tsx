@@ -71,7 +71,7 @@ function OverviewPage() {
           <ul className="divide-y divide-border text-sm">
             {(signups.retailers ?? []).map((r: any) => (
               <li key={r.id} className="flex items-center justify-between py-2">
-                <span>{r.business_name} <span className="text-muted-foreground">· {r.country ?? "—"}</span></span>
+                <span>{r.business_name} <span className="text-muted-foreground">· {r.country ?? "-"}</span></span>
                 <span className="font-mono text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</span>
               </li>
             ))}
@@ -81,7 +81,7 @@ function OverviewPage() {
           <ul className="divide-y divide-border text-sm">
             {(signups.consumers ?? []).map((c: any) => (
               <li key={c.id} className="flex items-center justify-between py-2">
-                <span>{c.display_name || c.email} <span className="text-muted-foreground">· {c.country ?? "—"}</span></span>
+                <span>{c.display_name || c.email} <span className="text-muted-foreground">· {c.country ?? "-"}</span></span>
                 <span className="font-mono text-xs text-muted-foreground">{new Date(c.created_at).toLocaleDateString()}</span>
               </li>
             ))}

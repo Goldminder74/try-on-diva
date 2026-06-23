@@ -20,7 +20,7 @@ export function usePaddleCheckout() {
         origin: window.location.origin,
         successUrl: options.successUrl,
       });
-      // Global event listener — surfaces checkout.error etc. that don't go through Checkout.open callbacks
+      // Global event listener - surfaces checkout.error etc. that don't go through Checkout.open callbacks
       try {
         window.Paddle.Update?.({
           eventCallback: (data: any) => {

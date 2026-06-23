@@ -14,7 +14,7 @@ export interface RetailerStatus {
 }
 
 /**
- * Reads the retailer's current lifecycle status — trial countdown, paywall
+ * Reads the retailer's current lifecycle status - trial countdown, paywall
  * gating, plan. Used by the portal layout to swap in a paywall card when
  * a trial has ended without a paid subscription.
  */
