@@ -1,0 +1,15 @@
+# Wigsmi
+
+> Wigsmi is a virtual wig try-on platform built for Black women and the retailers who serve them.
+
+## Pages
+
+- [Home](/): Discover and try on wigs virtually before you buy.
+- [Catalog](/catalog): Browse the full wig catalog with filters and styles.
+- [Try On](/try-on): Upload a photo and see how a wig looks on you.
+- [Pricing](/pricing): Consumer and retailer subscription plans.
+- [Retailers](/retailer): Information for wig retailers and salon owners.
+- [FAQ](/faq): Common questions for wig buyers and retailers.
+- [Terms](/terms): Terms of service.
+- [Privacy](/privacy): Privacy policy.
+- [Wig Details](/wig/614206cb-5f6f-412b-95bd-55fcc21fc026): Example product page with try-on, wishlist, and purchase options.
