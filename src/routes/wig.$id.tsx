@@ -116,7 +116,7 @@ function WigDetail() {
                 <Heart className="h-4 w-4" /> Save to wishlist
               </button>
               <a
-                href={wig.product_url}
+                href={wig.product_url ?? undefined}
                 target="_blank"
                 rel="noreferrer"
                 className="flex w-full items-center justify-center gap-2 rounded-md bg-gold px-5 py-3 text-sm font-medium text-mahogany hover:bg-gold-dark hover:text-cream"
