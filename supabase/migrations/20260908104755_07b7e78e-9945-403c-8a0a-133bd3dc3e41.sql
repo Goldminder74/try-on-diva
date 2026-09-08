@@ -1,0 +1,15 @@
+ALTER POLICY "Analytics: retailer/admin read" ON public.analytics_events TO authenticated;
+ALTER POLICY "API keys: retailer own" ON public.api_keys TO authenticated;
+ALTER POLICY "Consumer: own" ON public.consumer_profiles TO authenticated;
+ALTER POLICY "Profiles: read own" ON public.profiles TO authenticated;
+ALTER POLICY "Lifecycle events: retailer/admin read" ON public.retailer_lifecycle_events TO authenticated;
+ALTER POLICY "Subs: own" ON public.subscriptions TO authenticated;
+ALTER POLICY "Try-on: read own" ON public.try_on_events TO authenticated;
+ALTER POLICY "Roles: read own" ON public.user_roles TO authenticated;
+ALTER POLICY "Roles: admin manage" ON public.user_roles TO authenticated;
+ALTER POLICY "Widgets: retailer own" ON public.widget_embeds TO authenticated;
+ALTER POLICY "Clicks: retailer/admin read" ON public.wig_clicks TO authenticated;
+ALTER POLICY "Wig images retailer delete" ON storage.objects TO authenticated;
+ALTER POLICY "Wig images authed listing" ON storage.objects TO authenticated;
+ALTER POLICY "Wig images retailer write" ON storage.objects TO authenticated;
+ALTER POLICY "Wig images retailer update" ON storage.objects TO authenticated;

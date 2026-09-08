@@ -392,8 +392,9 @@ export const generateTryOn = createServerFn({ method: "POST" })
       },
     });
 
-    // 4. Record the analytics event exactly like recordTryOn does - note that the
-    //    result path is intentionally NOT written to try_on_events.
+    // 4. Record the single analytics event for this try-on and commit the
+    //    quota increment (recordTryOn only gates; this is the one write) - note
+    //    that the result path is intentionally NOT written to try_on_events.
     const { data: wig } = await supabase
       .from("wigs")
       .select("retailer_id")
@@ -406,6 +407,32 @@ export const generateTryOn = createServerFn({ method: "POST" })
       source: "app",
     });
     if (evErr) throw evErr;
+
+    const monthStart = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1,
+    )
+      .toISOString()
+      .slice(0, 10);
+    const { data: prof } = await supabase
+      .from("consumer_profiles")
+      .select("try_on_count_this_month, try_on_month_reset")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const priorCount =
+      prof && prof.try_on_month_reset && prof.try_on_month_reset >= monthStart
+        ? prof.try_on_count_this_month
+        : 0;
+    await supabase.from("consumer_profiles").upsert(
+      {
+        user_id: userId,
+        try_on_count_this_month: priorCount + 1,
+        try_on_month_reset: monthStart,
+      },
+      { onConflict: "user_id" },
+    );
+
 
     return {
       id: stored.id,
@@ -464,40 +491,14 @@ export const recordTryOn = createServerFn({ method: "POST" })
       return { allowed: false as const, reason: "quota", remaining: 0 };
     }
 
-    const { data: wig } = await supabase
-      .from("wigs")
-      .select("retailer_id")
-      .eq("id", data.wigId)
-      .maybeSingle();
-
-    const { error: insErr } = await supabase.from("try_on_events").insert({
-      user_id: userId,
-      wig_id: data.wigId,
-      retailer_id: wig?.retailer_id ?? null,
-      source: "app",
-    });
-    if (insErr) throw insErr;
-
-    const newCount = count + 1;
-    // Use upsert so a missing consumer_profiles row (edge case: trigger
-    // failed, manual user creation) doesn't silently allow unlimited
-    // try-ons. The auth trigger normally creates this row on signup.
-    const { error: upErr } = await supabase
-      .from("consumer_profiles")
-      .upsert(
-        {
-          user_id: userId,
-          try_on_count_this_month: newCount,
-          try_on_month_reset: monthStart,
-        },
-        { onConflict: "user_id" },
-      );
-    if (upErr) throw upErr;
-
+    // NOTE: the analytics event and the quota increment are committed by
+    // generateTryOn only after an image is actually produced, so a failed
+    // generation neither inflates retailer analytics nor burns a free try-on.
     return {
       allowed: true as const,
-      remaining: isPaid ? null : Math.max(0, FREE_QUOTA - newCount),
+      remaining: isPaid ? null : Math.max(0, FREE_QUOTA - (count + 1)),
     };
+
   });
 
 export const getTryOnQuota = createServerFn({ method: "GET" })
