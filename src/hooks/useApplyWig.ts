@@ -46,22 +46,35 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [views, setViews] = useState<Record<TryOnView, string | null>>({
+    front: null,
+    side: null,
+    back: null,
+  });
+  const [generatingView, setGeneratingView] = useState<TryOnView | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(null);
 
   const reset = useCallback(() => {
     setError(null);
     setResultUrl(null);
+    setViews({ front: null, side: null, back: null });
+    setGeneratingView(null);
     setBlocked(false);
   }, []);
 
-  const applyWig = useCallback(async () => {
+  const applyWig = useCallback(async (view: TryOnView = "front") => {
     if (!wig) return setError("Pick a wig first.");
     if (!wig.images?.[0]) return setError("This wig has no product image.");
     if (!photo) return setError("Upload a selfie first.");
 
     setError(null);
-    setResultUrl(null);
+    // A fresh front view starts a new set; side/back are added to the set.
+    if (view === "front") {
+      setResultUrl(null);
+      setViews({ front: null, side: null, back: null });
+    }
+    setGeneratingView(view);
     setApplying(true);
     try {
       // Freemium quota gate (also records the analytics event + increments the
