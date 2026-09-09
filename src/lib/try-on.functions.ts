@@ -385,9 +385,10 @@ export const generateTryOn = createServerFn({ method: "POST" })
     //    consume_try_on() increments in a single statement guarded by the free
     //    limit, so parallel tabs cannot both slip past the last free try-on.
     const isPaid = await isPaidConsumer(supabase, userId);
-    const { data: reservation, error: reserveErr } = await supabase.rpc("consume_try_on", {
+    const { data: reservation, error: reserveErr } = await (supabase as any).rpc("consume_try_on", {
       _limit: isPaid ? null : FREE_QUOTA,
     });
+
     if (reserveErr) throw reserveErr;
     const reserved = Array.isArray(reservation) ? reservation[0] : reservation;
     if (!reserved?.allowed) {
