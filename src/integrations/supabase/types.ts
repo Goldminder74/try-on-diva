@@ -773,6 +773,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_try_on: {
+        Args: { _limit: number }
+        Returns: {
+          allowed: boolean
+          remaining: number
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -821,6 +828,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      refund_try_on: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "consumer" | "retailer" | "admin"
