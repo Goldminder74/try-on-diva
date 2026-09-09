@@ -208,6 +208,9 @@ function TryOn() {
     setError(null);
     setResultUrl(null);
     setPhoto(f);
+    // Uploading a selfie immediately starts the try-on: the user never sees a
+    // raw selfie + wig-photo composite.
+    setPendingAuto(true);
   };
 
   const runAnonymousTryOn = async () => {
