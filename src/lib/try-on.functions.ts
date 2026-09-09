@@ -125,10 +125,25 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 
 // Substitute the wig fields into TRYON_PROMPT. Unknown tokens are left untouched;
 // the placeholder prompt has no tokens, so this is a no-op until you add them.
-function buildTryOnPrompt(wig: { name: string; styleType: string; colour: string }): string {
-  return TRYON_PROMPT.replaceAll("{wigName}", wig.name)
+export type TryOnView = "front" | "side" | "back";
+
+// Extra camera-angle instruction appended for the optional side/back views.
+const VIEW_INSTRUCTIONS: Record<TryOnView, string> = {
+  front: "",
+  side: `
+Camera angle: render this as a THREE-QUARTER / SIDE profile view of the same person wearing the same wig. Rotate the head roughly 60 degrees so one side of the face and the full side of the hair are visible. Keep the same person, same skin tone, same wig product, same lighting and same background.`,
+  back: `
+Camera angle: render this as a BACK view of the same person wearing the same wig, photographed from behind. The face is not visible. Show the full back of the hair: length, density, parting or braid pattern exactly as in IMAGE 2. Keep the same person's head shape, skin tone on the neck and ears, same lighting and same background.`,
+};
+
+function buildTryOnPrompt(
+  wig: { name: string; styleType: string; colour: string },
+  view: TryOnView = "front",
+): string {
+  const base = TRYON_PROMPT.replaceAll("{wigName}", wig.name)
     .replaceAll("{wigStyleType}", wig.styleType)
     .replaceAll("{wigColour}", wig.colour);
+  return base + VIEW_INSTRUCTIONS[view];
 }
 
 /**
@@ -365,6 +380,8 @@ export const generateTryOn = createServerFn({ method: "POST" })
       wigName: string;
       wigStyleType: string;
       wigColour: string;
+      /** Camera angle. Each view is generated separately and counts as one try-on. */
+      view?: TryOnView;
     }) =>
       z
         .object({
@@ -375,6 +392,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
           wigName: z.string().min(1),
           wigStyleType: z.string().min(1),
           wigColour: z.string().min(1),
+          view: z.enum(["front", "side", "back"]).default("front"),
         })
         .parse(d),
   )
@@ -414,11 +432,14 @@ export const generateTryOn = createServerFn({ method: "POST" })
       const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
 
       // 2. Generate the try-on image (provider hidden behind callGeminiImageAPI).
-      const prompt = buildTryOnPrompt({
-        name: data.wigName,
-        styleType: data.wigStyleType,
-        colour: data.wigColour,
-      });
+      const prompt = buildTryOnPrompt(
+        {
+          name: data.wigName,
+          styleType: data.wigStyleType,
+          colour: data.wigColour,
+        },
+        data.view ?? "front",
+      );
       const generated = await callGeminiImageAPI({
         prompt,
         userPhotoBase64: data.userPhotoBase64,

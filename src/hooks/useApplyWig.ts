@@ -17,13 +17,19 @@ export function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+export type TryOnView = "front" | "side" | "back";
+
 export type UseApplyWig = {
   applying: boolean;
   error: string | null;
   resultUrl: string | null;
+  /** Generated image per camera angle. Side and back are generated on request. */
+  views: Record<TryOnView, string | null>;
+  /** Which view is currently generating, if any. */
+  generatingView: TryOnView | null;
   blocked: boolean;
   remaining: number | null;
-  applyWig: () => Promise<void>;
+  applyWig: (view?: TryOnView) => Promise<void>;
   reset: () => void;
 };
 
@@ -40,22 +46,35 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [views, setViews] = useState<Record<TryOnView, string | null>>({
+    front: null,
+    side: null,
+    back: null,
+  });
+  const [generatingView, setGeneratingView] = useState<TryOnView | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(null);
 
   const reset = useCallback(() => {
     setError(null);
     setResultUrl(null);
+    setViews({ front: null, side: null, back: null });
+    setGeneratingView(null);
     setBlocked(false);
   }, []);
 
-  const applyWig = useCallback(async () => {
+  const applyWig = useCallback(async (view: TryOnView = "front") => {
     if (!wig) return setError("Pick a wig first.");
     if (!wig.images?.[0]) return setError("This wig has no product image.");
     if (!photo) return setError("Upload a selfie first.");
 
     setError(null);
-    setResultUrl(null);
+    // A fresh front view starts a new set; side/back are added to the set.
+    if (view === "front") {
+      setResultUrl(null);
+      setViews({ front: null, side: null, back: null });
+    }
+    setGeneratingView(view);
     setApplying(true);
     try {
       // Freemium quota gate (also records the analytics event + increments the
@@ -82,6 +101,7 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
           wigName: wig.name,
           wigStyleType: wig.style_type || "wig",
           wigColour: wig.colors?.[0] || "natural",
+          view,
         },
       });
 
@@ -89,14 +109,16 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
         setError("Generation returned no image URL.");
         return;
       }
-      setResultUrl(out.signedUrl);
+      setViews((prev) => ({ ...prev, [view]: out.signedUrl }));
+      if (view === "front") setResultUrl(out.signedUrl);
     } catch (err) {
-      setResultUrl(null);
+      if (view === "front") setResultUrl(null);
       setError(err instanceof Error ? err.message : "Try-on generation failed.");
     } finally {
+      setGeneratingView(null);
       setApplying(false);
     }
   }, [wig, photo, record, runGenerate]);
 
-  return { applying, error, resultUrl, blocked, remaining, applyWig, reset };
+  return { applying, error, resultUrl, views, generatingView, blocked, remaining, applyWig, reset };
 }
