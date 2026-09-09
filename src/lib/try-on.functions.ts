@@ -432,11 +432,14 @@ export const generateTryOn = createServerFn({ method: "POST" })
       const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
 
       // 2. Generate the try-on image (provider hidden behind callGeminiImageAPI).
-      const prompt = buildTryOnPrompt({
-        name: data.wigName,
-        styleType: data.wigStyleType,
-        colour: data.wigColour,
-      });
+      const prompt = buildTryOnPrompt(
+        {
+          name: data.wigName,
+          styleType: data.wigStyleType,
+          colour: data.wigColour,
+        },
+        data.view ?? "front",
+      );
       const generated = await callGeminiImageAPI({
         prompt,
         userPhotoBase64: data.userPhotoBase64,
