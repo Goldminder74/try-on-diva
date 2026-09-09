@@ -24,6 +24,7 @@ function AppTryOn() {
   const [list, setList] = useState<Wig[]>([]);
   const [wig, setWig] = useState<Wig | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
+  const [pendingAuto, setPendingAuto] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ remaining: number | null; isPaid: boolean } | null>(null);
