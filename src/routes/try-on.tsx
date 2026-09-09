@@ -84,6 +84,8 @@ function TryOn() {
   const [anonUsed, setAnonUsed] = useState(false);
   const [applying, setApplying] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  // Set when a freshly uploaded selfie should generate as soon as we're ready.
+  const [pendingAuto, setPendingAuto] = useState(false);
 
   // Two prompts: (a) post-result "create account" prompt, (b) hard wall on second try.
   const [postPromptOpen, setPostPromptOpen] = useState(false);
@@ -208,6 +210,9 @@ function TryOn() {
     setError(null);
     setResultUrl(null);
     setPhoto(f);
+    // Uploading a selfie immediately starts the try-on: the user never sees a
+    // raw selfie + wig-photo composite.
+    setPendingAuto(true);
   };
 
   const runAnonymousTryOn = async () => {
@@ -267,6 +272,19 @@ function TryOn() {
     }
     await runAnonymousTryOn();
   };
+
+  // Auto-run the try-on right after a selfie is uploaded, once auth + the
+  // anonymous check have resolved.
+  useEffect(() => {
+    if (!pendingAuto || !photo || !wig || applying) return;
+    if (authLoading) return;
+    if (!user && !anonReady) return;
+    setPendingAuto(false);
+    void onApply();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingAuto, photo, wig, applying, authLoading, user, anonReady]);
+
+
 
   // Preserve wig + scope across the auth round-trip.
   const redirectTarget = (() => {

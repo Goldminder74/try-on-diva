@@ -135,23 +135,15 @@ export function WigTryOnEngine({
     );
   }
 
-  // Result - overlay wig image at top of selfie
+  // Waiting state - show the clean selfie only. Never composite the raw wig
+  // photo over the user's face; the real result comes from generation.
   return (
     <div className={`${baseCard} ${className}`} ref={containerRef}>
       <img src={photoUrl} alt="Your selfie" className="h-full w-full object-cover" />
-      {resultReady && wig.images[0] && (
-        <img
-          src={wig.images[0]}
-          alt={wig.name}
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-[55%] w-full object-cover opacity-60 mix-blend-multiply"
-          style={{ maskImage: "linear-gradient(to bottom, black 70%, transparent 100%)" }}
-        />
-      )}
       <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-mahogany/85 px-3 py-2 backdrop-blur-sm">
         <span className="text-xs font-medium text-cream">{wig.name}</span>
         <span className="rounded-sm bg-gold/90 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-mahogany">
-          Preview mode · AR coming soon
+          Preparing your try-on
         </span>
       </div>
     </div>
