@@ -273,6 +273,19 @@ function TryOn() {
     await runAnonymousTryOn();
   };
 
+  // Auto-run the try-on right after a selfie is uploaded, once auth + the
+  // anonymous check have resolved.
+  useEffect(() => {
+    if (!pendingAuto || !photo || !wig || applying) return;
+    if (authLoading) return;
+    if (!user && !anonReady) return;
+    setPendingAuto(false);
+    void onApply();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingAuto, photo, wig, applying, authLoading, user, anonReady]);
+
+
+
   // Preserve wig + scope across the auth round-trip.
   const redirectTarget = (() => {
     const params = new URLSearchParams();
