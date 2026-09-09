@@ -84,6 +84,8 @@ function TryOn() {
   const [anonUsed, setAnonUsed] = useState(false);
   const [applying, setApplying] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  // Set when a freshly uploaded selfie should generate as soon as we're ready.
+  const [pendingAuto, setPendingAuto] = useState(false);
 
   // Two prompts: (a) post-result "create account" prompt, (b) hard wall on second try.
   const [postPromptOpen, setPostPromptOpen] = useState(false);
