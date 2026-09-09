@@ -108,10 +108,55 @@ function AppTryOn() {
         <div>
           {resultUrl ? (
             <>
-              <div className="overflow-hidden rounded-xl border border-border bg-card">
-                <img src={resultUrl} alt="Your try-on result" className="w-full object-contain" />
+              <div className="relative overflow-hidden rounded-xl border border-border bg-card">
+                {shownUrl ? (
+                  <img
+                    src={shownUrl}
+                    alt={`Your try-on result, ${activeView} view`}
+                    className="w-full object-contain"
+                  />
+                ) : (
+                  <div className="flex aspect-[3/4] w-full flex-col items-center justify-center gap-2 text-mahogany">
+                    <RefreshCw className="h-5 w-5 animate-spin" />
+                    <p className="font-display text-lg">
+                      Creating the {activeView} view…
+                    </p>
+                  </div>
+                )}
               </div>
-              <TryOnResultActions resultUrl={resultUrl} wigName={wig?.name} />
+
+              {/* Camera angles. Side and back are generated on request and each
+                  one counts as a separate try-on. */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {(["front", "side", "back"] as TryOnView[]).map((v) => {
+                  const ready = Boolean(views[v]);
+                  const busy = generatingView === v;
+                  return (
+                    <button
+                      key={v}
+                      onClick={() => {
+                        setActiveView(v);
+                        if (!ready && !applying) void applyWig(v);
+                      }}
+                      disabled={applying && !ready}
+                      className={`rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-colors disabled:opacity-50 ${
+                        activeView === v
+                          ? "border-gold bg-gold text-mahogany"
+                          : "border-border bg-card text-mahogany hover:border-mahogany"
+                      }`}
+                    >
+                      {busy ? "Generating…" : ready ? `${v} view` : `Create ${v} view`}
+                    </button>
+                  );
+                })}
+                {(!views.side || !views.back) && (
+                  <span className="text-xs text-muted-foreground">
+                    Each extra view uses one try-on.
+                  </span>
+                )}
+              </div>
+
+              {shownUrl && <TryOnResultActions resultUrl={shownUrl} wigName={wig?.name} />}
             </>
           ) : (
             <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
