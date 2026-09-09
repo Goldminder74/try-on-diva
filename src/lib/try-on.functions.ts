@@ -359,89 +359,87 @@ export const generateTryOn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // 1. Fetch the wig product image and encode it for an inline Gemini part.
-    const wigRes = await fetch(data.wigImageUrl);
-    if (!wigRes.ok) {
-      throw new Error(`Could not fetch wig image (${wigRes.status}).`);
+    // 0. Reserve the quota slot atomically BEFORE spending money on generation.
+    //    consume_try_on() increments in a single statement guarded by the free
+    //    limit, so parallel tabs cannot both slip past the last free try-on.
+    const isPaid = await isPaidConsumer(supabase, userId);
+    const { data: reservation, error: reserveErr } = await supabase.rpc("consume_try_on", {
+      _limit: isPaid ? null : FREE_QUOTA,
+    });
+    if (reserveErr) throw reserveErr;
+    const reserved = Array.isArray(reservation) ? reservation[0] : reservation;
+    if (!reserved?.allowed) {
+      throw new Error("Free try-on limit reached this month.");
     }
-    const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
-    const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
 
-    // 2. Generate the try-on image (provider hidden behind callGeminiImageAPI).
-    const prompt = buildTryOnPrompt({
-      name: data.wigName,
-      styleType: data.wigStyleType,
-      colour: data.wigColour,
-    });
-    const generated = await callGeminiImageAPI({
-      prompt,
-      userPhotoBase64: data.userPhotoBase64,
-      userPhotoMimeType: data.userPhotoMimeType,
-      wigImageBase64,
-      wigImageMimeType,
-    });
-
-    // 3. Store the result and get a signed URL. uploadTryOnResult reads the same
-    //    caller token from the request, so the upload + tryon_results insert run
-    //    under this user's RLS.
-    const stored = await uploadTryOnResult({
-      data: {
-        wigId: data.wigId,
-        imageBase64: generated.imageBase64,
-        contentType: generated.mimeType,
-      },
-    });
-
-    // 4. Record the single analytics event for this try-on and commit the
-    //    quota increment (recordTryOn only gates; this is the one write) - note
-    //    that the result path is intentionally NOT written to try_on_events.
-    const { data: wig } = await supabase
-      .from("wigs")
-      .select("retailer_id")
-      .eq("id", data.wigId)
-      .maybeSingle();
-    const { error: evErr } = await supabase.from("try_on_events").insert({
-      user_id: userId,
-      wig_id: data.wigId,
-      retailer_id: wig?.retailer_id ?? null,
-      source: "app",
-    });
-    if (evErr) throw evErr;
-
-    const monthStart = new Date(
-      new Date().getFullYear(),
-      new Date().getMonth(),
-      1,
-    )
-      .toISOString()
-      .slice(0, 10);
-    const { data: prof } = await supabase
-      .from("consumer_profiles")
-      .select("try_on_count_this_month, try_on_month_reset")
-      .eq("user_id", userId)
-      .maybeSingle();
-    const priorCount =
-      prof && prof.try_on_month_reset && prof.try_on_month_reset >= monthStart
-        ? prof.try_on_count_this_month
-        : 0;
-    await supabase.from("consumer_profiles").upsert(
-      {
-        user_id: userId,
-        try_on_count_this_month: priorCount + 1,
-        try_on_month_reset: monthStart,
-      },
-      { onConflict: "user_id" },
-    );
-
-
-    return {
-      id: stored.id,
-      path: stored.path,
-      signedUrl: stored.signedUrl,
-      expiresIn: stored.expiresIn,
-      model: generated.model,
+    // Any failure past this point refunds the reserved try-on.
+    const refund = async () => {
+      try {
+        await supabase.rpc("refund_try_on");
+      } catch {
+        /* best effort */
+      }
     };
+
+    try {
+      // 1. Fetch the wig product image and encode it for an inline Gemini part.
+      const wigRes = await fetch(data.wigImageUrl);
+      if (!wigRes.ok) {
+        throw new Error(`Could not fetch wig image (${wigRes.status}).`);
+      }
+      const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
+      const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
+
+      // 2. Generate the try-on image (provider hidden behind callGeminiImageAPI).
+      const prompt = buildTryOnPrompt({
+        name: data.wigName,
+        styleType: data.wigStyleType,
+        colour: data.wigColour,
+      });
+      const generated = await callGeminiImageAPI({
+        prompt,
+        userPhotoBase64: data.userPhotoBase64,
+        userPhotoMimeType: data.userPhotoMimeType,
+        wigImageBase64,
+        wigImageMimeType,
+      });
+
+      // 3. Store the result and get a signed URL.
+      const stored = await uploadTryOnResult({
+        data: {
+          wigId: data.wigId,
+          imageBase64: generated.imageBase64,
+          contentType: generated.mimeType,
+        },
+      });
+
+      // 4. Record the single analytics event for this try-on.
+      const { data: wig } = await supabase
+        .from("wigs")
+        .select("retailer_id")
+        .eq("id", data.wigId)
+        .maybeSingle();
+      const { error: evErr } = await supabase.from("try_on_events").insert({
+        user_id: userId,
+        wig_id: data.wigId,
+        retailer_id: wig?.retailer_id ?? null,
+        source: "app",
+      });
+      if (evErr) throw evErr;
+
+      return {
+        id: stored.id,
+        path: stored.path,
+        signedUrl: stored.signedUrl,
+        expiresIn: stored.expiresIn,
+        model: generated.model,
+      };
+    } catch (err) {
+      await refund();
+      throw err;
+    }
   });
+
 
 export const recordTryOn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
