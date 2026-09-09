@@ -51,7 +51,18 @@ function AppTryOn() {
     setError(null);
     resetApply();
     setPhoto(f);
+    // Uploading a selfie starts the try-on immediately, so the user never sees
+    // a raw selfie + wig-photo composite.
+    setPendingAuto(true);
   };
+
+  // Kick off generation as soon as the newly uploaded photo is in state.
+  useEffect(() => {
+    if (!pendingAuto || !photo || !wig || applying || blocked) return;
+    setPendingAuto(false);
+    void applyWig();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingAuto, photo, wig, applying, blocked]);
 
 
   return (
