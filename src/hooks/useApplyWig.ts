@@ -101,6 +101,7 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
           wigName: wig.name,
           wigStyleType: wig.style_type || "wig",
           wigColour: wig.colors?.[0] || "natural",
+          view,
         },
       });
 
@@ -108,14 +109,16 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
         setError("Generation returned no image URL.");
         return;
       }
-      setResultUrl(out.signedUrl);
+      setViews((prev) => ({ ...prev, [view]: out.signedUrl }));
+      if (view === "front") setResultUrl(out.signedUrl);
     } catch (err) {
-      setResultUrl(null);
+      if (view === "front") setResultUrl(null);
       setError(err instanceof Error ? err.message : "Try-on generation failed.");
     } finally {
+      setGeneratingView(null);
       setApplying(false);
     }
   }, [wig, photo, record, runGenerate]);
 
-  return { applying, error, resultUrl, blocked, remaining, applyWig, reset };
+  return { applying, error, resultUrl, views, generatingView, blocked, remaining, applyWig, reset };
 }
