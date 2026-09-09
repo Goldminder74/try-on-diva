@@ -17,13 +17,19 @@ export function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+export type TryOnView = "front" | "side" | "back";
+
 export type UseApplyWig = {
   applying: boolean;
   error: string | null;
   resultUrl: string | null;
+  /** Generated image per camera angle. Side and back are generated on request. */
+  views: Record<TryOnView, string | null>;
+  /** Which view is currently generating, if any. */
+  generatingView: TryOnView | null;
   blocked: boolean;
   remaining: number | null;
-  applyWig: () => Promise<void>;
+  applyWig: (view?: TryOnView) => Promise<void>;
   reset: () => void;
 };
 
