@@ -7,6 +7,28 @@ import type { Database } from "@/integrations/supabase/types";
 
 const FREE_QUOTA = 5;
 
+/** True when the consumer has a still-valid paid (plus/pro) subscription. */
+async function isPaidConsumer(supabase: any, userId: string): Promise<boolean> {
+  const { data: subRows } = await supabase
+    .from("subscriptions")
+    .select("plan, status, current_period_end")
+    .eq("profile_id", userId)
+    .eq("customer_type", "consumer")
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const subRow = subRows?.[0];
+  if (!subRow) return false;
+  const notExpired =
+    !subRow.current_period_end || new Date(subRow.current_period_end) > new Date();
+  const stillValid =
+    (["active", "trialing", "past_due"].includes(subRow.status) && notExpired) ||
+    (subRow.status === "canceled" &&
+      subRow.current_period_end &&
+      new Date(subRow.current_period_end) > new Date());
+  return Boolean(stillValid && (subRow.plan === "plus" || subRow.plan === "pro"));
+}
+
+
 // Signed URLs for stored try-on results last 7 days.
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 7;
 const TRYONS_BUCKET = "tryons";
