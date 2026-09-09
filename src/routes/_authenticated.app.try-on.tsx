@@ -30,8 +30,24 @@ function AppTryOn() {
   const [quota, setQuota] = useState<{ remaining: number | null; isPaid: boolean } | null>(null);
 
   // Apply-wig flow (gate + selfie conversion + generateTryOn) lives in the hook.
-  const { applying, error: applyError, resultUrl, blocked, remaining, applyWig, reset: resetApply } =
-    useApplyWig(wig, photo);
+  const {
+    applying,
+    error: applyError,
+    resultUrl,
+    views,
+    generatingView,
+    blocked,
+    remaining,
+    applyWig,
+    reset: resetApply,
+  } = useApplyWig(wig, photo);
+
+  // Which camera angle is on screen. Side and back are generated on request.
+  const [activeView, setActiveView] = useState<TryOnView>("front");
+  useEffect(() => {
+    if (!resultUrl) setActiveView("front");
+  }, [resultUrl]);
+  const shownUrl = views[activeView] ?? resultUrl;
 
   const fetchQuota = useServerFn(getTryOnQuota);
 
