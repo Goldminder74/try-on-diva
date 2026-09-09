@@ -8,7 +8,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getTryOnQuota } from "@/lib/try-on.functions";
 import { Link } from "@tanstack/react-router";
 // Apply-wig generation logic lives in a hook outside this Lovable-managed file.
-import { useApplyWig } from "@/hooks/useApplyWig";
+import { useApplyWig, type TryOnView } from "@/hooks/useApplyWig";
 
 export const Route = createFileRoute("/_authenticated/app/try-on")({
   validateSearch: (s: Record<string, unknown>) => ({
