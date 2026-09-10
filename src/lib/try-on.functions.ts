@@ -488,13 +488,11 @@ export const generateTryOn = createServerFn({ method: "POST" })
     };
 
     try {
-      // 1. Fetch the wig product image and encode it for an inline Gemini part.
-      const wigRes = await fetch(data.wigImageUrl);
-      if (!wigRes.ok) {
-        throw new Error(`Could not fetch wig image (${wigRes.status}).`);
-      }
-      const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
-      const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
+      // 1. Fetch every available photograph of this product as reference.
+      const wigImages = await fetchWigReferenceImages([
+        data.wigImageUrl,
+        ...(data.wigImageUrls ?? []),
+      ]);
 
       // 2. Generate all three camera angles in parallel, so the full set comes
       //    back in roughly the time one image used to take.
@@ -509,9 +507,10 @@ export const generateTryOn = createServerFn({ method: "POST" })
             prompt: buildTryOnPrompt(wigMeta, view),
             userPhotoBase64: data.userPhotoBase64,
             userPhotoMimeType: data.userPhotoMimeType,
-            wigImageBase64,
-            wigImageMimeType,
+            wigImages,
+            models: modelsForView(view),
           });
+
           const stored = await uploadTryOnResult({
             data: {
               wigId: data.wigId,
