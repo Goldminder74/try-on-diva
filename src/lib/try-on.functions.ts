@@ -5,7 +5,10 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
-const FREE_QUOTA = 5;
+// A "try-on" is one set of three angles (front, side, back) generated together
+// and charged as a single unit against the free monthly allowance.
+const FREE_QUOTA = 3;
+const ALL_VIEWS = ["front", "side", "back"] as const;
 
 /** True when the consumer has a still-valid paid (plus/pro) subscription. */
 async function isPaidConsumer(supabase: any, userId: string): Promise<boolean> {
