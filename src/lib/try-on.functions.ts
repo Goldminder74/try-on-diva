@@ -755,6 +755,8 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
           userPhotoMimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
           wigId: z.string().uuid(),
           wigImageUrl: z.string().url(),
+          wigImageUrls: z.array(z.string().url()).max(4).optional(),
+
           wigName: z.string().min(1),
           wigStyleType: z.string().min(1),
           wigColour: z.string().min(1),
