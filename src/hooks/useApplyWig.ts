@@ -112,8 +112,12 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
         setError("Generation returned no image URL.");
         return;
       }
-      setViews((prev) => ({ ...prev, [view]: out.signedUrl }));
-      if (view === "front") setResultUrl(out.signedUrl);
+      setViews({
+        front: out.views?.front ?? out.signedUrl,
+        side: out.views?.side ?? null,
+        back: out.views?.back ?? null,
+      });
+      setResultUrl(out.signedUrl);
     } catch (err) {
       if (view === "front") setResultUrl(null);
       setError(err instanceof Error ? err.message : "Try-on generation failed.");
