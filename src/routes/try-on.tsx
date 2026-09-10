@@ -500,9 +500,9 @@ function TryOn() {
                   >
                     <img src={w.images[0]} alt={w.name} className="aspect-square w-full object-cover" />
                     <div className="px-1 py-1.5">
-                      <p className="text-[11px] leading-tight text-foreground">{w.name}</p>
+                      <p className="text-[11px] leading-tight break-words text-foreground">{w.name}</p>
                       {!scoped && (
-                        <p className="mt-0.5 text-[10px] leading-tight text-muted-foreground">{w.retailer}</p>
+                        <p className="mt-0.5 text-[10px] leading-tight break-words text-muted-foreground">{w.retailer}</p>
                       )}
                     </div>
                   </button>

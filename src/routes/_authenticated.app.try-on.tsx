@@ -211,7 +211,7 @@ function AppTryOn() {
                 className={`group overflow-hidden rounded-md border-2 text-left transition-all ${wig?.id === w.id ? "border-gold" : "border-transparent hover:border-mahogany/40"}`}
               >
                 <img src={w.images[0]} alt={w.name} className="aspect-square w-full object-cover" />
-                <p className="line-clamp-1 px-1 py-1.5 text-[11px]">{w.name}</p>
+                <p className="px-1 py-1.5 text-[11px] leading-tight break-words">{w.name}</p>
               </button>
             ))}
           </div>
