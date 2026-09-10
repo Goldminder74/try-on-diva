@@ -777,18 +777,25 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       source: "anon",
     });
 
-    // 7. Signed URL for the result.
-    const { data: signed, error: signError } = await supabaseAdmin.storage
-      .from(TRYONS_BUCKET)
-      .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
-    if (signError) throw signError;
+    // 7. Signed URLs for every angle that generated.
+    const views: Record<TryOnView, string | null> = { front: null, side: null, back: null };
+    for (const view of ALL_VIEWS) {
+      const p = viewPaths[view];
+      if (!p) continue;
+      const { data: signed } = await supabaseAdmin.storage
+        .from(TRYONS_BUCKET)
+        .createSignedUrl(p, SIGNED_URL_TTL_SECONDS);
+      views[view] = signed?.signedUrl ?? null;
+    }
+    if (!views.front) throw new Error("Could not sign the try-on result.");
 
     return {
       alreadyUsed: false as const,
       path,
-      signedUrl: signed.signedUrl,
+      signedUrl: views.front,
       expiresIn: SIGNED_URL_TTL_SECONDS,
-      model: generated.model,
+      model,
+      views,
     };
   });
 
