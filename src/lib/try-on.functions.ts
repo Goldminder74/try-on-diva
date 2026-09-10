@@ -70,6 +70,19 @@ const GEMINI_MODELS = [
   "gemini-3-pro-image",
 ] as const;
 
+// The front view is the one the shopper judges the product by, so it runs on the
+// higher-fidelity Pro model first and falls back to Flash. Side and back views
+// keep the faster ordering; all three still run in parallel.
+const FRONT_MODELS = [
+  "gemini-3-pro-image",
+  "gemini-3.1-flash-image",
+] as const;
+
+function modelsForView(view: TryOnView): readonly string[] {
+  return view === "front" ? FRONT_MODELS : GEMINI_MODELS;
+}
+
+
 // Build a Supabase client for use inside server functions.
 // Lovable Cloud only exposes the publishable (anon) key server-side - there is no
 // service-role key - so all access runs under the publishable key. When an access
