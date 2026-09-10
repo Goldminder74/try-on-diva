@@ -246,7 +246,8 @@ function TryOn() {
     setApplying(true);
     try {
       const userPhotoBase64 = await blobToBase64(photo);
-      const wigImageUrl = new URL(wig.images[0], window.location.origin).href;
+      const toAbsolute = (u: string) => new URL(u, window.location.origin).href;
+      const wigImageUrl = toAbsolute(wig.images[0]);
       const out = await runAnonGenerate({
         data: {
           deviceId,
@@ -255,6 +256,8 @@ function TryOn() {
           userPhotoMimeType: photo.type as "image/jpeg" | "image/png" | "image/webp",
           wigId: wig.id,
           wigImageUrl,
+          wigImageUrls: (wig.images ?? []).slice(0, 4).map(toAbsolute),
+
           wigName: wig.name,
           wigStyleType: wig.style_type || "wig",
           wigColour: wig.colors?.[0] || "natural",
