@@ -44,20 +44,21 @@ const TRYONS_BUCKET = "tryons";
 // The following tokens are substituted at call time with the selected wig's
 // fields, so you can use them in the real prompt: {wigName}, {wigStyleType},
 // {wigColour}. Tokens that are not present are simply left out.
-const TRYON_PROMPT = `You are compositing a virtual hair try-on. You are given two images:
+const TRYON_PROMPT = `You are compositing a virtual hair try-on. You are given:
 IMAGE 1 is a photograph of a real person.
-IMAGE 2 is a wig product, named "{wigName}", style type "{wigStyleType}", colour "{wigColour}".
+The REMAINING images are photographs of ONE single wig product, named "{wigName}", style type "{wigStyleType}", colour "{wigColour}". They are different photographs of the SAME product; use all of them together as the ground truth for how the wig looks.
 
-Task: produce a single photorealistic image of the SAME person from IMAGE 1 now wearing the EXACT wig shown in IMAGE 2.
+Task: produce a single photorealistic image of the SAME person from IMAGE 1 now wearing the EXACT wig shown in the product images.
 
 Strict requirements, in priority order:
-1. Preserve the person's identity completely: same face, same features, same expression, same body, same background.
-2. Preserve the person's skin tone EXACTLY as it appears in IMAGE 1. Do not lighten, brighten, warm, cool, or otherwise alter the skin. Match the original luminance and undertone precisely. This is critical and non-negotiable.
-3. Reproduce the wig from IMAGE 2 faithfully: the same length, shape, parting, colour, and texture, including the specific pattern of any braids, locs, or curls. Do not substitute a generic or stylised version. The customer is buying this exact product. The wig colour and highlights must match IMAGE 2 exactly, including any balayage, ombre, or multi-tone colouring. Do not default to black.
-4.Fit the wig to the correct anatomical position.Fit the wig naturally with a realistic hairline and natural edges. Replace existing hair. The hairline must sit at the natural hairline position on the forehead, approximately 5 to 7cm above the eyebrows. The wig must never cover the eyebrows or sit above the natural hairline. For bob styles and styles with a fringe, the fringe must fall between mid-forehead and just above the eyebrows, not over them. The wig should sit flush to the head with natural volume, not raised or floating above the scalp.
+1. Product fidelity is the highest priority after identity. The wig in the product images is the ground truth. Copy its exact length, silhouette, volume, density, parting position, hairline shape, curl or braid or loc pattern and pattern scale, ends (blunt, layered, tapered), and colour including every highlight, ombre, balayage or multi-tone section. Never invent, simplify, restyle or substitute a similar-looking wig. Never default to plain black or a generic straight/wavy texture. If the product is braids, locs, twists, a bob, a pixie or a fringe style, the output MUST be that same style, not an approximation.
+2. Preserve the person's identity completely: same face, same features, same expression, same body, same background.
+3. Preserve the person's skin tone EXACTLY as it appears in IMAGE 1. Do not lighten, brighten, warm, cool, or otherwise alter the skin. Match the original luminance and undertone precisely. This is critical and non-negotiable.
+4. Fit the wig to the correct anatomical position, with a realistic hairline and natural edges. Replace existing hair. The hairline must sit at the natural hairline position on the forehead, approximately 5 to 7cm above the eyebrows. The wig must never cover the eyebrows or sit above the natural hairline. For bob styles and styles with a fringe, the fringe must fall between mid-forehead and just above the eyebrows, not over them. The wig should sit flush to the head with natural volume, not raised or floating above the scalp.
 5. Match the lighting and shadow of IMAGE 1 so the wig looks photographed on this person.
 
-Output only the final composited image.`;
+Before you output, compare your result against the product images: if the length, texture pattern or colour differs, correct it. Output only the final composited image.`;
+
 // Gemini image-generation model candidates, tried in order until one returns an
 // image. Swapping the backend later only touches callGeminiImageAPI below.
 // Current Nano Banana image models in the Gemini 3 family, verified against
