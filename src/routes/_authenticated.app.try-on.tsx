@@ -35,7 +35,6 @@ function AppTryOn() {
     error: applyError,
     resultUrl,
     views,
-    generatingView,
     blocked,
     remaining,
     applyWig,
