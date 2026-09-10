@@ -741,6 +741,8 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       userPhotoMimeType: string;
       wigId: string;
       wigImageUrl: string;
+      wigImageUrls?: string[];
+
       wigName: string;
       wigStyleType: string;
       wigColour: string;
