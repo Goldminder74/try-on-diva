@@ -40,15 +40,12 @@ const TRYONS_BUCKET = "tryons";
 // Gemini try-on generation (Phase 1C)
 // ---------------------------------------------------------------------------
 
-// EDITABLE PROMPT - replace this placeholder with the real try-on prompt.
-// The following tokens are substituted at call time with the selected wig's
-// fields, so you can use them in the real prompt: {wigName}, {wigStyleType},
-// {wigColour}. Tokens that are not present are simply left out.
+// EDITABLE PROMPT. The product photographs are the sole visual source of truth:
+// no catalogue text (name, style type, colour) is sent to the generator, so a
+// mislabelled listing can never influence the generated result.
 const TRYON_PROMPT = `You are compositing a virtual hair try-on. You are given:
 IMAGE 1 is a photograph of a real person.
 The REMAINING images are photographs of ONE single wig product. They are different photographs of the SAME product; use all of them together as the ground truth for how the wig looks.
-
-For context only, the retailer labels this product: name "{wigName}", style type "{wigStyleType}", colour "{wigColour}". These labels are UNRELIABLE and may contradict the photographs. Whenever the wording disagrees with what you can see in the product photographs, the PHOTOGRAPHS ALWAYS WIN. Never restyle or recolour the wig to match the words.
 
 Task: produce a single photorealistic image of the SAME person from IMAGE 1 now wearing the EXACT wig shown in the product images.
 
@@ -230,8 +227,8 @@ async function resolveWigReferenceImages(
 }
 
 
-// Substitute the wig fields into TRYON_PROMPT. Unknown tokens are left untouched;
-// the placeholder prompt has no tokens, so this is a no-op until you add them.
+// The prompt carries no catalogue text: only the camera-angle instruction is
+// appended. Photographs are the sole visual source of truth.
 export type TryOnView = "front" | "side" | "back";
 
 // Extra camera-angle instruction appended for the optional side/back views.
@@ -243,14 +240,8 @@ Camera angle: render this as a THREE-QUARTER / SIDE profile view of the same per
 Camera angle: render this as a BACK view of the same person wearing the same wig, photographed from behind. The face is not visible. Show the full back of the hair: length, density, parting or braid pattern exactly as in IMAGE 2. Keep the same person's head shape, skin tone on the neck and ears, same lighting and same background.`,
 };
 
-function buildTryOnPrompt(
-  wig: { name: string; styleType: string; colour: string },
-  view: TryOnView = "front",
-): string {
-  const base = TRYON_PROMPT.replaceAll("{wigName}", wig.name)
-    .replaceAll("{wigStyleType}", wig.styleType)
-    .replaceAll("{wigColour}", wig.colour);
-  return base + VIEW_INSTRUCTIONS[view];
+function buildTryOnPrompt(view: TryOnView = "front"): string {
+  return TRYON_PROMPT + VIEW_INSTRUCTIONS[view];
 }
 
 /**
@@ -547,15 +538,10 @@ export const generateTryOn = createServerFn({ method: "POST" })
 
       // 2. Generate all three camera angles in parallel, so the full set comes
       //    back in roughly the time one image used to take.
-      const wigMeta = {
-        name: data.wigName,
-        styleType: data.wigStyleType,
-        colour: data.wigColour,
-      };
       const settled = await Promise.allSettled(
         ALL_VIEWS.map(async (view) => {
           const generated = await callGeminiImageAPI({
-            prompt: buildTryOnPrompt(wigMeta, view),
+            prompt: buildTryOnPrompt(view),
             userPhotoBase64: data.userPhotoBase64,
             userPhotoMimeType: data.userPhotoMimeType,
             wigImages,
@@ -836,15 +822,10 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
 
     // 3+4. Generate all three angles in parallel and upload each to the anon
     //      folder in the `tryons` bucket via the service-role client.
-    const wigMeta = {
-      name: data.wigName,
-      styleType: data.wigStyleType,
-      colour: data.wigColour,
-    };
     const settled = await Promise.allSettled(
       ALL_VIEWS.map(async (view) => {
         const generated = await callGeminiImageAPI({
-          prompt: buildTryOnPrompt(wigMeta, view),
+          prompt: buildTryOnPrompt(view),
           userPhotoBase64: data.userPhotoBase64,
           userPhotoMimeType: data.userPhotoMimeType,
           wigImages,
