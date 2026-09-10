@@ -512,9 +512,11 @@ function TryOn() {
             <p className="mt-5 rounded-md border border-gold/30 bg-gold/10 p-3 font-mono text-[11px] leading-relaxed text-gold-dark">
               {user
                 ? "Tap Apply wig to generate your AI try-on."
-                : anonUsed
-                  ? "Create a free account to keep trying - 3 free try-ons every month."
-                  : `Your first ${anonRemaining ?? 3} try-ons are free, no signup needed. After that, create a free account for 3 free try-ons every month.`}
+                  : anonUsed
+                    ? "Create a free account to keep trying - 3 free try-ons every month."
+                    : anonRemaining !== null && anonRemaining < 3
+                      ? `You have ${anonRemaining} free try-on${anonRemaining === 1 ? "" : "s"} left, no signup needed. After that, create a free account for 3 free try-ons every month.`
+                      : "Your first 3 try-ons are free, no signup needed. After that, create a free account for 3 free try-ons every month."}
             </p>
           </aside>
         </div>
