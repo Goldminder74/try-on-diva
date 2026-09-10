@@ -215,6 +215,7 @@ function TryOn() {
     if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) { setError("Use JPEG, PNG or WebP."); return; }
     setError(null);
     setResultUrl(null);
+    setViews({ front: null, side: null, back: null });
     setPhoto(f);
     // Uploading a selfie immediately starts the try-on: the user never sees a
     // raw selfie + wig-photo composite.
