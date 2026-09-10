@@ -134,7 +134,9 @@ function AppTryOn() {
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         <div>
+          <SelectedWigBanner wig={wig} hasResult={Boolean(resultUrl)} hasPhoto={Boolean(photo)} />
           {resultUrl ? (
+
             <>
               <div className="relative overflow-hidden rounded-xl border border-border bg-card">
                 {shownUrl ? (
