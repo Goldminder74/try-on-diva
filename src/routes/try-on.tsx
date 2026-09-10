@@ -82,6 +82,8 @@ function TryOn() {
   const [deviceId, setDeviceId] = useState<string>("");
   const [fingerprint, setFingerprint] = useState<string>("");
   const [anonUsed, setAnonUsed] = useState(false);
+  // Free try-on sets left before an account is required (3 to start).
+  const [anonRemaining, setAnonRemaining] = useState<number | null>(null);
   const [applying, setApplying] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [views, setViews] = useState<Record<"front" | "side" | "back", string | null>>({
@@ -112,7 +114,10 @@ function TryOn() {
         const status = await fetchAnonStatus({
           data: { deviceId: id, fingerprintHash: fp },
         });
-        if (!cancelled) setAnonUsed(Boolean(status?.used));
+        if (!cancelled) {
+          setAnonUsed(Boolean(status?.used));
+          setAnonRemaining(status?.remaining ?? null);
+        }
       } catch {
         /* non-fatal - apply will revalidate server-side */
       }
