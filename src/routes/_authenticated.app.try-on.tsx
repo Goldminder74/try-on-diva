@@ -207,7 +207,7 @@ function AppTryOn() {
             {list.map((w) => (
               <button
                 key={w.id}
-                onClick={() => setWig(w)}
+                onClick={() => onSelectWig(w)}
                 className={`group overflow-hidden rounded-md border-2 text-left transition-all ${wig?.id === w.id ? "border-gold" : "border-transparent hover:border-mahogany/40"}`}
               >
                 <img src={w.images[0]} alt={w.name} className="aspect-square w-full object-cover" />
