@@ -44,7 +44,7 @@ const BUYER_QA: QA[] = [
   },
   {
     q: "How many try-ons do I get for free?",
-    a: "5 every month, forever, with no card required. The count resets on the 1st of each month.",
+    a: "3 every month, forever, with no card required. Each try-on gives you front, side and back views. The count resets on the 1st of each month.",
   },
   {
     q: "What happens when I run out of free try-ons?",
