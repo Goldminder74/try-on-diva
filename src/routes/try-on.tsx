@@ -370,9 +370,35 @@ function TryOn() {
             {resultUrl ? (
               <>
                 <div className="relative overflow-hidden rounded-xl border border-border bg-card">
-                  <img src={resultUrl} alt="Your try-on result" className="w-full object-contain" />
+                  <img
+                    src={views[activeView] ?? resultUrl}
+                    alt={`Your try-on result, ${activeView} view`}
+                    className="w-full object-contain"
+                  />
                 </div>
-                <TryOnResultActions resultUrl={resultUrl} wigName={wig?.name} />
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {(["front", "side", "back"] as const).map((v) => (
+                    <button
+                      key={v}
+                      onClick={() => setActiveView(v)}
+                      disabled={!views[v]}
+                      className={`rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-colors disabled:opacity-40 ${
+                        activeView === v
+                          ? "border-gold bg-gold text-mahogany"
+                          : "border-border bg-card text-mahogany hover:border-mahogany"
+                      }`}
+                    >
+                      {v} view
+                    </button>
+                  ))}
+                  <span className="text-xs text-muted-foreground">
+                    Front, side and back, all in one try-on.
+                  </span>
+                </div>
+                <TryOnResultActions
+                  resultUrl={views[activeView] ?? resultUrl}
+                  wigName={wig?.name}
+                />
               </>
             ) : (
               <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
