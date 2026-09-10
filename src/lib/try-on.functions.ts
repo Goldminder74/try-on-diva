@@ -605,14 +605,30 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
   });
 
 // ---------------------------------------------------------------------------
-// Anonymous one-free try-on (no account required)
+// Anonymous free try-ons (no account required)
 //
-// Lets a first-time visitor complete exactly one full try-on, then prompts
-// for signup. Enforcement combines a client-issued deviceId (localStorage)
-// with a browser fingerprint hash and a server-hashed IP. Uniqueness on both
-// device_id and fingerprint_hash in `anonymous_tryons` blocks clearing
-// cookies as an escape hatch. Authenticated try-ons are unaffected.
+// Lets a first-time visitor complete ANON_FREE_QUOTA full try-on sets, then
+// prompts for signup. Enforcement combines a client-issued deviceId
+// (localStorage) with a browser fingerprint hash and a server-hashed IP.
+// Rows in `anonymous_tryons` are counted per device_id OR fingerprint_hash,
+// so clearing cookies is not an escape hatch. Authenticated try-ons are
+// unaffected.
 // ---------------------------------------------------------------------------
+
+const ANON_FREE_QUOTA = 3;
+
+async function countAnonymousTryOns(
+  supabaseAdmin: { from: (t: string) => any },
+  deviceId: string,
+  fingerprintHash: string,
+): Promise<number> {
+  const { count } = await supabaseAdmin
+    .from("anonymous_tryons")
+    .select("id", { count: "exact", head: true })
+    .or(`device_id.eq.${deviceId},fingerprint_hash.eq.${fingerprintHash}`);
+  return count ?? 0;
+}
+
 
 async function sha256HexServer(input: string): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
@@ -641,16 +657,19 @@ export const getAnonymousTryOnStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row } = await supabaseAdmin
-      .from("anonymous_tryons")
-      .select("id")
-      .or(
-        `device_id.eq.${data.deviceId},fingerprint_hash.eq.${data.fingerprintHash}`,
-      )
-      .limit(1)
-      .maybeSingle();
-    return { used: Boolean(row) };
+    const used = await countAnonymousTryOns(
+      supabaseAdmin as any,
+      data.deviceId,
+      data.fingerprintHash,
+    );
+    return {
+      used: used >= ANON_FREE_QUOTA,
+      usedCount: used,
+      limit: ANON_FREE_QUOTA,
+      remaining: Math.max(0, ANON_FREE_QUOTA - used),
+    };
   });
+
 
 export const generateAnonymousTryOn = createServerFn({ method: "POST" })
   .inputValidator(
@@ -682,18 +701,16 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // 1. Refuse if this device or fingerprint already used its one free try-on.
-    const { data: existing } = await supabaseAdmin
-      .from("anonymous_tryons")
-      .select("id")
-      .or(
-        `device_id.eq.${data.deviceId},fingerprint_hash.eq.${data.fingerprintHash}`,
-      )
-      .limit(1)
-      .maybeSingle();
-    if (existing) {
+    // 1. Refuse once this device or fingerprint has used all free try-ons.
+    const usedCount = await countAnonymousTryOns(
+      supabaseAdmin as any,
+      data.deviceId,
+      data.fingerprintHash,
+    );
+    if (usedCount >= ANON_FREE_QUOTA) {
       return { alreadyUsed: true as const };
     }
+
 
     // 2. Fetch the wig product image for Gemini.
     const wigRes = await fetch(data.wigImageUrl);
@@ -796,6 +813,8 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       expiresIn: SIGNED_URL_TTL_SECONDS,
       model,
       views,
+      remaining: Math.max(0, ANON_FREE_QUOTA - (usedCount + 1)),
     };
+
   });
 

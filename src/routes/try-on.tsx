@@ -82,6 +82,8 @@ function TryOn() {
   const [deviceId, setDeviceId] = useState<string>("");
   const [fingerprint, setFingerprint] = useState<string>("");
   const [anonUsed, setAnonUsed] = useState(false);
+  // Free try-on sets left before an account is required (3 to start).
+  const [anonRemaining, setAnonRemaining] = useState<number | null>(null);
   const [applying, setApplying] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [views, setViews] = useState<Record<"front" | "side" | "back", string | null>>({
@@ -112,7 +114,10 @@ function TryOn() {
         const status = await fetchAnonStatus({
           data: { deviceId: id, fingerprintHash: fp },
         });
-        if (!cancelled) setAnonUsed(Boolean(status?.used));
+        if (!cancelled) {
+          setAnonUsed(Boolean(status?.used));
+          setAnonRemaining(status?.remaining ?? null);
+        }
       } catch {
         /* non-fatal - apply will revalidate server-side */
       }
@@ -197,17 +202,29 @@ function TryOn() {
     };
   }, [search.widget, search.r, showAll, fetchWidget]);
 
+  // Only preselect a wig when the URL names one. Otherwise the visitor picks a
+  // style themselves, which is what decides when generation starts:
+  //   - wig chosen first  -> generation starts as soon as the selfie lands
+  //   - selfie first      -> generation starts as soon as a wig is chosen
   const initialWigId = search.wig;
   const desiredWig = useMemo(() => {
-    if (list.length === 0) return null;
-    return (initialWigId && list.find((w) => w.id === initialWigId)) || list[0];
+    if (!initialWigId || list.length === 0) return null;
+    return list.find((w) => w.id === initialWigId) ?? null;
   }, [list, initialWigId]);
 
   useEffect(() => {
-    if (desiredWig && (!wig || !list.some((w) => w.id === wig.id))) {
-      setWig(desiredWig);
-    }
-  }, [desiredWig, wig, list]);
+    if (desiredWig && !wig) setWig(desiredWig);
+  }, [desiredWig, wig]);
+
+  // Choosing a style. When a selfie is already uploaded, this is the trigger
+  // that starts generation.
+  const onSelectWig = (w: Wig) => {
+    setWig(w);
+    setResultUrl(null);
+    setViews({ front: null, side: null, back: null });
+    if (photo && !applying) setPendingAuto(true);
+  };
+
 
   const onFile = (f: File | undefined) => {
     if (!f) return;
@@ -255,7 +272,9 @@ function TryOn() {
         back: out.views?.back ?? null,
       });
       setActiveView("front");
-      setAnonUsed(true);
+      const left = typeof out.remaining === "number" ? out.remaining : 0;
+      setAnonRemaining(left);
+      setAnonUsed(left <= 0);
       // Don't open the prompt immediately - let the user see their result first.
       // The prompt is opened by a 4s timer or any user interaction (see effect below).
     } catch (err) {
@@ -474,7 +493,7 @@ function TryOn() {
                 {list.map((w: Wig) => (
                   <button
                     key={w.id}
-                    onClick={() => { setWig(w); setResultUrl(null); }}
+                    onClick={() => onSelectWig(w)}
                     className={`group overflow-hidden rounded-md border-2 text-left transition-all ${
                       wig?.id === w.id ? "border-gold" : "border-transparent hover:border-mahogany/40"
                     }`}
@@ -495,7 +514,7 @@ function TryOn() {
                 ? "Tap Apply wig to generate your AI try-on."
                 : anonUsed
                   ? "Create a free account to keep trying - 3 free try-ons every month."
-                  : "First try-on is free, no signup needed. Then 3 free try-ons every month with a free account."}
+                  : `Your first ${anonRemaining ?? 3} try-ons are free, no signup needed. After that, create a free account for 3 free try-ons every month.`}
             </p>
           </aside>
         </div>
@@ -544,7 +563,7 @@ function TryOn() {
               Create a free account to keep going.
             </AlertDialogTitle>
             <AlertDialogDescription className="text-foreground/75">
-              You've used your free try-on. Create a free account for 3 try-ons every month - no card needed.
+              You've used your 3 free try-ons. Create a free account for 3 try-ons every month - no card needed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
