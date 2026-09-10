@@ -5,11 +5,15 @@ import { Upload, RefreshCw, Sparkles } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
+import { SelectedWigBanner } from "@/components/try-on/SelectedWigBanner";
+
 import { TryOnResultActions } from "@/components/try-on/TryOnResultActions";
 import {
   fetchFeaturedWigs,
   fetchRetailerBySlug,
   fetchWigsByRetailerId,
+  fetchWigById,
+
   type Wig,
 } from "@/lib/wigs";
 import { getPublicWidgetData } from "@/lib/widget-public.functions";
@@ -202,8 +206,9 @@ function TryOn() {
     };
   }, [search.widget, search.r, showAll, fetchWidget]);
 
-  // Only preselect a wig when the URL names one. Otherwise the visitor picks a
-  // style themselves, which is what decides when generation starts:
+  // Only preselect a wig when the URL names one (e.g. arriving from the
+  // catalogue). Otherwise the visitor picks a style themselves, which is what
+  // decides when generation starts:
   //   - wig chosen first  -> generation starts as soon as the selfie lands
   //   - selfie first      -> generation starts as soon as a wig is chosen
   const initialWigId = search.wig;
@@ -215,6 +220,23 @@ function TryOn() {
   useEffect(() => {
     if (desiredWig && !wig) setWig(desiredWig);
   }, [desiredWig, wig]);
+
+  // The catalogue can link to any style, including one outside the shortlist
+  // shown here. Fetch it directly so the visitor lands with that exact style
+  // already chosen instead of an empty picker.
+  useEffect(() => {
+    if (!initialWigId || wig || desiredWig) return;
+    let cancelled = false;
+    fetchWigById(initialWigId).then((w) => {
+      if (cancelled || !w) return;
+      setWig(w);
+      setList((prev) => (prev.some((p) => p.id === w.id) ? prev : [w, ...prev]));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [initialWigId, wig, desiredWig]);
+
 
   // Choosing a style. When a selfie is already uploaded, this is the trigger
   // that starts generation.
@@ -246,7 +268,8 @@ function TryOn() {
     setApplying(true);
     try {
       const userPhotoBase64 = await blobToBase64(photo);
-      const wigImageUrl = new URL(wig.images[0], window.location.origin).href;
+      const toAbsolute = (u: string) => new URL(u, window.location.origin).href;
+      const wigImageUrl = toAbsolute(wig.images[0]);
       const out = await runAnonGenerate({
         data: {
           deviceId,
@@ -255,6 +278,8 @@ function TryOn() {
           userPhotoMimeType: photo.type as "image/jpeg" | "image/png" | "image/webp",
           wigId: wig.id,
           wigImageUrl,
+          wigImageUrls: (wig.images ?? []).slice(0, 4).map(toAbsolute),
+
           wigName: wig.name,
           wigStyleType: wig.style_type || "wig",
           wigColour: wig.colors?.[0] || "natural",
@@ -386,7 +411,9 @@ function TryOn() {
 
         <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
           <div>
+            <SelectedWigBanner wig={wig} hasResult={Boolean(resultUrl)} hasPhoto={Boolean(photo)} />
             {resultUrl ? (
+
               <>
                 <div className="relative overflow-hidden rounded-xl border border-border bg-card">
                   <img

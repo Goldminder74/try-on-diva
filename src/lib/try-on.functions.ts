@@ -44,20 +44,21 @@ const TRYONS_BUCKET = "tryons";
 // The following tokens are substituted at call time with the selected wig's
 // fields, so you can use them in the real prompt: {wigName}, {wigStyleType},
 // {wigColour}. Tokens that are not present are simply left out.
-const TRYON_PROMPT = `You are compositing a virtual hair try-on. You are given two images:
+const TRYON_PROMPT = `You are compositing a virtual hair try-on. You are given:
 IMAGE 1 is a photograph of a real person.
-IMAGE 2 is a wig product, named "{wigName}", style type "{wigStyleType}", colour "{wigColour}".
+The REMAINING images are photographs of ONE single wig product, named "{wigName}", style type "{wigStyleType}", colour "{wigColour}". They are different photographs of the SAME product; use all of them together as the ground truth for how the wig looks.
 
-Task: produce a single photorealistic image of the SAME person from IMAGE 1 now wearing the EXACT wig shown in IMAGE 2.
+Task: produce a single photorealistic image of the SAME person from IMAGE 1 now wearing the EXACT wig shown in the product images.
 
 Strict requirements, in priority order:
-1. Preserve the person's identity completely: same face, same features, same expression, same body, same background.
-2. Preserve the person's skin tone EXACTLY as it appears in IMAGE 1. Do not lighten, brighten, warm, cool, or otherwise alter the skin. Match the original luminance and undertone precisely. This is critical and non-negotiable.
-3. Reproduce the wig from IMAGE 2 faithfully: the same length, shape, parting, colour, and texture, including the specific pattern of any braids, locs, or curls. Do not substitute a generic or stylised version. The customer is buying this exact product. The wig colour and highlights must match IMAGE 2 exactly, including any balayage, ombre, or multi-tone colouring. Do not default to black.
-4.Fit the wig to the correct anatomical position.Fit the wig naturally with a realistic hairline and natural edges. Replace existing hair. The hairline must sit at the natural hairline position on the forehead, approximately 5 to 7cm above the eyebrows. The wig must never cover the eyebrows or sit above the natural hairline. For bob styles and styles with a fringe, the fringe must fall between mid-forehead and just above the eyebrows, not over them. The wig should sit flush to the head with natural volume, not raised or floating above the scalp.
+1. Product fidelity is the highest priority after identity. The wig in the product images is the ground truth. Copy its exact length, silhouette, volume, density, parting position, hairline shape, curl or braid or loc pattern and pattern scale, ends (blunt, layered, tapered), and colour including every highlight, ombre, balayage or multi-tone section. Never invent, simplify, restyle or substitute a similar-looking wig. Never default to plain black or a generic straight/wavy texture. If the product is braids, locs, twists, a bob, a pixie or a fringe style, the output MUST be that same style, not an approximation.
+2. Preserve the person's identity completely: same face, same features, same expression, same body, same background.
+3. Preserve the person's skin tone EXACTLY as it appears in IMAGE 1. Do not lighten, brighten, warm, cool, or otherwise alter the skin. Match the original luminance and undertone precisely. This is critical and non-negotiable.
+4. Fit the wig to the correct anatomical position, with a realistic hairline and natural edges. Replace existing hair. The hairline must sit at the natural hairline position on the forehead, approximately 5 to 7cm above the eyebrows. The wig must never cover the eyebrows or sit above the natural hairline. For bob styles and styles with a fringe, the fringe must fall between mid-forehead and just above the eyebrows, not over them. The wig should sit flush to the head with natural volume, not raised or floating above the scalp.
 5. Match the lighting and shadow of IMAGE 1 so the wig looks photographed on this person.
 
-Output only the final composited image.`;
+Before you output, compare your result against the product images: if the length, texture pattern or colour differs, correct it. Output only the final composited image.`;
+
 // Gemini image-generation model candidates, tried in order until one returns an
 // image. Swapping the backend later only touches callGeminiImageAPI below.
 // Current Nano Banana image models in the Gemini 3 family, verified against
@@ -68,6 +69,19 @@ const GEMINI_MODELS = [
   "gemini-3.1-flash-image",
   "gemini-3-pro-image",
 ] as const;
+
+// The front view is the one the shopper judges the product by, so it runs on the
+// higher-fidelity Pro model first and falls back to Flash. Side and back views
+// keep the faster ordering; all three still run in parallel.
+const FRONT_MODELS = [
+  "gemini-3-pro-image",
+  "gemini-3.1-flash-image",
+] as const;
+
+function modelsForView(view: TryOnView): readonly string[] {
+  return view === "front" ? FRONT_MODELS : GEMINI_MODELS;
+}
+
 
 // Build a Supabase client for use inside server functions.
 // Lovable Cloud only exposes the publishable (anon) key server-side - there is no
@@ -126,6 +140,45 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
+/**
+ * Fetch up to `max` photographs of the same wig product and encode them as
+ * inline Gemini parts. More reference angles means the model has far less room
+ * to invent a different-looking wig. The first URL is required; extra ones are
+ * best-effort.
+ */
+async function fetchWigReferenceImages(
+  urls: string[],
+  max = 3,
+): Promise<{ base64: string; mimeType: string }[]> {
+  const unique = Array.from(new Set(urls.filter(Boolean))).slice(0, max);
+  if (unique.length === 0) throw new Error("This wig has no product image.");
+
+  const settled = await Promise.allSettled(
+    unique.map(async (url) => {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Could not fetch wig image (${res.status}).`);
+      return {
+        mimeType: res.headers.get("content-type") ?? "image/jpeg",
+        base64: arrayBufferToBase64(await res.arrayBuffer()),
+      };
+    }),
+  );
+
+  const images = settled
+    .filter((s): s is PromiseFulfilledResult<{ base64: string; mimeType: string }> =>
+      s.status === "fulfilled")
+    .map((s) => s.value);
+
+  if (images.length === 0) {
+    const reason = settled[0] as PromiseRejectedResult | undefined;
+    throw new Error(
+      reason?.reason instanceof Error ? reason.reason.message : "Could not fetch wig image.",
+    );
+  }
+  return images;
+}
+
+
 // Substitute the wig fields into TRYON_PROMPT. Unknown tokens are left untouched;
 // the placeholder prompt has no tokens, so this is a no-op until you add them.
 export type TryOnView = "front" | "side" | "back";
@@ -164,8 +217,9 @@ async function callGeminiImageAPI(input: {
   prompt: string;
   userPhotoBase64: string;
   userPhotoMimeType: string;
-  wigImageBase64: string;
-  wigImageMimeType: string;
+  /** One or more photographs of the SAME wig product, used as ground truth. */
+  wigImages: { base64: string; mimeType: string }[];
+  models?: readonly string[];
 }): Promise<{ imageBase64: string; mimeType: string; model: string }> {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
@@ -178,7 +232,9 @@ async function callGeminiImageAPI(input: {
         parts: [
           { text: input.prompt },
           { inline_data: { mime_type: input.userPhotoMimeType, data: input.userPhotoBase64 } },
-          { inline_data: { mime_type: input.wigImageMimeType, data: input.wigImageBase64 } },
+          ...input.wigImages.map((img) => ({
+            inline_data: { mime_type: img.mimeType, data: img.base64 },
+          })),
         ],
       },
     ],
@@ -188,7 +244,8 @@ async function callGeminiImageAPI(input: {
 
   // Try each candidate model in order; return the first that yields an image.
   const failures: string[] = [];
-  for (const model of GEMINI_MODELS) {
+  for (const model of input.models ?? GEMINI_MODELS) {
+
     try {
       const endpoint =
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
@@ -380,6 +437,9 @@ export const generateTryOn = createServerFn({ method: "POST" })
       userPhotoMimeType: string;
       wigId: string;
       wigImageUrl: string;
+      /** Extra photographs of the same product, used as reference. */
+      wigImageUrls?: string[];
+
       wigName: string;
       wigStyleType: string;
       wigColour: string;
@@ -392,6 +452,8 @@ export const generateTryOn = createServerFn({ method: "POST" })
           userPhotoMimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
           wigId: z.string().uuid(),
           wigImageUrl: z.string().url(),
+          wigImageUrls: z.array(z.string().url()).max(4).optional(),
+
           wigName: z.string().min(1),
           wigStyleType: z.string().min(1),
           wigColour: z.string().min(1),
@@ -426,13 +488,11 @@ export const generateTryOn = createServerFn({ method: "POST" })
     };
 
     try {
-      // 1. Fetch the wig product image and encode it for an inline Gemini part.
-      const wigRes = await fetch(data.wigImageUrl);
-      if (!wigRes.ok) {
-        throw new Error(`Could not fetch wig image (${wigRes.status}).`);
-      }
-      const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
-      const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
+      // 1. Fetch every available photograph of this product as reference.
+      const wigImages = await fetchWigReferenceImages([
+        data.wigImageUrl,
+        ...(data.wigImageUrls ?? []),
+      ]);
 
       // 2. Generate all three camera angles in parallel, so the full set comes
       //    back in roughly the time one image used to take.
@@ -447,9 +507,10 @@ export const generateTryOn = createServerFn({ method: "POST" })
             prompt: buildTryOnPrompt(wigMeta, view),
             userPhotoBase64: data.userPhotoBase64,
             userPhotoMimeType: data.userPhotoMimeType,
-            wigImageBase64,
-            wigImageMimeType,
+            wigImages,
+            models: modelsForView(view),
           });
+
           const stored = await uploadTryOnResult({
             data: {
               wigId: data.wigId,
@@ -680,6 +741,8 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       userPhotoMimeType: string;
       wigId: string;
       wigImageUrl: string;
+      wigImageUrls?: string[];
+
       wigName: string;
       wigStyleType: string;
       wigColour: string;
@@ -692,6 +755,8 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
           userPhotoMimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
           wigId: z.string().uuid(),
           wigImageUrl: z.string().url(),
+          wigImageUrls: z.array(z.string().url()).max(4).optional(),
+
           wigName: z.string().min(1),
           wigStyleType: z.string().min(1),
           wigColour: z.string().min(1),
@@ -712,11 +777,11 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
     }
 
 
-    // 2. Fetch the wig product image for Gemini.
-    const wigRes = await fetch(data.wigImageUrl);
-    if (!wigRes.ok) throw new Error(`Could not fetch wig image (${wigRes.status}).`);
-    const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
-    const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
+    // 2. Fetch every available photograph of this product as reference.
+    const wigImages = await fetchWigReferenceImages([
+      data.wigImageUrl,
+      ...(data.wigImageUrls ?? []),
+    ]);
 
     // 3+4. Generate all three angles in parallel and upload each to the anon
     //      folder in the `tryons` bucket via the service-role client.
@@ -731,9 +796,10 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
           prompt: buildTryOnPrompt(wigMeta, view),
           userPhotoBase64: data.userPhotoBase64,
           userPhotoMimeType: data.userPhotoMimeType,
-          wigImageBase64,
-          wigImageMimeType,
+          wigImages,
+          models: modelsForView(view),
         });
+
         const viewPath = `anon/${crypto.randomUUID()}.png`;
         const { error: upErr } = await supabaseAdmin.storage
           .from(TRYONS_BUCKET)

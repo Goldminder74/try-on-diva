@@ -2,8 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Upload, RefreshCw } from "lucide-react";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
+import { SelectedWigBanner } from "@/components/try-on/SelectedWigBanner";
 import { TryOnResultActions } from "@/components/try-on/TryOnResultActions";
-import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
+import { fetchFeaturedWigs, fetchWigById, type Wig } from "@/lib/wigs";
+
 import { useServerFn } from "@tanstack/react-start";
 import { getTryOnQuota } from "@/lib/try-on.functions";
 import { Link } from "@tanstack/react-router";
@@ -52,15 +54,30 @@ function AppTryOn() {
 
 
   useEffect(() => {
-    fetchFeaturedWigs(9).then((items) => {
+    fetchFeaturedWigs(9).then(async (items) => {
       setList(items);
       // No default hair selection. Only select a wig when the URL explicitly
       // names one; otherwise the user must tap a style deliberately.
-      const initial = search.wig ? items.find((w) => w.id === search.wig) ?? null : null;
-      setWig(initial);
+      if (!search.wig) {
+        setWig(null);
+        return;
+      }
+      const inList = items.find((w) => w.id === search.wig) ?? null;
+      if (inList) {
+        setWig(inList);
+        return;
+      }
+      // Arrived from the catalogue with a style outside this shortlist: fetch
+      // it so it is already selected, waiting only for a selfie.
+      const fetched = await fetchWigById(search.wig);
+      if (fetched) {
+        setWig(fetched);
+        setList((prev) => (prev.some((p) => p.id === fetched.id) ? prev : [fetched, ...prev]));
+      }
     });
     fetchQuota({ data: {} }).then((q) => setQuota({ remaining: q.remaining, isPaid: q.isPaid }));
   }, [fetchQuota, search.wig]);
+
 
   // Choosing a style. When a selfie is already uploaded, this is the trigger
   // that starts generation.
@@ -117,7 +134,9 @@ function AppTryOn() {
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         <div>
+          <SelectedWigBanner wig={wig} hasResult={Boolean(resultUrl)} hasPhoto={Boolean(photo)} />
           {resultUrl ? (
+
             <>
               <div className="relative overflow-hidden rounded-xl border border-border bg-card">
                 {shownUrl ? (

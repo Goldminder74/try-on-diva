@@ -93,7 +93,9 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
       // Convert the uploaded selfie and call the generation server function.
       const userPhotoBase64 = await blobToBase64(photo);
       const userPhotoMimeType = photo.type as "image/jpeg" | "image/png" | "image/webp";
-      const wigImageUrl = new URL(wig.images[0], window.location.origin).href;
+      const toAbsolute = (u: string) => new URL(u, window.location.origin).href;
+      const wigImageUrl = toAbsolute(wig.images[0]);
+      const wigImageUrls = (wig.images ?? []).slice(0, 4).map(toAbsolute);
 
       const out = await runGenerate({
         data: {
@@ -101,12 +103,14 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
           userPhotoMimeType,
           wigId: wig.id,
           wigImageUrl,
+          wigImageUrls,
           wigName: wig.name,
           wigStyleType: wig.style_type || "wig",
           wigColour: wig.colors?.[0] || "natural",
           view,
         },
       });
+
 
       if (!out?.signedUrl) {
         setError("Generation returned no image URL.");
