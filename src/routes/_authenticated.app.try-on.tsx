@@ -2,8 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Upload, RefreshCw } from "lucide-react";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
+import { SelectedWigBanner } from "@/components/try-on/SelectedWigBanner";
 import { TryOnResultActions } from "@/components/try-on/TryOnResultActions";
-import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
+import { fetchFeaturedWigs, fetchWigById, type Wig } from "@/lib/wigs";
+
 import { useServerFn } from "@tanstack/react-start";
 import { getTryOnQuota } from "@/lib/try-on.functions";
 import { Link } from "@tanstack/react-router";

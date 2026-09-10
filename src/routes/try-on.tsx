@@ -5,6 +5,8 @@ import { Upload, RefreshCw, Sparkles } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
+import { SelectedWigBanner } from "@/components/try-on/SelectedWigBanner";
+
 import { TryOnResultActions } from "@/components/try-on/TryOnResultActions";
 import {
   fetchFeaturedWigs,
