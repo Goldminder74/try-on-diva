@@ -197,17 +197,29 @@ function TryOn() {
     };
   }, [search.widget, search.r, showAll, fetchWidget]);
 
+  // Only preselect a wig when the URL names one. Otherwise the visitor picks a
+  // style themselves, which is what decides when generation starts:
+  //   - wig chosen first  -> generation starts as soon as the selfie lands
+  //   - selfie first      -> generation starts as soon as a wig is chosen
   const initialWigId = search.wig;
   const desiredWig = useMemo(() => {
-    if (list.length === 0) return null;
-    return (initialWigId && list.find((w) => w.id === initialWigId)) || list[0];
+    if (!initialWigId || list.length === 0) return null;
+    return list.find((w) => w.id === initialWigId) ?? null;
   }, [list, initialWigId]);
 
   useEffect(() => {
-    if (desiredWig && (!wig || !list.some((w) => w.id === wig.id))) {
-      setWig(desiredWig);
-    }
-  }, [desiredWig, wig, list]);
+    if (desiredWig && !wig) setWig(desiredWig);
+  }, [desiredWig, wig]);
+
+  // Choosing a style. When a selfie is already uploaded, this is the trigger
+  // that starts generation.
+  const onSelectWig = (w: Wig) => {
+    setWig(w);
+    setResultUrl(null);
+    setViews({ front: null, side: null, back: null });
+    if (photo && !applying) setPendingAuto(true);
+  };
+
 
   const onFile = (f: File | undefined) => {
     if (!f) return;
