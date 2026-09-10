@@ -140,6 +140,45 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
+/**
+ * Fetch up to `max` photographs of the same wig product and encode them as
+ * inline Gemini parts. More reference angles means the model has far less room
+ * to invent a different-looking wig. The first URL is required; extra ones are
+ * best-effort.
+ */
+async function fetchWigReferenceImages(
+  urls: string[],
+  max = 3,
+): Promise<{ base64: string; mimeType: string }[]> {
+  const unique = Array.from(new Set(urls.filter(Boolean))).slice(0, max);
+  if (unique.length === 0) throw new Error("This wig has no product image.");
+
+  const settled = await Promise.allSettled(
+    unique.map(async (url) => {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Could not fetch wig image (${res.status}).`);
+      return {
+        mimeType: res.headers.get("content-type") ?? "image/jpeg",
+        base64: arrayBufferToBase64(await res.arrayBuffer()),
+      };
+    }),
+  );
+
+  const images = settled
+    .filter((s): s is PromiseFulfilledResult<{ base64: string; mimeType: string }> =>
+      s.status === "fulfilled")
+    .map((s) => s.value);
+
+  if (images.length === 0) {
+    const reason = settled[0] as PromiseRejectedResult | undefined;
+    throw new Error(
+      reason?.reason instanceof Error ? reason.reason.message : "Could not fetch wig image.",
+    );
+  }
+  return images;
+}
+
+
 // Substitute the wig fields into TRYON_PROMPT. Unknown tokens are left untouched;
 // the placeholder prompt has no tokens, so this is a no-op until you add them.
 export type TryOnView = "front" | "side" | "back";
