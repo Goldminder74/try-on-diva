@@ -538,15 +538,10 @@ export const generateTryOn = createServerFn({ method: "POST" })
 
       // 2. Generate all three camera angles in parallel, so the full set comes
       //    back in roughly the time one image used to take.
-      const wigMeta = {
-        name: data.wigName,
-        styleType: data.wigStyleType,
-        colour: data.wigColour,
-      };
       const settled = await Promise.allSettled(
         ALL_VIEWS.map(async (view) => {
           const generated = await callGeminiImageAPI({
-            prompt: buildTryOnPrompt(wigMeta, view),
+            prompt: buildTryOnPrompt(view),
             userPhotoBase64: data.userPhotoBase64,
             userPhotoMimeType: data.userPhotoMimeType,
             wigImages,
