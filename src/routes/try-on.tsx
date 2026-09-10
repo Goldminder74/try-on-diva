@@ -84,6 +84,12 @@ function TryOn() {
   const [anonUsed, setAnonUsed] = useState(false);
   const [applying, setApplying] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [views, setViews] = useState<Record<"front" | "side" | "back", string | null>>({
+    front: null,
+    side: null,
+    back: null,
+  });
+  const [activeView, setActiveView] = useState<"front" | "side" | "back">("front");
   // Set when a freshly uploaded selfie should generate as soon as we're ready.
   const [pendingAuto, setPendingAuto] = useState(false);
 
