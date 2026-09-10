@@ -813,6 +813,8 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       expiresIn: SIGNED_URL_TTL_SECONDS,
       model,
       views,
+      remaining: Math.max(0, ANON_FREE_QUOTA - (usedCount + 1)),
     };
+
   });
 
