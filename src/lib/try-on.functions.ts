@@ -701,18 +701,16 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // 1. Refuse if this device or fingerprint already used its one free try-on.
-    const { data: existing } = await supabaseAdmin
-      .from("anonymous_tryons")
-      .select("id")
-      .or(
-        `device_id.eq.${data.deviceId},fingerprint_hash.eq.${data.fingerprintHash}`,
-      )
-      .limit(1)
-      .maybeSingle();
-    if (existing) {
+    // 1. Refuse once this device or fingerprint has used all free try-ons.
+    const usedCount = await countAnonymousTryOns(
+      supabaseAdmin as any,
+      data.deviceId,
+      data.fingerprintHash,
+    );
+    if (usedCount >= ANON_FREE_QUOTA) {
       return { alreadyUsed: true as const };
     }
+
 
     // 2. Fetch the wig product image for Gemini.
     const wigRes = await fetch(data.wigImageUrl);
