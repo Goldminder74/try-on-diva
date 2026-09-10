@@ -272,7 +272,9 @@ function TryOn() {
         back: out.views?.back ?? null,
       });
       setActiveView("front");
-      setAnonUsed(true);
+      const left = typeof out.remaining === "number" ? out.remaining : 0;
+      setAnonRemaining(left);
+      setAnonUsed(left <= 0);
       // Don't open the prompt immediately - let the user see their result first.
       // The prompt is opened by a 4s timer or any user interaction (see effect below).
     } catch (err) {
@@ -491,7 +493,7 @@ function TryOn() {
                 {list.map((w: Wig) => (
                   <button
                     key={w.id}
-                    onClick={() => { setWig(w); setResultUrl(null); }}
+                    onClick={() => onSelectWig(w)}
                     className={`group overflow-hidden rounded-md border-2 text-left transition-all ${
                       wig?.id === w.id ? "border-gold" : "border-transparent hover:border-mahogany/40"
                     }`}
@@ -512,7 +514,7 @@ function TryOn() {
                 ? "Tap Apply wig to generate your AI try-on."
                 : anonUsed
                   ? "Create a free account to keep trying - 3 free try-ons every month."
-                  : "First try-on is free, no signup needed. Then 3 free try-ons every month with a free account."}
+                  : `Your first ${anonRemaining ?? 3} try-ons are free, no signup needed. After that, create a free account for 3 free try-ons every month.`}
             </p>
           </aside>
         </div>
@@ -561,7 +563,7 @@ function TryOn() {
               Create a free account to keep going.
             </AlertDialogTitle>
             <AlertDialogDescription className="text-foreground/75">
-              You've used your free try-on. Create a free account for 3 try-ons every month - no card needed.
+              You've used your 3 free try-ons. Create a free account for 3 try-ons every month - no card needed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
