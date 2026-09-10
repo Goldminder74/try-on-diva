@@ -248,6 +248,12 @@ function TryOn() {
         return;
       }
       setResultUrl(out.signedUrl);
+      setViews({
+        front: out.views?.front ?? out.signedUrl,
+        side: out.views?.side ?? null,
+        back: out.views?.back ?? null,
+      });
+      setActiveView("front");
       setAnonUsed(true);
       // Don't open the prompt immediately - let the user see their result first.
       // The prompt is opened by a 4s timer or any user interaction (see effect below).
