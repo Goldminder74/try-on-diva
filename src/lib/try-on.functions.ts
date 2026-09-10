@@ -46,7 +46,9 @@ const TRYONS_BUCKET = "tryons";
 // {wigColour}. Tokens that are not present are simply left out.
 const TRYON_PROMPT = `You are compositing a virtual hair try-on. You are given:
 IMAGE 1 is a photograph of a real person.
-The REMAINING images are photographs of ONE single wig product, named "{wigName}", style type "{wigStyleType}", colour "{wigColour}". They are different photographs of the SAME product; use all of them together as the ground truth for how the wig looks.
+The REMAINING images are photographs of ONE single wig product. They are different photographs of the SAME product; use all of them together as the ground truth for how the wig looks.
+
+For context only, the retailer labels this product: name "{wigName}", style type "{wigStyleType}", colour "{wigColour}". These labels are UNRELIABLE and may contradict the photographs. Whenever the wording disagrees with what you can see in the product photographs, the PHOTOGRAPHS ALWAYS WIN. Never restyle or recolour the wig to match the words.
 
 Task: produce a single photorealistic image of the SAME person from IMAGE 1 now wearing the EXACT wig shown in the product images.
 
@@ -157,10 +159,16 @@ async function fetchWigReferenceImages(
     unique.map(async (url) => {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Could not fetch wig image (${res.status}).`);
-      return {
-        mimeType: res.headers.get("content-type") ?? "image/jpeg",
-        base64: arrayBufferToBase64(await res.arrayBuffer()),
-      };
+      const mimeType = (res.headers.get("content-type") ?? "").split(";")[0].trim();
+      // A missing image often returns an HTML error page with a 200, which would
+      // silently be sent to the model as "the product" and produce a wig that
+      // looks nothing like the catalogue photo. Reject anything that is not an image.
+      if (!mimeType.startsWith("image/")) {
+        throw new Error(`Wig image URL did not return an image (${mimeType || "unknown type"}).`);
+      }
+      const bytes = await res.arrayBuffer();
+      if (bytes.byteLength < 1024) throw new Error("Wig image is empty or corrupt.");
+      return { mimeType, base64: arrayBufferToBase64(bytes) };
     }),
   );
 
@@ -170,12 +178,55 @@ async function fetchWigReferenceImages(
     .map((s) => s.value);
 
   if (images.length === 0) {
-    const reason = settled[0] as PromiseRejectedResult | undefined;
+    const reason = settled.find((s) => s.status === "rejected") as PromiseRejectedResult | undefined;
     throw new Error(
       reason?.reason instanceof Error ? reason.reason.message : "Could not fetch wig image.",
     );
   }
   return images;
+}
+
+/**
+ * The catalogue record is the source of truth for what the shopper selected.
+ * Read the product's own photographs from the database by id and use those as
+ * the references, falling back to the URLs the browser sent only if the lookup
+ * fails. This guarantees the generated wig is built from the same photo shown
+ * on the product card.
+ */
+async function resolveWigReferenceImages(
+  client: { from: (t: string) => any },
+  wigId: string,
+  fallbackUrls: string[],
+): Promise<{ base64: string; mimeType: string }[]> {
+  const origin = (() => {
+    try {
+      const req = getRequest();
+      return req?.url ? new URL(req.url).origin : "";
+    } catch {
+      return "";
+    }
+  })();
+
+  let dbUrls: string[] = [];
+  try {
+    const { data: row } = await client.from("wigs").select("images").eq("id", wigId).maybeSingle();
+    const images: string[] = Array.isArray(row?.images) ? row.images : [];
+    dbUrls = images
+      .filter(Boolean)
+      .map((u) => (u.startsWith("http") ? u : origin ? new URL(u, origin).href : ""))
+      .filter(Boolean);
+  } catch {
+    /* fall back to the client-supplied URLs below */
+  }
+
+  if (dbUrls.length > 0) {
+    try {
+      return await fetchWigReferenceImages(dbUrls);
+    } catch {
+      /* fall through to the browser-supplied URLs */
+    }
+  }
+  return fetchWigReferenceImages(fallbackUrls);
 }
 
 
@@ -489,7 +540,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
 
     try {
       // 1. Fetch every available photograph of this product as reference.
-      const wigImages = await fetchWigReferenceImages([
+      const wigImages = await resolveWigReferenceImages(supabase as any, data.wigId, [
         data.wigImageUrl,
         ...(data.wigImageUrls ?? []),
       ]);
@@ -778,7 +829,7 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
 
 
     // 2. Fetch every available photograph of this product as reference.
-    const wigImages = await fetchWigReferenceImages([
+    const wigImages = await resolveWigReferenceImages(supabaseAdmin as any, data.wigId, [
       data.wigImageUrl,
       ...(data.wigImageUrls ?? []),
     ]);
