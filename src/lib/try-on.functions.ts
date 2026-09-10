@@ -5,7 +5,10 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
-const FREE_QUOTA = 5;
+// A "try-on" is one set of three angles (front, side, back) generated together
+// and charged as a single unit against the free monthly allowance.
+const FREE_QUOTA = 3;
+const ALL_VIEWS = ["front", "side", "back"] as const;
 
 /** True when the consumer has a still-valid paid (plus/pro) subscription. */
 async function isPaidConsumer(supabase: any, userId: string): Promise<boolean> {
@@ -380,7 +383,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
       wigName: string;
       wigStyleType: string;
       wigColour: string;
-      /** Camera angle. Each view is generated separately and counts as one try-on. */
+      /** Ignored: all three angles are always generated together. */
       view?: TryOnView;
     }) =>
       z
@@ -392,7 +395,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
           wigName: z.string().min(1),
           wigStyleType: z.string().min(1),
           wigColour: z.string().min(1),
-          view: z.enum(["front", "side", "back"]).default("front"),
+          view: z.enum(["front", "side", "back"]).optional(),
         })
         .parse(d),
   )
@@ -431,31 +434,60 @@ export const generateTryOn = createServerFn({ method: "POST" })
       const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
       const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
 
-      // 2. Generate the try-on image (provider hidden behind callGeminiImageAPI).
-      const prompt = buildTryOnPrompt(
-        {
-          name: data.wigName,
-          styleType: data.wigStyleType,
-          colour: data.wigColour,
-        },
-        data.view ?? "front",
+      // 2. Generate all three camera angles in parallel, so the full set comes
+      //    back in roughly the time one image used to take.
+      const wigMeta = {
+        name: data.wigName,
+        styleType: data.wigStyleType,
+        colour: data.wigColour,
+      };
+      const settled = await Promise.allSettled(
+        ALL_VIEWS.map(async (view) => {
+          const generated = await callGeminiImageAPI({
+            prompt: buildTryOnPrompt(wigMeta, view),
+            userPhotoBase64: data.userPhotoBase64,
+            userPhotoMimeType: data.userPhotoMimeType,
+            wigImageBase64,
+            wigImageMimeType,
+          });
+          const stored = await uploadTryOnResult({
+            data: {
+              wigId: data.wigId,
+              imageBase64: generated.imageBase64,
+              contentType: generated.mimeType,
+            },
+          });
+          return { view, generated, stored };
+        }),
       );
-      const generated = await callGeminiImageAPI({
-        prompt,
-        userPhotoBase64: data.userPhotoBase64,
-        userPhotoMimeType: data.userPhotoMimeType,
-        wigImageBase64,
-        wigImageMimeType,
-      });
 
-      // 3. Store the result and get a signed URL.
-      const stored = await uploadTryOnResult({
-        data: {
-          wigId: data.wigId,
-          imageBase64: generated.imageBase64,
-          contentType: generated.mimeType,
-        },
-      });
+      const views: Record<TryOnView, string | null> = { front: null, side: null, back: null };
+      let front: { id: string | null; path: string; signedUrl: string; model: string } | null = null;
+      for (const outcome of settled) {
+        if (outcome.status !== "fulfilled") continue;
+        const { view, stored, generated } = outcome.value;
+        views[view] = stored.signedUrl;
+        if (view === "front") {
+          front = {
+            id: stored.id,
+            path: stored.path,
+            signedUrl: stored.signedUrl,
+            model: generated.model,
+          };
+        }
+      }
+
+      // The front view is the headline result: without it, the try-on failed.
+      if (!front) {
+        const reason = settled.find((s) => s.status === "rejected") as
+          | PromiseRejectedResult
+          | undefined;
+        throw new Error(
+          reason?.reason instanceof Error ? reason.reason.message : "Try-on generation failed.",
+        );
+      }
+      const stored = front;
+
 
       // 4. Record the single analytics event for this try-on.
       const { data: wig } = await supabase
@@ -475,8 +507,9 @@ export const generateTryOn = createServerFn({ method: "POST" })
         id: stored.id,
         path: stored.path,
         signedUrl: stored.signedUrl,
-        expiresIn: stored.expiresIn,
-        model: generated.model,
+        expiresIn: SIGNED_URL_TTL_SECONDS,
+        model: stored.model,
+        views,
       };
     } catch (err) {
       await refund();
@@ -668,28 +701,51 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
     const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
     const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
 
-    // 3. Generate try-on image.
-    const prompt = buildTryOnPrompt({
+    // 3+4. Generate all three angles in parallel and upload each to the anon
+    //      folder in the `tryons` bucket via the service-role client.
+    const wigMeta = {
       name: data.wigName,
       styleType: data.wigStyleType,
       colour: data.wigColour,
-    });
-    const generated = await callGeminiImageAPI({
-      prompt,
-      userPhotoBase64: data.userPhotoBase64,
-      userPhotoMimeType: data.userPhotoMimeType,
-      wigImageBase64,
-      wigImageMimeType,
-    });
+    };
+    const settled = await Promise.allSettled(
+      ALL_VIEWS.map(async (view) => {
+        const generated = await callGeminiImageAPI({
+          prompt: buildTryOnPrompt(wigMeta, view),
+          userPhotoBase64: data.userPhotoBase64,
+          userPhotoMimeType: data.userPhotoMimeType,
+          wigImageBase64,
+          wigImageMimeType,
+        });
+        const viewPath = `anon/${crypto.randomUUID()}.png`;
+        const { error: upErr } = await supabaseAdmin.storage
+          .from(TRYONS_BUCKET)
+          .upload(viewPath, decodeBase64Image(generated.imageBase64), {
+            contentType: generated.mimeType,
+            upsert: false,
+          });
+        if (upErr) throw upErr;
+        return { view, viewPath, model: generated.model };
+      }),
+    );
 
-    // 4. Upload to anon folder in `tryons` bucket via service-role client.
-    const objectId = crypto.randomUUID();
-    const path = `anon/${objectId}.png`;
-    const bytes = decodeBase64Image(generated.imageBase64);
-    const { error: upErr } = await supabaseAdmin.storage
-      .from(TRYONS_BUCKET)
-      .upload(path, bytes, { contentType: generated.mimeType, upsert: false });
-    if (upErr) throw upErr;
+    const viewPaths: Record<TryOnView, string | null> = { front: null, side: null, back: null };
+    let model = "";
+    for (const outcome of settled) {
+      if (outcome.status !== "fulfilled") continue;
+      viewPaths[outcome.value.view] = outcome.value.viewPath;
+      if (outcome.value.view === "front") model = outcome.value.model;
+    }
+    if (!viewPaths.front) {
+      const reason = settled.find((s) => s.status === "rejected") as
+        | PromiseRejectedResult
+        | undefined;
+      throw new Error(
+        reason?.reason instanceof Error ? reason.reason.message : "Try-on generation failed.",
+      );
+    }
+    const path = viewPaths.front;
+
 
     // 5. Record the anonymous usage. Unique indexes on device_id and
     //    fingerprint_hash double-guard against concurrent attempts.
@@ -721,18 +777,25 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       source: "anon",
     });
 
-    // 7. Signed URL for the result.
-    const { data: signed, error: signError } = await supabaseAdmin.storage
-      .from(TRYONS_BUCKET)
-      .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
-    if (signError) throw signError;
+    // 7. Signed URLs for every angle that generated.
+    const views: Record<TryOnView, string | null> = { front: null, side: null, back: null };
+    for (const view of ALL_VIEWS) {
+      const p = viewPaths[view];
+      if (!p) continue;
+      const { data: signed } = await supabaseAdmin.storage
+        .from(TRYONS_BUCKET)
+        .createSignedUrl(p, SIGNED_URL_TTL_SECONDS);
+      views[view] = signed?.signedUrl ?? null;
+    }
+    if (!views.front) throw new Error("Could not sign the try-on result.");
 
     return {
       alreadyUsed: false as const,
       path,
-      signedUrl: signed.signedUrl,
+      signedUrl: views.front,
       expiresIn: SIGNED_URL_TTL_SECONDS,
-      model: generated.model,
+      model,
+      views,
     };
   });
 

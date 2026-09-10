@@ -63,7 +63,10 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
     setBlocked(false);
   }, []);
 
-  const applyWig = useCallback(async (view: TryOnView = "front") => {
+  // All three angles are generated together in one request and count as a
+  // single try-on. The `view` argument is kept only for call-site compatibility.
+  const applyWig = useCallback(async (_view: TryOnView = "front") => {
+    const view: TryOnView = "front";
     if (!wig) return setError("Pick a wig first.");
     if (!wig.images?.[0]) return setError("This wig has no product image.");
     if (!photo) return setError("Upload a selfie first.");
@@ -109,8 +112,12 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
         setError("Generation returned no image URL.");
         return;
       }
-      setViews((prev) => ({ ...prev, [view]: out.signedUrl }));
-      if (view === "front") setResultUrl(out.signedUrl);
+      setViews({
+        front: out.views?.front ?? out.signedUrl,
+        side: out.views?.side ?? null,
+        back: out.views?.back ?? null,
+      });
+      setResultUrl(out.signedUrl);
     } catch (err) {
       if (view === "front") setResultUrl(null);
       setError(err instanceof Error ? err.message : "Try-on generation failed.");

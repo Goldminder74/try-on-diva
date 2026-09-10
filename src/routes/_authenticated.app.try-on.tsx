@@ -35,7 +35,6 @@ function AppTryOn() {
     error: applyError,
     resultUrl,
     views,
-    generatingView,
     blocked,
     remaining,
     applyWig,
@@ -98,7 +97,7 @@ function AppTryOn() {
 
       {blocked && (
         <div className="mt-6 rounded-xl border border-gold/30 bg-gold/10 p-5">
-          <p className="font-display text-2xl text-mahogany">You've used your 5 free try-ons this month.</p>
+          <p className="font-display text-2xl text-mahogany">You've used your 3 free try-ons this month.</p>
           <p className="mt-2 text-sm text-foreground/80">Upgrade to Plus for unlimited try-ons and HD downloads.</p>
           <Link to="/pricing" className="mt-4 inline-flex rounded-md bg-mahogany px-4 py-2 text-sm text-cream">See plans</Link>
         </div>
@@ -125,35 +124,28 @@ function AppTryOn() {
                 )}
               </div>
 
-              {/* Camera angles. Side and back are generated on request and each
-                  one counts as a separate try-on. */}
+              {/* All three angles come back together as one try-on. */}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {(["front", "side", "back"] as TryOnView[]).map((v) => {
                   const ready = Boolean(views[v]);
-                  const busy = generatingView === v;
                   return (
                     <button
                       key={v}
-                      onClick={() => {
-                        setActiveView(v);
-                        if (!ready && !applying) void applyWig(v);
-                      }}
-                      disabled={applying && !ready}
-                      className={`rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-colors disabled:opacity-50 ${
+                      onClick={() => setActiveView(v)}
+                      disabled={!ready}
+                      className={`rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-colors disabled:opacity-40 ${
                         activeView === v
                           ? "border-gold bg-gold text-mahogany"
                           : "border-border bg-card text-mahogany hover:border-mahogany"
                       }`}
                     >
-                      {busy ? "Generating…" : ready ? `${v} view` : `Create ${v} view`}
+                      {v} view
                     </button>
                   );
                 })}
-                {(!views.side || !views.back) && (
-                  <span className="text-xs text-muted-foreground">
-                    Each extra view uses one try-on.
-                  </span>
-                )}
+                <span className="text-xs text-muted-foreground">
+                  Front, side and back, all in one try-on.
+                </span>
               </div>
 
               {shownUrl && <TryOnResultActions resultUrl={shownUrl} wigName={wig?.name} />}

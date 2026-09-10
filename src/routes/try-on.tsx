@@ -84,6 +84,12 @@ function TryOn() {
   const [anonUsed, setAnonUsed] = useState(false);
   const [applying, setApplying] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [views, setViews] = useState<Record<"front" | "side" | "back", string | null>>({
+    front: null,
+    side: null,
+    back: null,
+  });
+  const [activeView, setActiveView] = useState<"front" | "side" | "back">("front");
   // Set when a freshly uploaded selfie should generate as soon as we're ready.
   const [pendingAuto, setPendingAuto] = useState(false);
 
@@ -209,6 +215,7 @@ function TryOn() {
     if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) { setError("Use JPEG, PNG or WebP."); return; }
     setError(null);
     setResultUrl(null);
+    setViews({ front: null, side: null, back: null });
     setPhoto(f);
     // Uploading a selfie immediately starts the try-on: the user never sees a
     // raw selfie + wig-photo composite.
@@ -242,6 +249,12 @@ function TryOn() {
         return;
       }
       setResultUrl(out.signedUrl);
+      setViews({
+        front: out.views?.front ?? out.signedUrl,
+        side: out.views?.side ?? null,
+        back: out.views?.back ?? null,
+      });
+      setActiveView("front");
       setAnonUsed(true);
       // Don't open the prompt immediately - let the user see their result first.
       // The prompt is opened by a 4s timer or any user interaction (see effect below).
@@ -357,9 +370,35 @@ function TryOn() {
             {resultUrl ? (
               <>
                 <div className="relative overflow-hidden rounded-xl border border-border bg-card">
-                  <img src={resultUrl} alt="Your try-on result" className="w-full object-contain" />
+                  <img
+                    src={views[activeView] ?? resultUrl}
+                    alt={`Your try-on result, ${activeView} view`}
+                    className="w-full object-contain"
+                  />
                 </div>
-                <TryOnResultActions resultUrl={resultUrl} wigName={wig?.name} />
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {(["front", "side", "back"] as const).map((v) => (
+                    <button
+                      key={v}
+                      onClick={() => setActiveView(v)}
+                      disabled={!views[v]}
+                      className={`rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-colors disabled:opacity-40 ${
+                        activeView === v
+                          ? "border-gold bg-gold text-mahogany"
+                          : "border-border bg-card text-mahogany hover:border-mahogany"
+                      }`}
+                    >
+                      {v} view
+                    </button>
+                  ))}
+                  <span className="text-xs text-muted-foreground">
+                    Front, side and back, all in one try-on.
+                  </span>
+                </div>
+                <TryOnResultActions
+                  resultUrl={views[activeView] ?? resultUrl}
+                  wigName={wig?.name}
+                />
               </>
             ) : (
               <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
@@ -374,7 +413,7 @@ function TryOn() {
               </button>
               {(photo || resultUrl) && (
                 <button
-                  onClick={() => { setPhoto(null); setResultUrl(null); setError(null); }}
+                  onClick={() => { setPhoto(null); setResultUrl(null); setViews({ front: null, side: null, back: null }); setError(null); }}
                   disabled={applying}
                   className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany disabled:opacity-50"
                 >
@@ -455,8 +494,8 @@ function TryOn() {
               {user
                 ? "Tap Apply wig to generate your AI try-on."
                 : anonUsed
-                  ? "Create a free account to keep trying - 5 free try-ons every month."
-                  : "First try-on is free, no signup needed. Then 5 free try-ons every month with a free account."}
+                  ? "Create a free account to keep trying - 3 free try-ons every month."
+                  : "First try-on is free, no signup needed. Then 3 free try-ons every month with a free account."}
             </p>
           </aside>
         </div>
@@ -473,7 +512,7 @@ function TryOn() {
             <div className="min-w-0">
               <p className="font-display text-lg text-mahogany">Love what you see?</p>
               <p className="text-sm text-foreground/75">
-                Create a free account for 5 try-ons every month. No card needed.
+                Create a free account for 3 try-ons every month. No card needed.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -505,7 +544,7 @@ function TryOn() {
               Create a free account to keep going.
             </AlertDialogTitle>
             <AlertDialogDescription className="text-foreground/75">
-              You've used your free try-on. Create a free account for 5 try-ons every month - no card needed.
+              You've used your free try-on. Create a free account for 3 try-ons every month - no card needed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
