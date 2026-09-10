@@ -494,8 +494,8 @@ function TryOn() {
               {user
                 ? "Tap Apply wig to generate your AI try-on."
                 : anonUsed
-                  ? "Create a free account to keep trying - 5 free try-ons every month."
-                  : "First try-on is free, no signup needed. Then 5 free try-ons every month with a free account."}
+                  ? "Create a free account to keep trying - 3 free try-ons every month."
+                  : "First try-on is free, no signup needed. Then 3 free try-ons every month with a free account."}
             </p>
           </aside>
         </div>
@@ -512,7 +512,7 @@ function TryOn() {
             <div className="min-w-0">
               <p className="font-display text-lg text-mahogany">Love what you see?</p>
               <p className="text-sm text-foreground/75">
-                Create a free account for 5 try-ons every month. No card needed.
+                Create a free account for 3 try-ons every month. No card needed.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -544,7 +544,7 @@ function TryOn() {
               Create a free account to keep going.
             </AlertDialogTitle>
             <AlertDialogDescription className="text-foreground/75">
-              You've used your free try-on. Create a free account for 5 try-ons every month - no card needed.
+              You've used your free try-on. Create a free account for 3 try-ons every month - no card needed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">

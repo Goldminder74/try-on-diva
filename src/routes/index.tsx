@@ -53,7 +53,7 @@ function Landing() {
                 I'm a retailer →
               </Link>
             </div>
-            <p className="mt-4 font-mono text-xs text-muted-foreground">No card needed. 5 free try-ons every month.</p>
+            <p className="mt-4 font-mono text-xs text-muted-foreground">No card needed. 3 free try-ons every month.</p>
           </div>
 
           <div className="relative">
@@ -148,7 +148,7 @@ function Landing() {
           <h2 className="font-display text-4xl md:text-5xl">Start free.<br/>Upgrade when you fall in love.</h2>
           <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-4 text-left md:grid-cols-3">
             {[
-              { name: "Free", price: "£0", desc: "5 try-ons / month. Browse the full catalog." },
+              { name: "Free", price: "£0", desc: "3 try-ons / month. Browse the full catalog." },
               { name: "Plus", price: "£4.99", desc: "Unlimited try-ons. Save your photo. Style quiz." , badge: true },
               { name: "Pro", price: "£9.99", desc: "Everything in Plus, plus early access to new drops." },
             ].map((p) => (
