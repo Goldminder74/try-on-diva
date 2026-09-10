@@ -507,8 +507,9 @@ export const generateTryOn = createServerFn({ method: "POST" })
         id: stored.id,
         path: stored.path,
         signedUrl: stored.signedUrl,
-        expiresIn: stored.expiresIn,
-        model: generated.model,
+        expiresIn: SIGNED_URL_TTL_SECONDS,
+        model: stored.model,
+        views,
       };
     } catch (err) {
       await refund();
