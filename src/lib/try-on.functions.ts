@@ -777,11 +777,11 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
     }
 
 
-    // 2. Fetch the wig product image for Gemini.
-    const wigRes = await fetch(data.wigImageUrl);
-    if (!wigRes.ok) throw new Error(`Could not fetch wig image (${wigRes.status}).`);
-    const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
-    const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
+    // 2. Fetch every available photograph of this product as reference.
+    const wigImages = await fetchWigReferenceImages([
+      data.wigImageUrl,
+      ...(data.wigImageUrls ?? []),
+    ]);
 
     // 3+4. Generate all three angles in parallel and upload each to the anon
     //      folder in the `tryons` bucket via the service-role client.
@@ -796,9 +796,10 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
           prompt: buildTryOnPrompt(wigMeta, view),
           userPhotoBase64: data.userPhotoBase64,
           userPhotoMimeType: data.userPhotoMimeType,
-          wigImageBase64,
-          wigImageMimeType,
+          wigImages,
+          models: modelsForView(view),
         });
+
         const viewPath = `anon/${crypto.randomUUID()}.png`;
         const { error: upErr } = await supabaseAdmin.storage
           .from(TRYONS_BUCKET)
