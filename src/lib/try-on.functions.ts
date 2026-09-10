@@ -540,7 +540,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
 
     try {
       // 1. Fetch every available photograph of this product as reference.
-      const wigImages = await fetchWigReferenceImages([
+      const wigImages = await resolveWigReferenceImages(supabase as any, data.wigId, [
         data.wigImageUrl,
         ...(data.wigImageUrls ?? []),
       ]);
@@ -829,7 +829,7 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
 
 
     // 2. Fetch every available photograph of this product as reference.
-    const wigImages = await fetchWigReferenceImages([
+    const wigImages = await resolveWigReferenceImages(supabaseAdmin as any, data.wigId, [
       data.wigImageUrl,
       ...(data.wigImageUrls ?? []),
     ]);
