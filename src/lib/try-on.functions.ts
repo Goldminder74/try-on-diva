@@ -383,7 +383,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
       wigName: string;
       wigStyleType: string;
       wigColour: string;
-      /** Camera angle. Each view is generated separately and counts as one try-on. */
+      /** Ignored: all three angles are always generated together. */
       view?: TryOnView;
     }) =>
       z
@@ -395,7 +395,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
           wigName: z.string().min(1),
           wigStyleType: z.string().min(1),
           wigColour: z.string().min(1),
-          view: z.enum(["front", "side", "back"]).default("front"),
+          view: z.enum(["front", "side", "back"]).optional(),
         })
         .parse(d),
   )
