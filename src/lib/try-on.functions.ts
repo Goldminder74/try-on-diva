@@ -437,6 +437,9 @@ export const generateTryOn = createServerFn({ method: "POST" })
       userPhotoMimeType: string;
       wigId: string;
       wigImageUrl: string;
+      /** Extra photographs of the same product, used as reference. */
+      wigImageUrls?: string[];
+
       wigName: string;
       wigStyleType: string;
       wigColour: string;
