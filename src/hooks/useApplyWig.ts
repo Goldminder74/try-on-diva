@@ -63,7 +63,10 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
     setBlocked(false);
   }, []);
 
-  const applyWig = useCallback(async (view: TryOnView = "front") => {
+  // All three angles are generated together in one request and count as a
+  // single try-on. The `view` argument is kept only for call-site compatibility.
+  const applyWig = useCallback(async (_view: TryOnView = "front") => {
+    const view: TryOnView = "front";
     if (!wig) return setError("Pick a wig first.");
     if (!wig.images?.[0]) return setError("This wig has no product image.");
     if (!photo) return setError("Upload a selfie first.");
