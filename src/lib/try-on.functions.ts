@@ -822,15 +822,10 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
 
     // 3+4. Generate all three angles in parallel and upload each to the anon
     //      folder in the `tryons` bucket via the service-role client.
-    const wigMeta = {
-      name: data.wigName,
-      styleType: data.wigStyleType,
-      colour: data.wigColour,
-    };
     const settled = await Promise.allSettled(
       ALL_VIEWS.map(async (view) => {
         const generated = await callGeminiImageAPI({
-          prompt: buildTryOnPrompt(wigMeta, view),
+          prompt: buildTryOnPrompt(view),
           userPhotoBase64: data.userPhotoBase64,
           userPhotoMimeType: data.userPhotoMimeType,
           wigImages,
