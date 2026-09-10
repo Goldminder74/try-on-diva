@@ -178,8 +178,9 @@ async function callGeminiImageAPI(input: {
   prompt: string;
   userPhotoBase64: string;
   userPhotoMimeType: string;
-  wigImageBase64: string;
-  wigImageMimeType: string;
+  /** One or more photographs of the SAME wig product, used as ground truth. */
+  wigImages: { base64: string; mimeType: string }[];
+  models?: readonly string[];
 }): Promise<{ imageBase64: string; mimeType: string; model: string }> {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
@@ -192,7 +193,9 @@ async function callGeminiImageAPI(input: {
         parts: [
           { text: input.prompt },
           { inline_data: { mime_type: input.userPhotoMimeType, data: input.userPhotoBase64 } },
-          { inline_data: { mime_type: input.wigImageMimeType, data: input.wigImageBase64 } },
+          ...input.wigImages.map((img) => ({
+            inline_data: { mime_type: img.mimeType, data: img.base64 },
+          })),
         ],
       },
     ],
@@ -202,7 +205,8 @@ async function callGeminiImageAPI(input: {
 
   // Try each candidate model in order; return the first that yields an image.
   const failures: string[] = [];
-  for (const model of GEMINI_MODELS) {
+  for (const model of input.models ?? GEMINI_MODELS) {
+
     try {
       const endpoint =
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
