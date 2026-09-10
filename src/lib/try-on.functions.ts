@@ -701,28 +701,51 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
     const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
     const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
 
-    // 3. Generate try-on image.
-    const prompt = buildTryOnPrompt({
+    // 3+4. Generate all three angles in parallel and upload each to the anon
+    //      folder in the `tryons` bucket via the service-role client.
+    const wigMeta = {
       name: data.wigName,
       styleType: data.wigStyleType,
       colour: data.wigColour,
-    });
-    const generated = await callGeminiImageAPI({
-      prompt,
-      userPhotoBase64: data.userPhotoBase64,
-      userPhotoMimeType: data.userPhotoMimeType,
-      wigImageBase64,
-      wigImageMimeType,
-    });
+    };
+    const settled = await Promise.allSettled(
+      ALL_VIEWS.map(async (view) => {
+        const generated = await callGeminiImageAPI({
+          prompt: buildTryOnPrompt(wigMeta, view),
+          userPhotoBase64: data.userPhotoBase64,
+          userPhotoMimeType: data.userPhotoMimeType,
+          wigImageBase64,
+          wigImageMimeType,
+        });
+        const viewPath = `anon/${crypto.randomUUID()}.png`;
+        const { error: upErr } = await supabaseAdmin.storage
+          .from(TRYONS_BUCKET)
+          .upload(viewPath, decodeBase64Image(generated.imageBase64), {
+            contentType: generated.mimeType,
+            upsert: false,
+          });
+        if (upErr) throw upErr;
+        return { view, viewPath, model: generated.model };
+      }),
+    );
 
-    // 4. Upload to anon folder in `tryons` bucket via service-role client.
-    const objectId = crypto.randomUUID();
-    const path = `anon/${objectId}.png`;
-    const bytes = decodeBase64Image(generated.imageBase64);
-    const { error: upErr } = await supabaseAdmin.storage
-      .from(TRYONS_BUCKET)
-      .upload(path, bytes, { contentType: generated.mimeType, upsert: false });
-    if (upErr) throw upErr;
+    const viewPaths: Record<TryOnView, string | null> = { front: null, side: null, back: null };
+    let model = "";
+    for (const outcome of settled) {
+      if (outcome.status !== "fulfilled") continue;
+      viewPaths[outcome.value.view] = outcome.value.viewPath;
+      if (outcome.value.view === "front") model = outcome.value.model;
+    }
+    if (!viewPaths.front) {
+      const reason = settled.find((s) => s.status === "rejected") as
+        | PromiseRejectedResult
+        | undefined;
+      throw new Error(
+        reason?.reason instanceof Error ? reason.reason.message : "Try-on generation failed.",
+      );
+    }
+    const path = viewPaths.front;
+
 
     // 5. Record the anonymous usage. Unique indexes on device_id and
     //    fingerprint_hash double-guard against concurrent attempts.
