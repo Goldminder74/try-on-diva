@@ -10,6 +10,8 @@ import {
   fetchFeaturedWigs,
   fetchRetailerBySlug,
   fetchWigsByRetailerId,
+  fetchWigById,
+
   type Wig,
 } from "@/lib/wigs";
 import { getPublicWidgetData } from "@/lib/widget-public.functions";
