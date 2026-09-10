@@ -434,31 +434,60 @@ export const generateTryOn = createServerFn({ method: "POST" })
       const wigImageMimeType = wigRes.headers.get("content-type") ?? "image/jpeg";
       const wigImageBase64 = arrayBufferToBase64(await wigRes.arrayBuffer());
 
-      // 2. Generate the try-on image (provider hidden behind callGeminiImageAPI).
-      const prompt = buildTryOnPrompt(
-        {
-          name: data.wigName,
-          styleType: data.wigStyleType,
-          colour: data.wigColour,
-        },
-        data.view ?? "front",
+      // 2. Generate all three camera angles in parallel, so the full set comes
+      //    back in roughly the time one image used to take.
+      const wigMeta = {
+        name: data.wigName,
+        styleType: data.wigStyleType,
+        colour: data.wigColour,
+      };
+      const settled = await Promise.allSettled(
+        ALL_VIEWS.map(async (view) => {
+          const generated = await callGeminiImageAPI({
+            prompt: buildTryOnPrompt(wigMeta, view),
+            userPhotoBase64: data.userPhotoBase64,
+            userPhotoMimeType: data.userPhotoMimeType,
+            wigImageBase64,
+            wigImageMimeType,
+          });
+          const stored = await uploadTryOnResult({
+            data: {
+              wigId: data.wigId,
+              imageBase64: generated.imageBase64,
+              contentType: generated.mimeType,
+            },
+          });
+          return { view, generated, stored };
+        }),
       );
-      const generated = await callGeminiImageAPI({
-        prompt,
-        userPhotoBase64: data.userPhotoBase64,
-        userPhotoMimeType: data.userPhotoMimeType,
-        wigImageBase64,
-        wigImageMimeType,
-      });
 
-      // 3. Store the result and get a signed URL.
-      const stored = await uploadTryOnResult({
-        data: {
-          wigId: data.wigId,
-          imageBase64: generated.imageBase64,
-          contentType: generated.mimeType,
-        },
-      });
+      const views: Record<TryOnView, string | null> = { front: null, side: null, back: null };
+      let front: { id: string | null; path: string; signedUrl: string; model: string } | null = null;
+      for (const outcome of settled) {
+        if (outcome.status !== "fulfilled") continue;
+        const { view, stored, generated } = outcome.value;
+        views[view] = stored.signedUrl;
+        if (view === "front") {
+          front = {
+            id: stored.id,
+            path: stored.path,
+            signedUrl: stored.signedUrl,
+            model: generated.model,
+          };
+        }
+      }
+
+      // The front view is the headline result: without it, the try-on failed.
+      if (!front) {
+        const reason = settled.find((s) => s.status === "rejected") as
+          | PromiseRejectedResult
+          | undefined;
+        throw new Error(
+          reason?.reason instanceof Error ? reason.reason.message : "Try-on generation failed.",
+        );
+      }
+      const stored = front;
+
 
       // 4. Record the single analytics event for this try-on.
       const { data: wig } = await supabase
