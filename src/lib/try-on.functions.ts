@@ -40,15 +40,12 @@ const TRYONS_BUCKET = "tryons";
 // Gemini try-on generation (Phase 1C)
 // ---------------------------------------------------------------------------
 
-// EDITABLE PROMPT - replace this placeholder with the real try-on prompt.
-// The following tokens are substituted at call time with the selected wig's
-// fields, so you can use them in the real prompt: {wigName}, {wigStyleType},
-// {wigColour}. Tokens that are not present are simply left out.
+// EDITABLE PROMPT. The product photographs are the sole visual source of truth:
+// no catalogue text (name, style type, colour) is sent to the generator, so a
+// mislabelled listing can never influence the generated result.
 const TRYON_PROMPT = `You are compositing a virtual hair try-on. You are given:
 IMAGE 1 is a photograph of a real person.
 The REMAINING images are photographs of ONE single wig product. They are different photographs of the SAME product; use all of them together as the ground truth for how the wig looks.
-
-For context only, the retailer labels this product: name "{wigName}", style type "{wigStyleType}", colour "{wigColour}". These labels are UNRELIABLE and may contradict the photographs. Whenever the wording disagrees with what you can see in the product photographs, the PHOTOGRAPHS ALWAYS WIN. Never restyle or recolour the wig to match the words.
 
 Task: produce a single photorealistic image of the SAME person from IMAGE 1 now wearing the EXACT wig shown in the product images.
 
