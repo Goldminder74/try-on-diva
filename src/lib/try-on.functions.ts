@@ -657,16 +657,19 @@ export const getAnonymousTryOnStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row } = await supabaseAdmin
-      .from("anonymous_tryons")
-      .select("id")
-      .or(
-        `device_id.eq.${data.deviceId},fingerprint_hash.eq.${data.fingerprintHash}`,
-      )
-      .limit(1)
-      .maybeSingle();
-    return { used: Boolean(row) };
+    const used = await countAnonymousTryOns(
+      supabaseAdmin as any,
+      data.deviceId,
+      data.fingerprintHash,
+    );
+    return {
+      used: used >= ANON_FREE_QUOTA,
+      usedCount: used,
+      limit: ANON_FREE_QUOTA,
+      remaining: Math.max(0, ANON_FREE_QUOTA - used),
+    };
   });
+
 
 export const generateAnonymousTryOn = createServerFn({ method: "POST" })
   .inputValidator(
