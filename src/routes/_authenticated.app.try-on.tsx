@@ -98,7 +98,7 @@ function AppTryOn() {
 
       {blocked && (
         <div className="mt-6 rounded-xl border border-gold/30 bg-gold/10 p-5">
-          <p className="font-display text-2xl text-mahogany">You've used your 5 free try-ons this month.</p>
+          <p className="font-display text-2xl text-mahogany">You've used your 3 free try-ons this month.</p>
           <p className="mt-2 text-sm text-foreground/80">Upgrade to Plus for unlimited try-ons and HD downloads.</p>
           <Link to="/pricing" className="mt-4 inline-flex rounded-md bg-mahogany px-4 py-2 text-sm text-cream">See plans</Link>
         </div>
