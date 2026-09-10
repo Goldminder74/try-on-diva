@@ -413,7 +413,7 @@ function TryOn() {
               </button>
               {(photo || resultUrl) && (
                 <button
-                  onClick={() => { setPhoto(null); setResultUrl(null); setError(null); }}
+                  onClick={() => { setPhoto(null); setResultUrl(null); setViews({ front: null, side: null, back: null }); setError(null); }}
                   disabled={applying}
                   className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany disabled:opacity-50"
                 >
