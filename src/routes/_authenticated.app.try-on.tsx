@@ -54,11 +54,21 @@ function AppTryOn() {
   useEffect(() => {
     fetchFeaturedWigs(9).then((items) => {
       setList(items);
-      const initial = (search.wig && items.find((w) => w.id === search.wig)) || items[0] || null;
+      // No default hair selection. Only select a wig when the URL explicitly
+      // names one; otherwise the user must tap a style deliberately.
+      const initial = search.wig ? items.find((w) => w.id === search.wig) ?? null : null;
       setWig(initial);
     });
     fetchQuota({ data: {} }).then((q) => setQuota({ remaining: q.remaining, isPaid: q.isPaid }));
   }, [fetchQuota, search.wig]);
+
+  // Choosing a style. When a selfie is already uploaded, this is the trigger
+  // that starts generation.
+  const onSelectWig = (w: Wig) => {
+    setWig(w);
+    resetApply();
+    if (photo && !applying) setPendingAuto(true);
+  };
 
   const onFile = (f: File | undefined) => {
     if (!f) return;
@@ -67,12 +77,14 @@ function AppTryOn() {
     setError(null);
     resetApply();
     setPhoto(f);
-    // Uploading a selfie starts the try-on immediately, so the user never sees
-    // a raw selfie + wig-photo composite.
+    // Uploading a selfie starts the try-on immediately, but only when a wig has
+    // already been deliberately selected. If no wig is chosen yet, generation
+    // waits for the user's hair selection.
     setPendingAuto(true);
   };
 
-  // Kick off generation as soon as the newly uploaded photo is in state.
+  // Kick off generation as soon as both a selfie and a deliberately chosen wig
+  // are in state.
   useEffect(() => {
     if (!pendingAuto || !photo || !wig || applying || blocked) return;
     setPendingAuto(false);
@@ -195,7 +207,7 @@ function AppTryOn() {
             {list.map((w) => (
               <button
                 key={w.id}
-                onClick={() => setWig(w)}
+                onClick={() => onSelectWig(w)}
                 className={`group overflow-hidden rounded-md border-2 text-left transition-all ${wig?.id === w.id ? "border-gold" : "border-transparent hover:border-mahogany/40"}`}
               >
                 <img src={w.images[0]} alt={w.name} className="aspect-square w-full object-cover" />
