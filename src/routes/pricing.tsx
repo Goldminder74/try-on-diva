@@ -351,7 +351,7 @@ function Pricing() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          VAT included where applicable. Payments processed securely by Paddle.
+          VAT included where applicable. Payments processed securely by Stripe.
         </p>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">

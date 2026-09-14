@@ -83,7 +83,7 @@ function PrivacyPage() {
             <p>We share data only with processors that help us run the Service:</p>
             <ul className="list-disc space-y-2 pl-6">
               <li>Cloud hosting and database providers.</li>
-              <li>Paddle (paddle.com) - our payment processor and merchant of record, who handles all billing for retailer and consumer subscriptions. Paddle is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See paddle.com/privacy.</li>
+              <li>Stripe (stripe.com) - our payment processor and merchant of record, who handles all billing for retailer and consumer subscriptions. Stripe is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See stripe.com/privacy.</li>
               <li>Google LLC (Gemini image API) - processes selfie photos you upload solely to generate your virtual try-on result. Google is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See policies.google.com/privacy. Photos are not retained by Google beyond the processing request.</li>
               <li>Email delivery providers.</li>
               <li>Analytics providers (aggregated, where possible).</li>

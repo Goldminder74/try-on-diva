@@ -1,6 +1,6 @@
 // Shared plan config for the retailer pricing page, /portal/billing,
 // and the trial-expired paywall. Keep monthly/yearly priceIds in sync with
-// the Paddle products created via create_product / create_price.
+// the payment provider products created via create_product / create_price.
 
 export type RetailerPlanId = "starter" | "growth" | "scale";
 export type BillingInterval = "monthly" | "yearly";

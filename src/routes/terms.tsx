@@ -81,7 +81,7 @@ function TermsPage() {
           <section>
             <h2 className="font-display text-2xl text-mahogany">5. Payments, refunds, and cancellation</h2>
             <div className="mt-3 space-y-3">
-              <p>All payments are processed by Paddle (paddle.com), who acts as the merchant of record for transactions on Wigsmi. Your payment contract is with Paddle, and Paddle's terms apply to all billing matters.</p>
+              <p>All payments are processed by Stripe (stripe.com), who acts as the merchant of record for transactions on Wigsmi. Your payment contract is with Stripe, and Stripe's terms apply to all billing matters.</p>
               <p>Retailer subscriptions are billed monthly or yearly in advance and auto-renew until cancelled. You may cancel at any time from your billing portal; access continues until the end of the paid period.</p>
               <p>Consumer paid plans are billed monthly and auto-renew until cancelled. You may cancel at any time from your account settings.</p>
               <p>Refunds: you may request a full refund within 30 days of any purchase by emailing support@wigsmi.com. After 30 days, fees are non-refundable except where required by law.</p>

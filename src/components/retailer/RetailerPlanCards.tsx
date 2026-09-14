@@ -13,7 +13,7 @@ import { toast } from "sonner";
 interface RetailerPlanCardsProps {
   /** Currently active paid plan, if any - used to render a "Current plan" pill. */
   currentPlanId?: RetailerPlanId | null;
-  /** Where to redirect after successful Paddle checkout. */
+  /** Where to redirect after successful checkout. */
   successUrl?: string;
   /** Label override for the action button (e.g. "Switch to"). */
   ctaLabel?: (planName: string) => string;
@@ -30,7 +30,7 @@ interface RetailerPlanCardsProps {
 
 /**
  * Reusable retailer plan grid with monthly/yearly toggle and working
- * Paddle checkout buttons. Used on /retailer (public marketing),
+ * Checkout buttons. Used on /retailer (public marketing),
  * /portal/billing (signed-in management), and inside TrialExpiredPaywall.
  */
 export function RetailerPlanCards({
