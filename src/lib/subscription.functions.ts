@@ -26,7 +26,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
     (d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
       z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
-  .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
+  .handler(async ({ data, context }): Promise<{ url: string }> => {
     const { supabase, userId } = context;
     const { data: sub } = await supabase
       .from("subscriptions")
@@ -46,7 +46,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
       });
       return { url: portal.url };
     } catch (error) {
-      return { error: getStripeErrorMessage(error) };
+      throw new Error(getStripeErrorMessage(error));
     }
   });
 
