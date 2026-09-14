@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/contexts/auth-context";
+import { CheckoutProvider } from "@/components/payments/CheckoutProvider";
 
 
 function NotFoundComponent() {
