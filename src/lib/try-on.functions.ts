@@ -4,14 +4,19 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import {
+  type ConsumerTier,
+  consumerTier,
+  planFeatures,
+} from "@/lib/entitlements";
 
 // A "try-on" is one set of three angles (front, side, back) generated together
 // and charged as a single unit against the free monthly allowance.
 const FREE_QUOTA = 3;
 const ALL_VIEWS = ["front", "side", "back"] as const;
 
-/** True when the consumer has a still-valid paid (plus/pro) subscription. */
-async function isPaidConsumer(supabase: any, userId: string): Promise<boolean> {
+/** Resolve the consumer's current tier from their latest consumer subscription. */
+async function getConsumerTier(supabase: any, userId: string): Promise<ConsumerTier> {
   const { data: subRows } = await supabase
     .from("subscriptions")
     .select("plan, status, current_period_end")
@@ -19,17 +24,16 @@ async function isPaidConsumer(supabase: any, userId: string): Promise<boolean> {
     .eq("customer_type", "consumer")
     .order("created_at", { ascending: false })
     .limit(1);
-  const subRow = subRows?.[0];
-  if (!subRow) return false;
-  const notExpired =
-    !subRow.current_period_end || new Date(subRow.current_period_end) > new Date();
-  const stillValid =
-    (["active", "trialing", "past_due"].includes(subRow.status) && notExpired) ||
-    (subRow.status === "canceled" &&
-      subRow.current_period_end &&
-      new Date(subRow.current_period_end) > new Date());
-  return Boolean(stillValid && (subRow.plan === "plus" || subRow.plan === "pro"));
+  return consumerTier(subRows?.[0]);
 }
+
+/** What the signed-in shopper's plan unlocks (quota, watermark, history). */
+export const getMyPlanFeatures = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    return planFeatures(await getConsumerTier(supabase, userId));
+  });
 
 
 // Signed URLs for stored try-on results last 7 days.
@@ -436,7 +440,7 @@ export const getTryOnSignedUrl = createServerFn({ method: "GET" })
 
     const { data: row, error } = await supabase
       .from("tryon_results")
-      .select("id, user_id, result_url")
+      .select("id, user_id, result_url, created_at")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw error;
@@ -444,6 +448,18 @@ export const getTryOnSignedUrl = createServerFn({ method: "GET" })
     // RLS already restricts SELECT to the owner; verify explicitly as defence in depth.
     if (!row || row.user_id !== userId) {
       throw new Response("Not found", { status: 404 });
+    }
+
+    // History retention: Pro keeps saved looks forever, everyone else keeps a
+    // rolling window.
+    const features = planFeatures(await getConsumerTier(supabase, userId));
+    if (features.historyDays && row.created_at) {
+      const ageDays = (Date.now() - new Date(row.created_at).getTime()) / 86400000;
+      if (ageDays > features.historyDays) {
+        throw new Error(
+          `Saved looks are kept for ${features.historyDays} days on your plan. Upgrade to Pro to keep your full history.`,
+        );
+      }
     }
 
     const { data: signed, error: signError } = await supabase.storage
@@ -509,7 +525,9 @@ export const generateTryOn = createServerFn({ method: "POST" })
     // 0. Reserve the quota slot atomically BEFORE spending money on generation.
     //    consume_try_on() increments in a single statement guarded by the free
     //    limit, so parallel tabs cannot both slip past the last free try-on.
-    const isPaid = await isPaidConsumer(supabase, userId);
+    const tier = await getConsumerTier(supabase, userId);
+    const features = planFeatures(tier);
+    const isPaid = features.unlimitedTryOns;
     const { data: reservation, error: reserveErr } = await (supabase as any).rpc("consume_try_on", {
       _limit: isPaid ? null : FREE_QUOTA,
     });
@@ -545,7 +563,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
             userPhotoBase64: data.userPhotoBase64,
             userPhotoMimeType: data.userPhotoMimeType,
             wigImages,
-            models: modelsForView(view),
+            models: features.priorityGeneration ? FRONT_MODELS : modelsForView(view),
           });
 
           const stored = await uploadTryOnResult({
@@ -643,8 +661,7 @@ export const recordTryOn = createServerFn({ method: "POST" })
         : 0;
     }
 
-    const isPaid = await isPaidConsumer(supabase, userId);
-
+    const isPaid = planFeatures(await getConsumerTier(supabase, userId)).unlimitedTryOns;
 
     if (!isPaid && count >= FREE_QUOTA) {
       return { allowed: false as const, reason: "quota", remaining: 0 };
@@ -688,17 +705,16 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
       subQuery = subQuery.eq("environment", data.environment);
     }
     const { data: subRows } = await subQuery;
-    const subRow = subRows?.[0];
-    const stillValid =
-      subRow &&
-      (subRow.status === "active" || subRow.status === "trialing") &&
-      (!subRow.current_period_end || new Date(subRow.current_period_end) > today);
-    const isPaid = Boolean(stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro"));
+    const tier = consumerTier(subRows?.[0]);
+    const features = planFeatures(tier);
+    const isPaid = features.unlimitedTryOns;
     return {
       count,
       remaining: isPaid ? null : Math.max(0, FREE_QUOTA - count),
       limit: FREE_QUOTA,
       isPaid,
+      tier,
+      features,
     };
   });
 

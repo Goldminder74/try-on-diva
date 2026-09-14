@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useSubscription } from "@/hooks/useSubscription";
+import { syncMySubscription } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/checkout/success")({
   head: () => ({
@@ -33,6 +35,14 @@ function CheckoutSuccess() {
     const t = setInterval(() => setWaited((w) => w + 1), 1000);
     return () => clearInterval(t);
   }, []);
+
+  // Don't rely solely on the provider's notification: pull the subscription
+  // ourselves a few seconds in, and again if it still hasn't landed.
+  useEffect(() => {
+    if (!user || isActive) return;
+    if (waited !== 3 && waited !== 9) return;
+    syncMySubscription({ data: { environment: getStripeEnvironment() } }).catch(() => {});
+  }, [user, isActive, waited]);
 
   const destination = customerType === "retailer" ? "/portal/billing" : "/app";
 

@@ -5,6 +5,8 @@ import { watermarkImage, downloadBlob } from "@/lib/watermark";
 type Props = {
   resultUrl: string;
   wigName?: string | null;
+  /** Pro shoppers download and share without the Wigsmi watermark. */
+  watermark?: boolean;
 };
 
 const canNativeShareFiles = () => {
@@ -18,7 +20,7 @@ const canNativeShareFiles = () => {
   }
 };
 
-export function TryOnResultActions({ resultUrl, wigName }: Props) {
+export function TryOnResultActions({ resultUrl, wigName, watermark = true }: Props) {
   const [busy, setBusy] = useState<"save" | "share" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -30,7 +32,9 @@ export function TryOnResultActions({ resultUrl, wigName }: Props) {
     .replace(/(^-|-$)/g, "")}.jpg`;
 
   const buildFile = async () => {
-    const blob = await watermarkImage(resultUrl);
+    const blob = watermark
+      ? await watermarkImage(resultUrl)
+      : await fetch(resultUrl).then((r) => r.blob());
     return { blob, file: new File([blob], filename, { type: "image/jpeg" }) };
   };
 
