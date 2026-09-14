@@ -31,6 +31,7 @@ function AppTryOn() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ remaining: number | null; isPaid: boolean } | null>(null);
+  const { features: planFeats } = usePlanFeatures();
 
   // Apply-wig flow (gate + selfie conversion + generateTryOn) lives in the hook.
   const {
