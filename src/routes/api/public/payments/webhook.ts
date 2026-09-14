@@ -48,6 +48,23 @@ function iso(seconds?: number | null): string | null {
   return seconds ? new Date(seconds * 1000).toISOString() : null;
 }
 
+/**
+ * Mark an event id as processed. Returns false when we have already handled it,
+ * so retries and duplicate deliveries cannot send a second email or double-apply
+ * a plan change.
+ */
+async function claimEvent(eventId: string, type: string): Promise<boolean> {
+  if (!eventId) return true;
+  const { error } = await getSupabase()
+    .from("payment_webhook_events")
+    .insert({ event_id: eventId, event_type: type });
+  if (error) {
+    console.log("Duplicate payment event ignored:", eventId, error.message);
+    return false;
+  }
+  return true;
+}
+
 async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
   const { data: row } = await getSupabase()
     .from("subscriptions")
@@ -58,11 +75,39 @@ async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
   if (!row || row.customer_type !== "retailer" || !row.user_id) return;
   const periodEnd = row.current_period_end ? new Date(row.current_period_end) : null;
   const inGrace = periodEnd ? periodEnd > new Date() : false;
-  const newPlan = row.status === "canceled" && !inGrace ? "starter" : row.plan;
-  await getSupabase()
+  const ended = ["canceled", "unpaid", "incomplete_expired"].includes(row.status) && !inGrace;
+  const sb = getSupabase();
+
+  await sb
     .from("retailers")
-    .update({ plan: newPlan, updated_at: new Date().toISOString() })
+    .update({
+      // Once the paid period is over the retailer loses paid access entirely
+      // rather than silently falling back to Starter.
+      plan: ended ? "none" : row.plan,
+      ...(ended && { is_active: false, trial_ends_at: null }),
+      updated_at: new Date().toISOString(),
+    })
     .eq("owner_id", row.user_id);
+
+  if (!ended) return;
+
+  // Pause their listings so nothing paid-for stays live after access ends.
+  const { data: retailer } = await sb
+    .from("retailers")
+    .select("id")
+    .eq("owner_id", row.user_id)
+    .maybeSingle();
+  if (retailer?.id) {
+    await sb
+      .from("wigs")
+      .update({
+        is_published: false,
+        auto_unpublished_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("retailer_id", retailer.id)
+      .eq("is_published", true);
+  }
 }
 
 async function handleSubscriptionCreated(sub: any, env: StripeEnv) {
@@ -269,7 +314,12 @@ async function handlePaymentFailed(invoice: any, env: StripeEnv) {
 }
 
 async function handleWebhook(req: Request, env: StripeEnv) {
-  const event = await verifyWebhook(req, env);
+  const event = (await verifyWebhook(req, env)) as {
+    id?: string;
+    type: string;
+    data: { object: any };
+  };
+  if (!(await claimEvent(event.id ?? "", event.type))) return;
   switch (event.type) {
     case "customer.subscription.created":
       await handleSubscriptionCreated(event.data.object, env);
