@@ -10,8 +10,8 @@ import type { Database } from "@/integrations/supabase/types";
 const FREE_QUOTA = 3;
 const ALL_VIEWS = ["front", "side", "back"] as const;
 
-/** True when the consumer has a still-valid paid (plus/pro) subscription. */
-async function isPaidConsumer(supabase: any, userId: string): Promise<boolean> {
+/** Resolve the consumer's current tier from their latest consumer subscription. */
+async function getConsumerTier(supabase: any, userId: string): Promise<ConsumerTier> {
   const { data: subRows } = await supabase
     .from("subscriptions")
     .select("plan, status, current_period_end")
@@ -19,17 +19,16 @@ async function isPaidConsumer(supabase: any, userId: string): Promise<boolean> {
     .eq("customer_type", "consumer")
     .order("created_at", { ascending: false })
     .limit(1);
-  const subRow = subRows?.[0];
-  if (!subRow) return false;
-  const notExpired =
-    !subRow.current_period_end || new Date(subRow.current_period_end) > new Date();
-  const stillValid =
-    (["active", "trialing", "past_due"].includes(subRow.status) && notExpired) ||
-    (subRow.status === "canceled" &&
-      subRow.current_period_end &&
-      new Date(subRow.current_period_end) > new Date());
-  return Boolean(stillValid && (subRow.plan === "plus" || subRow.plan === "pro"));
+  return consumerTier(subRows?.[0]);
 }
+
+/** What the signed-in shopper's plan unlocks (quota, watermark, history). */
+export const getMyPlanFeatures = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    return planFeatures(await getConsumerTier(supabase, userId));
+  });
 
 
 // Signed URLs for stored try-on results last 7 days.
