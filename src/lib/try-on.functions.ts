@@ -4,6 +4,11 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import {
+  type ConsumerTier,
+  consumerTier,
+  planFeatures,
+} from "@/lib/entitlements";
 
 // A "try-on" is one set of three angles (front, side, back) generated together
 // and charged as a single unit against the free monthly allowance.
@@ -508,7 +513,9 @@ export const generateTryOn = createServerFn({ method: "POST" })
     // 0. Reserve the quota slot atomically BEFORE spending money on generation.
     //    consume_try_on() increments in a single statement guarded by the free
     //    limit, so parallel tabs cannot both slip past the last free try-on.
-    const isPaid = await isPaidConsumer(supabase, userId);
+    const tier = await getConsumerTier(supabase, userId);
+    const features = planFeatures(tier);
+    const isPaid = features.unlimitedTryOns;
     const { data: reservation, error: reserveErr } = await (supabase as any).rpc("consume_try_on", {
       _limit: isPaid ? null : FREE_QUOTA,
     });
@@ -544,7 +551,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
             userPhotoBase64: data.userPhotoBase64,
             userPhotoMimeType: data.userPhotoMimeType,
             wigImages,
-            models: modelsForView(view),
+            models: features.priorityGeneration ? FRONT_MODELS : modelsForView(view),
           });
 
           const stored = await uploadTryOnResult({
@@ -642,8 +649,7 @@ export const recordTryOn = createServerFn({ method: "POST" })
         : 0;
     }
 
-    const isPaid = await isPaidConsumer(supabase, userId);
-
+    const isPaid = planFeatures(await getConsumerTier(supabase, userId)).unlimitedTryOns;
 
     if (!isPaid && count >= FREE_QUOTA) {
       return { allowed: false as const, reason: "quota", remaining: 0 };
@@ -687,17 +693,16 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
       subQuery = subQuery.eq("environment", data.environment);
     }
     const { data: subRows } = await subQuery;
-    const subRow = subRows?.[0];
-    const stillValid =
-      subRow &&
-      (subRow.status === "active" || subRow.status === "trialing") &&
-      (!subRow.current_period_end || new Date(subRow.current_period_end) > today);
-    const isPaid = Boolean(stillValid && (subRow!.plan === "plus" || subRow!.plan === "pro"));
+    const tier = consumerTier(subRows?.[0]);
+    const features = planFeatures(tier);
+    const isPaid = features.unlimitedTryOns;
     return {
       count,
       remaining: isPaid ? null : Math.max(0, FREE_QUOTA - count),
       limit: FREE_QUOTA,
       isPaid,
+      tier,
+      features,
     };
   });
 
