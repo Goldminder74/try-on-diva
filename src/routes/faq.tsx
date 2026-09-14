@@ -111,7 +111,7 @@ const RETAILER_QA: QA[] = [
   },
   {
     q: "Who handles payments and is it secure?",
-    a: "All payments are processed by Paddle, who acts as the merchant of record and handles billing, tax compliance and refunds securely on our behalf.",
+    a: "All payments are processed by Stripe, who acts as the merchant of record and handles billing, tax compliance and refunds securely on our behalf.",
   },
   {
     q: "How do I get help if I'm stuck?",

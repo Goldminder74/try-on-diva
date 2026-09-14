@@ -404,6 +404,8 @@ export type Database = {
           product_id: string | null
           profile_id: string
           status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           trial_ends_at: string | null
           updated_at: string
           user_id: string | null
@@ -424,6 +426,8 @@ export type Database = {
           product_id?: string | null
           profile_id: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
           user_id?: string | null
@@ -444,6 +448,8 @@ export type Database = {
           product_id?: string | null
           profile_id?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
           user_id?: string | null

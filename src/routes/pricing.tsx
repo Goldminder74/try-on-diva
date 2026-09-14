@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Check, X, Loader2 } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useCheckout } from "@/hooks/useCheckout";
 import { useAuth } from "@/contexts/auth-context";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useServerFn } from "@tanstack/react-start";
@@ -13,7 +13,7 @@ import {
   createPortalSession,
   previewPlanChange,
 } from "@/lib/subscription.functions";
-import { getPaddleEnvironment } from "@/lib/paddle";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -118,7 +118,7 @@ interface PreviewState {
 function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
+  const { openCheckout, loading: checkoutLoading } = useCheckout();
   const { subscription, isActive } = useSubscription();
   const changePlan = useServerFn(changeSubscriptionPlan);
   const portal = useServerFn(createPortalSession);
@@ -135,7 +135,7 @@ function Pricing() {
   const isConsumerSub =
     isActive &&
     subscription?.customer_type === "consumer" &&
-    subscription.paddle_subscription_id !== null;
+    subscription.stripe_subscription_id !== null;
 
   const onChoose = async (priceId: string | null, planName: string, planKey: string) => {
     if (!priceId) {
@@ -149,7 +149,7 @@ function Pricing() {
     setBusyId(planKey);
     try {
       if (isConsumerSub) {
-        const env = getPaddleEnvironment();
+        const env = getStripeEnvironment();
         const p = await preview({
           data: { newPriceId: priceId, environment: env, customerType: "consumer" },
         });
@@ -184,7 +184,7 @@ function Pricing() {
       await changePlan({
         data: {
           newPriceId: previewState.priceId,
-          environment: getPaddleEnvironment(),
+          environment: getStripeEnvironment(),
           customerType: "consumer",
         },
       });
@@ -201,7 +201,7 @@ function Pricing() {
     setBusyId("cancel");
     try {
       await cancelSub({
-        data: { environment: getPaddleEnvironment(), customerType: "consumer" },
+        data: { environment: getStripeEnvironment(), customerType: "consumer" },
       });
       toast.success("Subscription cancelled. You keep access until the end of your billing period.");
       setConfirmCancel(false);
@@ -216,7 +216,7 @@ function Pricing() {
     setBusyId("portal");
     try {
       const { url } = await portal({
-        data: { environment: getPaddleEnvironment(), customerType: "consumer" },
+        data: { environment: getStripeEnvironment(), customerType: "consumer" },
       });
       window.open(url, "_blank", "noopener");
     } catch (e) {
@@ -351,7 +351,7 @@ function Pricing() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          VAT included where applicable. Payments processed securely by Paddle.
+          VAT included where applicable. Payments processed securely by Stripe.
         </p>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">

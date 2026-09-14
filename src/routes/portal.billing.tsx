@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { getPaddleEnvironment } from "@/lib/paddle";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { useServerFn } from "@tanstack/react-start";
 import {
   createPortalSession,
@@ -10,7 +10,7 @@ import {
   previewPlanChange,
   changeSubscriptionPlan,
 } from "@/lib/subscription.functions";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useCheckout } from "@/hooks/useCheckout";
 import { Loader2, ExternalLink, FileText, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { RetailerPlanCards } from "@/components/retailer/RetailerPlanCards";
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/portal/billing")({
 interface CurrentSub {
   plan: string;
   status: string;
-  paddle_subscription_id: string | null;
+  stripe_subscription_id: string | null;
   current_period_end: string | null;
   billing_interval: string | null;
 }
@@ -78,7 +78,7 @@ function BillingPage() {
   const invoicesFn = useServerFn(listInvoices);
   const preview = useServerFn(previewPlanChange);
   const changePlan = useServerFn(changeSubscriptionPlan);
-  const { openCheckout } = usePaddleCheckout();
+  const { openCheckout } = useCheckout();
   const [sub, setSub] = useState<CurrentSub | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
@@ -88,10 +88,10 @@ function BillingPage() {
 
   const refetch = () => {
     if (!user) return;
-    const env = getPaddleEnvironment();
+    const env = getStripeEnvironment();
     supabase
       .from("subscriptions")
-      .select("plan, status, paddle_subscription_id, current_period_end, billing_interval")
+      .select("plan, status, stripe_subscription_id, current_period_end, billing_interval")
       .eq("user_id", user.id)
       .eq("customer_type", "retailer")
       .eq("environment", env)
@@ -120,11 +120,11 @@ function BillingPage() {
 
   useEffect(() => {
     if (!user) return;
-    invoicesFn({ data: { environment: getPaddleEnvironment(), customerType: "retailer" } })
+    invoicesFn({ data: { environment: getStripeEnvironment(), customerType: "retailer" } })
       .then(setInvoices)
       .catch(() => setInvoices([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, sub?.paddle_subscription_id]);
+  }, [user, sub?.stripe_subscription_id]);
 
   const isPaidActive =
     !!sub &&
@@ -160,7 +160,7 @@ function BillingPage() {
     setBusy("portal");
     try {
       const { url } = await portal({
-        data: { environment: getPaddleEnvironment(), customerType: "retailer" },
+        data: { environment: getStripeEnvironment(), customerType: "retailer" },
       });
       window.open(url, "_blank", "noopener");
     } catch (e) {
@@ -173,7 +173,7 @@ function BillingPage() {
   const onSwitchPlan = async (planId: RetailerPlanId, priceId: string, planName: string) => {
     setPreviewBusy(planId);
     try {
-      const env = getPaddleEnvironment();
+      const env = getStripeEnvironment();
       const p = await preview({
         data: { newPriceId: priceId, environment: env, customerType: "retailer" },
       });
@@ -200,7 +200,7 @@ function BillingPage() {
       await changePlan({
         data: {
           newPriceId: switchPreview.priceId,
-          environment: getPaddleEnvironment(),
+          environment: getStripeEnvironment(),
           customerType: "retailer",
         },
       });

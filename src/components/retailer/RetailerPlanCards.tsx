@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/contexts/auth-context";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useCheckout } from "@/hooks/useCheckout";
 import {
   RETAILER_PLANS,
   type BillingInterval,
@@ -13,7 +13,7 @@ import { toast } from "sonner";
 interface RetailerPlanCardsProps {
   /** Currently active paid plan, if any - used to render a "Current plan" pill. */
   currentPlanId?: RetailerPlanId | null;
-  /** Where to redirect after successful Paddle checkout. */
+  /** Where to redirect after successful checkout. */
   successUrl?: string;
   /** Label override for the action button (e.g. "Switch to"). */
   ctaLabel?: (planName: string) => string;
@@ -30,7 +30,7 @@ interface RetailerPlanCardsProps {
 
 /**
  * Reusable retailer plan grid with monthly/yearly toggle and working
- * Paddle checkout buttons. Used on /retailer (public marketing),
+ * Checkout buttons. Used on /retailer (public marketing),
  * /portal/billing (signed-in management), and inside TrialExpiredPaywall.
  */
 export function RetailerPlanCards({
@@ -42,7 +42,7 @@ export function RetailerPlanCards({
   onSwitch,
 }: RetailerPlanCardsProps) {
   const { user } = useAuth();
-  const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
+  const { openCheckout, loading: checkoutLoading } = useCheckout();
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [busy, setBusy] = useState<string | null>(null);
 

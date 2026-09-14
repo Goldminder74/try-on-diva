@@ -5,7 +5,7 @@ import { Sparkles, ExternalLink, Loader2 } from "lucide-react";
 import { getMyConsumerProfile } from "@/lib/consumer-profile.functions";
 import { useSubscription } from "@/hooks/useSubscription";
 import { createPortalSession } from "@/lib/subscription.functions";
-import { getPaddleEnvironment } from "@/lib/paddle";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { toast } from "sonner";
 
 const FREE_TRY_ON_LIMIT = 5;
@@ -79,7 +79,7 @@ function SubscriptionPage() {
   const onManage = async () => {
     setPortalBusy(true);
     try {
-      const { url } = await portal({ data: { environment: getPaddleEnvironment(), customerType: "consumer" } });
+      const { url } = await portal({ data: { environment: getStripeEnvironment(), customerType: "consumer" } });
       window.open(url, "_blank", "noopener");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't open billing portal");

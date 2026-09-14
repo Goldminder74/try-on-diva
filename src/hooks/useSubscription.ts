@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getPaddleEnvironment } from "@/lib/paddle";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { useAuth } from "@/contexts/auth-context";
 
 export interface SubscriptionRow {
@@ -10,8 +10,8 @@ export interface SubscriptionRow {
   customer_type: string;
   product_id: string | null;
   price_id: string | null;
-  paddle_subscription_id: string | null;
-  paddle_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  stripe_customer_id: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   environment: string;
@@ -31,7 +31,7 @@ export function useSubscription(opts?: { customerType?: "consumer" | "retailer" 
       return;
     }
     let active = true;
-    const env = getPaddleEnvironment();
+    const env = getStripeEnvironment();
 
     const fetch = async () => {
       let q = supabase

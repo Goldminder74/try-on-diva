@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/contexts/auth-context";
+import { CheckoutProvider } from "@/components/payments/CheckoutProvider";
 
 
 function NotFoundComponent() {
@@ -129,8 +130,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        
-        <Outlet />
+        <CheckoutProvider>
+          <Outlet />
+        </CheckoutProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
