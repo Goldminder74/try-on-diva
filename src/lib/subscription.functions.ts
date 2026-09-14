@@ -1,172 +1,197 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { getPaddleClient, gatewayFetch, type PaddleEnv } from "@/lib/paddle.server";
+import {
+  type StripeEnv,
+  createStripeClient,
+  getStripeErrorMessage,
+} from "@/lib/stripe.server";
 
 const envSchema = z.enum(["sandbox", "live"]);
 const customerTypeSchema = z.enum(["consumer", "retailer"]);
 
-async function resolvePaddlePriceId(env: PaddleEnv, externalId: string): Promise<string> {
-  const r = await gatewayFetch(env, `/prices?external_id=${encodeURIComponent(externalId)}`);
-  const j = await r.json();
-  if (!j.data?.length) throw new Error("Price not found: " + externalId);
-  return j.data[0].id as string;
+async function resolvePriceByLookupKey(
+  stripe: ReturnType<typeof createStripeClient>,
+  lookupKey: string,
+) {
+  const prices = await stripe.prices.list({ lookup_keys: [lookupKey] });
+  if (!prices.data.length) throw new Error("Price not found: " + lookupKey);
+  return prices.data[0];
 }
 
-/**
- * Open a Paddle customer-portal session so the user can cancel,
- * update payment method or download invoices.
- */
+/** Open the hosted billing portal so the user can manage their subscription. */
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
-    z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
+  .inputValidator(
+    (d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+      z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
     const { supabase, userId } = context;
     const { data: sub } = await supabase
       .from("subscriptions")
-      .select("paddle_customer_id, paddle_subscription_id, environment")
+      .select("stripe_customer_id")
       .eq("user_id", userId)
       .eq("environment", data.environment)
       .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (!sub?.paddle_customer_id) throw new Error("No subscription found.");
+    if (!sub?.stripe_customer_id) throw new Error("No subscription found.");
 
-    const paddle = getPaddleClient(data.environment);
-    const session = await paddle.customerPortalSessions.create(
-      sub.paddle_customer_id,
-      sub.paddle_subscription_id ? [sub.paddle_subscription_id] : [],
-    );
-    return { url: session.urls.general.overview };
+    try {
+      const stripe = createStripeClient(data.environment as StripeEnv);
+      const portal = await stripe.billingPortal.sessions.create({
+        customer: sub.stripe_customer_id,
+      });
+      return { url: portal.url };
+    } catch (error) {
+      return { error: getStripeErrorMessage(error) };
+    }
   });
 
-/**
- * Switch an existing subscription to a new price (upgrade/downgrade) with
- * prorated_immediately billing. Returns the updated paddle subscription.
- */
+/** Switch an existing subscription to a new price, prorated immediately. */
 export const changeSubscriptionPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { newPriceId: string; environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
-    z
-      .object({
-        newPriceId: z.string().min(1).max(120),
-        environment: envSchema,
-        customerType: customerTypeSchema,
-      })
-      .parse(d),
+  .inputValidator(
+    (d: {
+      newPriceId: string;
+      environment: "sandbox" | "live";
+      customerType: "consumer" | "retailer";
+    }) =>
+      z
+        .object({
+          newPriceId: z.string().min(1).max(120),
+          environment: envSchema,
+          customerType: customerTypeSchema,
+        })
+        .parse(d),
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { supabase, userId } = context;
     const { data: sub } = await supabase
       .from("subscriptions")
-      .select("paddle_subscription_id, status")
+      .select("stripe_subscription_id, status")
       .eq("user_id", userId)
       .eq("environment", data.environment)
       .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (!sub?.paddle_subscription_id) throw new Error("No active subscription.");
+    if (!sub?.stripe_subscription_id) throw new Error("No active subscription.");
     if (!["active", "trialing", "past_due"].includes(sub.status)) {
       throw new Error("Subscription not in a state that can be changed.");
     }
 
-    const paddle = getPaddleClient(data.environment);
-    const paddlePriceId = await resolvePaddlePriceId(data.environment, data.newPriceId);
+    try {
+      const stripe = createStripeClient(data.environment as StripeEnv);
+      const price = await resolvePriceByLookupKey(stripe, data.newPriceId);
+      const current = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
+      const itemId = current.items.data[0]?.id;
+      if (!itemId) throw new Error("Subscription has no billable item.");
 
-    await paddle.subscriptions.update(sub.paddle_subscription_id, {
-      items: [{ priceId: paddlePriceId, quantity: 1 }],
-      prorationBillingMode: "prorated_immediately",
-    });
-    return { ok: true };
+      await stripe.subscriptions.update(sub.stripe_subscription_id, {
+        items: [{ id: itemId, price: price.id, quantity: 1 }],
+        proration_behavior: "always_invoice",
+        cancel_at_period_end: false,
+      });
+      return { ok: true };
+    } catch (error) {
+      return { error: getStripeErrorMessage(error) };
+    }
   });
 
-/**
- * Preview what changing the plan will charge or credit the customer.
- */
+/** Preview what changing the plan will charge or credit the customer. */
 export const previewPlanChange = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { newPriceId: string; environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
-    z.object({
-      newPriceId: z.string().min(1).max(120),
-      environment: envSchema,
-      customerType: customerTypeSchema,
-    }).parse(d),
+  .inputValidator(
+    (d: {
+      newPriceId: string;
+      environment: "sandbox" | "live";
+      customerType: "consumer" | "retailer";
+    }) =>
+      z
+        .object({
+          newPriceId: z.string().min(1).max(120),
+          environment: envSchema,
+          customerType: customerTypeSchema,
+        })
+        .parse(d),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: sub } = await supabase
       .from("subscriptions")
-      .select("paddle_subscription_id, status")
+      .select("stripe_subscription_id, stripe_customer_id")
       .eq("user_id", userId)
       .eq("environment", data.environment)
       .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (!sub?.paddle_subscription_id) throw new Error("No active subscription.");
+    if (!sub?.stripe_subscription_id || !sub.stripe_customer_id) {
+      throw new Error("No active subscription.");
+    }
 
-    const paddlePriceId = await resolvePaddlePriceId(data.environment, data.newPriceId);
+    const stripe = createStripeClient(data.environment as StripeEnv);
+    const price = await resolvePriceByLookupKey(stripe, data.newPriceId);
+    const current = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
+    const itemId = current.items.data[0]?.id;
+    if (!itemId) throw new Error("Subscription has no billable item.");
 
-    const r = await gatewayFetch(
-      data.environment,
-      `/subscriptions/${sub.paddle_subscription_id}/preview`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          items: [{ price_id: paddlePriceId, quantity: 1 }],
-          proration_billing_mode: "prorated_immediately",
-        }),
+    const preview = await (stripe.invoices as any).createPreview({
+      customer: sub.stripe_customer_id,
+      subscription: sub.stripe_subscription_id,
+      subscription_details: {
+        items: [{ id: itemId, price: price.id, quantity: 1 }],
+        proration_behavior: "always_invoice",
       },
-    );
-    const j = await r.json();
-    if (!r.ok) throw new Error(j?.error?.detail || "Preview failed");
+    });
 
-    const immediate = j.data?.immediate_transaction;
-    const next = j.data?.next_transaction;
+    const currentItem = current.items.data[0];
+    const periodEnd =
+      (currentItem as any)?.current_period_end ?? (current as any).current_period_end;
+
     return {
-      currency: j.data?.currency_code as string,
-      immediateAmount: immediate?.details?.totals?.grand_total
-        ? Number(immediate.details.totals.grand_total)
-        : 0,
-      nextAmount: next?.details?.totals?.grand_total
-        ? Number(next.details.totals.grand_total)
-        : 0,
-      nextBilledAt: next?.billing_period?.starts_at ?? null,
+      currency: (preview.currency as string)?.toUpperCase() ?? "GBP",
+      immediateAmount: Number(preview.amount_due ?? 0),
+      nextAmount: Number(price.unit_amount ?? 0),
+      nextBilledAt: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
     };
   });
 
-/**
- * Cancel the user's current subscription at period end (keeps access until then).
- */
+/** Cancel the user's subscription at period end (keeps access until then). */
 export const cancelSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
-    z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
+  .inputValidator(
+    (d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+      z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { supabase, userId } = context;
     const { data: sub } = await supabase
       .from("subscriptions")
-      .select("paddle_subscription_id, status")
+      .select("stripe_subscription_id, status")
       .eq("user_id", userId)
       .eq("environment", data.environment)
       .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (!sub?.paddle_subscription_id) throw new Error("No active subscription.");
+    if (!sub?.stripe_subscription_id) throw new Error("No active subscription.");
     if (!["active", "trialing", "past_due"].includes(sub.status)) {
       throw new Error("Subscription is not active.");
     }
-    const paddle = getPaddleClient(data.environment);
-    await paddle.subscriptions.cancel(sub.paddle_subscription_id, {
-      effectiveFrom: "next_billing_period",
-    });
-    return { ok: true };
+
+    try {
+      const stripe = createStripeClient(data.environment as StripeEnv);
+      await stripe.subscriptions.update(sub.stripe_subscription_id, {
+        cancel_at_period_end: true,
+      });
+      return { ok: true };
+    } catch (error) {
+      return { error: getStripeErrorMessage(error) };
+    }
   });
 
 interface InvoiceRow {
@@ -179,55 +204,39 @@ interface InvoiceRow {
   invoiceUrl: string | null;
 }
 
-/**
- * List the user's recent transactions (invoices) from Paddle.
- */
+/** List the user's recent invoices. */
 export const listInvoices = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
-    z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
+  .inputValidator(
+    (d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+      z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
   .handler(async ({ data, context }): Promise<InvoiceRow[]> => {
     const { supabase, userId } = context;
     const { data: sub } = await supabase
       .from("subscriptions")
-      .select("paddle_customer_id")
+      .select("stripe_customer_id")
       .eq("user_id", userId)
       .eq("environment", data.environment)
       .eq("customer_type", data.customerType)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (!sub?.paddle_customer_id) return [];
+    if (!sub?.stripe_customer_id) return [];
 
-    const r = await gatewayFetch(
-      data.environment,
-      `/transactions?customer_id=${encodeURIComponent(sub.paddle_customer_id)}&per_page=12&order_by=billed_at[DESC]`,
-    );
-    const j = await r.json();
-    if (!r.ok) throw new Error(j?.error?.detail || "Failed to load invoices");
+    const stripe = createStripeClient(data.environment as StripeEnv);
+    const list = await stripe.invoices.list({
+      customer: sub.stripe_customer_id,
+      limit: 12,
+    });
 
-    const rows: InvoiceRow[] = (j.data ?? []).map((t: any) => ({
-      id: t.id,
-      number: t.invoice_number ?? null,
-      status: t.status,
-      currency: t.currency_code,
-      total: Number(t.details?.totals?.grand_total ?? 0),
-      billedAt: t.billed_at ?? t.created_at ?? null,
-      invoiceUrl: null,
+    return list.data.map((inv) => ({
+      id: inv.id ?? "",
+      number: inv.number ?? null,
+      status: inv.status ?? "unknown",
+      currency: (inv.currency ?? "gbp").toUpperCase(),
+      total: Number(inv.total ?? 0),
+      billedAt: inv.created ? new Date(inv.created * 1000).toISOString() : null,
+      invoiceUrl: inv.hosted_invoice_url ?? inv.invoice_pdf ?? null,
     }));
-
-    await Promise.all(
-      rows.map(async (row) => {
-        if (row.status !== "completed" && row.status !== "billed" && row.status !== "paid") return;
-        try {
-          const ir = await gatewayFetch(data.environment, `/transactions/${row.id}/invoice`);
-          const ij = await ir.json();
-          if (ir.ok) row.invoiceUrl = ij.data?.url ?? null;
-        } catch {
-          /* ignore */
-        }
-      }),
-    );
-    return rows;
   });
