@@ -85,12 +85,13 @@ const PLANS: {
       [true, "Unlimited wishlist"],
       [true, "Style quiz personalisation"],
       [true, "Save your selfie"],
-      [false, "Early access to new drops"],
+      [true, "30 days of try-on history"],
+      [false, "Watermark-free downloads"],
     ] as const,
   },
   {
     name: "Pro",
-    desc: "Everything, plus first-look at new arrivals.",
+    desc: "Watermark-free downloads, full history and priority quality.",
     prices: { monthly: "£9.99", yearly: "£77.92" },
     monthlyEquivYearly: "£6.49",
     yearlySavings: "£41.96",
@@ -98,9 +99,11 @@ const PLANS: {
     planKey: "pro",
     features: [
       [true, "Everything in Plus"],
+      [true, "Downloads with no watermark"],
+      [true, "Full try-on history kept forever"],
+      [true, "Priority, highest quality try-ons"],
       [true, "Early access to new drops"],
       [true, "Priority support"],
-      [true, "Exclusive style edits"],
     ] as const,
   },
 ];
