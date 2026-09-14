@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import Stripe from "stripe";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   type StripeEnv,
   createStripeClient,
@@ -100,5 +101,90 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {
       return { error: getStripeErrorMessage(error) };
+    }
+  });
+
+/**
+ * Pull the caller's latest subscription straight from the payment provider and
+ * write it into our subscriptions table.
+ *
+ * The provider's notification usually lands first, but it can be delayed. The
+ * success page calls this so the customer never sees "activating" forever.
+ */
+export const syncMySubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { environment: StripeEnv }) => {
+    if (d?.environment !== "sandbox" && d?.environment !== "live") {
+      throw new Error("Invalid environment");
+    }
+    return d;
+  })
+  .handler(async ({ data, context }): Promise<{ synced: boolean }> => {
+    const { userId } = context;
+    try {
+      const stripe = createStripeClient(data.environment);
+      const customers = await stripe.customers.search({
+        query: `metadata['userId']:'${userId}'`,
+        limit: 1,
+      });
+      const customer = customers.data[0];
+      if (!customer) return { synced: false };
+
+      const subs = await stripe.subscriptions.list({
+        customer: customer.id,
+        status: "all",
+        limit: 5,
+      });
+      const sub = subs.data.find((s) =>
+        ["active", "trialing", "past_due"].includes(s.status),
+      );
+      if (!sub) return { synced: false };
+
+      const item = sub.items.data[0];
+      const lookupKey = (item?.price as any)?.lookup_key as string | undefined;
+      const priceId = lookupKey ?? item?.price?.id ?? "unknown_price";
+      const productId = lookupKey
+        ? lookupKey.replace(/_(monthly|yearly)$/, "")
+        : "unknown_product";
+      const plan = productId.replace(/^(consumer_|retailer_)/, "");
+      const ctype = productId.startsWith("retailer_") ? "retailer" : "consumer";
+      const periodStart = (item as any)?.current_period_start ?? (sub as any).current_period_start;
+      const periodEnd = (item as any)?.current_period_end ?? (sub as any).current_period_end;
+
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await (supabaseAdmin as any).from("subscriptions").upsert(
+        {
+          user_id: userId,
+          profile_id: userId,
+          stripe_subscription_id: sub.id,
+          stripe_customer_id: customer.id,
+          product_id: productId,
+          price_id: priceId,
+          plan,
+          customer_type: ctype,
+          status: sub.status,
+          billing_interval: item?.price?.recurring?.interval ?? null,
+          current_period_start: periodStart
+            ? new Date(periodStart * 1000).toISOString()
+            : null,
+          current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+          cancel_at_period_end: sub.cancel_at_period_end ?? false,
+          environment: data.environment,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "stripe_subscription_id" },
+      );
+
+      if (ctype === "retailer") {
+        await (supabaseAdmin as any)
+          .from("retailers")
+          .update({ plan, is_active: true, updated_at: new Date().toISOString() })
+          .eq("owner_id", userId);
+      }
+
+      return { synced: true };
+    } catch (error) {
+      console.error("syncMySubscription failed:", getStripeErrorMessage(error));
+      return { synced: false };
     }
   });
