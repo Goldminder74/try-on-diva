@@ -440,7 +440,7 @@ export const getTryOnSignedUrl = createServerFn({ method: "GET" })
 
     const { data: row, error } = await supabase
       .from("tryon_results")
-      .select("id, user_id, result_url")
+      .select("id, user_id, result_url, created_at")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw error;
@@ -448,6 +448,18 @@ export const getTryOnSignedUrl = createServerFn({ method: "GET" })
     // RLS already restricts SELECT to the owner; verify explicitly as defence in depth.
     if (!row || row.user_id !== userId) {
       throw new Response("Not found", { status: 404 });
+    }
+
+    // History retention: Pro keeps saved looks forever, everyone else keeps a
+    // rolling window.
+    const features = planFeatures(await getConsumerTier(supabase, userId));
+    if (features.historyDays && row.created_at) {
+      const ageDays = (Date.now() - new Date(row.created_at).getTime()) / 86400000;
+      if (ageDays > features.historyDays) {
+        throw new Error(
+          `Saved looks are kept for ${features.historyDays} days on your plan. Upgrade to Pro to keep your full history.`,
+        );
+      }
     }
 
     const { data: signed, error: signError } = await supabase.storage

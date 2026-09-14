@@ -4,6 +4,7 @@ import { Upload, RefreshCw } from "lucide-react";
 import { WigTryOnEngine } from "@/components/try-on/WigTryOnEngine";
 import { SelectedWigBanner } from "@/components/try-on/SelectedWigBanner";
 import { TryOnResultActions } from "@/components/try-on/TryOnResultActions";
+import { usePlanFeatures } from "@/hooks/usePlanFeatures";
 import { fetchFeaturedWigs, fetchWigById, type Wig } from "@/lib/wigs";
 
 import { useServerFn } from "@tanstack/react-start";
@@ -179,7 +180,13 @@ function AppTryOn() {
                 </span>
               </div>
 
-              {shownUrl && <TryOnResultActions resultUrl={shownUrl} wigName={wig?.name} />}
+              {shownUrl && (
+                <TryOnResultActions
+                  resultUrl={shownUrl}
+                  wigName={wig?.name}
+                  watermark={!planFeats.watermarkFree}
+                />
+              )}
             </>
           ) : (
             <WigTryOnEngine photo={photo} wig={wig} skinTone={4} />
