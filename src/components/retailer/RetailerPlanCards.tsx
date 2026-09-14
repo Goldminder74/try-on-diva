@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/contexts/auth-context";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useCheckout } from "@/hooks/useCheckout";
 import {
   RETAILER_PLANS,
   type BillingInterval,
@@ -42,7 +42,7 @@ export function RetailerPlanCards({
   onSwitch,
 }: RetailerPlanCardsProps) {
   const { user } = useAuth();
-  const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
+  const { openCheckout, loading: checkoutLoading } = useCheckout();
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [busy, setBusy] = useState<string | null>(null);
 
