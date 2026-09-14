@@ -146,6 +146,28 @@ async function handleSubscriptionCreated(sub: any, env: StripeEnv) {
       { onConflict: "stripe_subscription_id" },
     );
 
+  if (ctype === "consumer") {
+    const sb = getSupabase();
+    const { data: profile } = await sb
+      .from("profiles")
+      .select("email, display_name")
+      .eq("id", userId)
+      .maybeSingle();
+    if (profile?.email) {
+      await serverSendTransactionalEmail({
+        baseUrl: "https://wigsmi.com",
+        templateName: "consumer-subscribed",
+        recipientEmail: profile.email,
+        idempotencyKey: `consumer-subscribed-${sub.id}`,
+        templateData: {
+          name: profile.display_name,
+          plan,
+          appUrl: "https://wigsmi.com/app/try-on",
+        },
+      });
+    }
+  }
+
   if (ctype === "retailer") {
     const sb = getSupabase();
     await sb
