@@ -82,6 +82,16 @@ function AppTryOn() {
   }, [fetchQuota, search.wig]);
 
 
+  // A selfie uploaded on the public try-on page before we knew the visitor was
+  // signed in: pick it up so they do not have to upload it again.
+  useEffect(() => {
+    const handed = takeSelfie();
+    if (handed) {
+      setPhoto(handed);
+      setPendingAuto(true);
+    }
+  }, []);
+
   // Choosing a style. When a selfie is already uploaded, this is the trigger
   // that starts generation.
   const onSelectWig = (w: Wig) => {
