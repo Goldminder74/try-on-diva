@@ -12,7 +12,7 @@ import {
 
 // A "try-on" is one set of three angles (front, side, back) generated together
 // and charged as a single unit against the free monthly allowance.
-const FREE_QUOTA = 3;
+const FREE_QUOTA = 5;
 const ALL_VIEWS = ["front", "side", "back"] as const;
 
 /** Resolve the consumer's current tier from their latest consumer subscription. */
@@ -729,7 +729,7 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
 // unaffected.
 // ---------------------------------------------------------------------------
 
-const ANON_FREE_QUOTA = 3;
+const ANON_FREE_QUOTA = 5;
 
 async function countAnonymousTryOns(
   supabaseAdmin: { from: (t: string) => any },
