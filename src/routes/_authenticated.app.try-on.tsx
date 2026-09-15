@@ -6,6 +6,7 @@ import { SelectedWigBanner } from "@/components/try-on/SelectedWigBanner";
 import { TryOnResultActions } from "@/components/try-on/TryOnResultActions";
 import { usePlanFeatures } from "@/hooks/usePlanFeatures";
 import { fetchFeaturedWigs, fetchWigById, type Wig } from "@/lib/wigs";
+import { takeSelfie } from "@/lib/selfie-handoff";
 
 import { useServerFn } from "@tanstack/react-start";
 import { getTryOnQuota } from "@/lib/try-on.functions";
