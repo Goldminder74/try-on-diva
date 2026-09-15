@@ -86,7 +86,7 @@ function TryOn() {
   const [deviceId, setDeviceId] = useState<string>("");
   const [fingerprint, setFingerprint] = useState<string>("");
   const [anonUsed, setAnonUsed] = useState(false);
-  // Free try-on sets left before an account is required (3 to start).
+  // Free try-on sets left before an account is required (5 to start).
   const [anonRemaining, setAnonRemaining] = useState<number | null>(null);
   const [applying, setApplying] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
@@ -540,10 +540,10 @@ function TryOn() {
               {user
                 ? "Tap Apply wig to generate your AI try-on."
                   : anonUsed
-                    ? "Create a free account to keep trying - 3 free try-ons every month."
-                    : anonRemaining !== null && anonRemaining < 3
-                      ? `You have ${anonRemaining} free try-on${anonRemaining === 1 ? "" : "s"} left, no signup needed. After that, create a free account for 3 free try-ons every month.`
-                      : "Your first 3 try-ons are free, no signup needed. After that, create a free account for 3 free try-ons every month."}
+                    ? "Create a free account to keep trying - 5 free try-ons every month."
+                    : anonRemaining !== null && anonRemaining < 5
+                      ? `You have ${anonRemaining} free try-on${anonRemaining === 1 ? "" : "s"} left, no signup needed. After that, create a free account for 5 free try-ons every month.`
+                      : "Your first 5 try-ons are free, no signup needed. After that, create a free account for 5 free try-ons every month."}
             </p>
           </aside>
         </div>
@@ -560,7 +560,7 @@ function TryOn() {
             <div className="min-w-0">
               <p className="font-display text-lg text-mahogany">Love what you see?</p>
               <p className="text-sm text-foreground/75">
-                Create a free account for 3 try-ons every month. No card needed.
+                Create a free account for 5 try-ons every month. No card needed.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -592,7 +592,7 @@ function TryOn() {
               Create a free account to keep going.
             </AlertDialogTitle>
             <AlertDialogDescription className="text-foreground/75">
-              You've used your 3 free try-ons. Create a free account for 3 try-ons every month - no card needed.
+              You've used your 5 free try-ons. Create a free account for 5 try-ons every month - no card needed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
