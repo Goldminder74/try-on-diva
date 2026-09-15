@@ -560,7 +560,7 @@ function TryOn() {
             <div className="min-w-0">
               <p className="font-display text-lg text-mahogany">Love what you see?</p>
               <p className="text-sm text-foreground/75">
-                Create a free account for 3 try-ons every month. No card needed.
+                Create a free account for 5 try-ons every month. No card needed.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -592,7 +592,7 @@ function TryOn() {
               Create a free account to keep going.
             </AlertDialogTitle>
             <AlertDialogDescription className="text-foreground/75">
-              You've used your 3 free try-ons. Create a free account for 3 try-ons every month - no card needed.
+              You've used your 5 free try-ons. Create a free account for 5 try-ons every month - no card needed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
