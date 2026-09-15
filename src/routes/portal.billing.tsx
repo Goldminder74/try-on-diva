@@ -197,13 +197,17 @@ function BillingPage() {
     if (!switchPreview) return;
     setConfirmingSwitch(true);
     try {
-      await changePlan({
+      const res = (await changePlan({
         data: {
           newPriceId: switchPreview.priceId,
           environment: getStripeEnvironment(),
           customerType: "retailer",
         },
-      });
+      })) as { error?: string } | undefined;
+      if (res?.error) {
+        toast.error(res.error);
+        return;
+      }
       toast.success("Plan updated. Your account will refresh in a few seconds.");
       setSwitchPreview(null);
     } catch (e) {

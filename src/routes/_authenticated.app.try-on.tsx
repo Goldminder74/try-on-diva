@@ -6,6 +6,7 @@ import { SelectedWigBanner } from "@/components/try-on/SelectedWigBanner";
 import { TryOnResultActions } from "@/components/try-on/TryOnResultActions";
 import { usePlanFeatures } from "@/hooks/usePlanFeatures";
 import { fetchFeaturedWigs, fetchWigById, type Wig } from "@/lib/wigs";
+import { takeSelfie } from "@/lib/selfie-handoff";
 
 import { useServerFn } from "@tanstack/react-start";
 import { getTryOnQuota } from "@/lib/try-on.functions";
@@ -80,6 +81,16 @@ function AppTryOn() {
     fetchQuota({ data: {} }).then((q) => setQuota({ remaining: q.remaining, isPaid: q.isPaid }));
   }, [fetchQuota, search.wig]);
 
+
+  // A selfie uploaded on the public try-on page before we knew the visitor was
+  // signed in: pick it up so they do not have to upload it again.
+  useEffect(() => {
+    const handed = takeSelfie();
+    if (handed) {
+      setPhoto(handed);
+      setPendingAuto(true);
+    }
+  }, []);
 
   // Choosing a style. When a selfie is already uploaded, this is the trigger
   // that starts generation.

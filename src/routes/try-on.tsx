@@ -16,6 +16,7 @@ import {
 
   type Wig,
 } from "@/lib/wigs";
+import { stashSelfie } from "@/lib/selfie-handoff";
 import { getPublicWidgetData } from "@/lib/widget-public.functions";
 import {
   generateAnonymousTryOn,
@@ -315,8 +316,10 @@ function TryOn() {
     setError(null);
     if (authLoading) return;
 
-    // Signed-in users: existing authenticated flow unchanged.
+    // Signed-in users continue in the app, carrying the selfie with them so
+    // they never have to upload the same photo twice.
     if (user) {
+      stashSelfie(photo);
       navigate({ to: "/app/try-on", search: { wig: wig.id } });
       return;
     }
