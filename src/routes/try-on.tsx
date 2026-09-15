@@ -540,10 +540,10 @@ function TryOn() {
               {user
                 ? "Tap Apply wig to generate your AI try-on."
                   : anonUsed
-                    ? "Create a free account to keep trying - 3 free try-ons every month."
-                    : anonRemaining !== null && anonRemaining < 3
-                      ? `You have ${anonRemaining} free try-on${anonRemaining === 1 ? "" : "s"} left, no signup needed. After that, create a free account for 3 free try-ons every month.`
-                      : "Your first 3 try-ons are free, no signup needed. After that, create a free account for 3 free try-ons every month."}
+                    ? "Create a free account to keep trying - 5 free try-ons every month."
+                    : anonRemaining !== null && anonRemaining < 5
+                      ? `You have ${anonRemaining} free try-on${anonRemaining === 1 ? "" : "s"} left, no signup needed. After that, create a free account for 5 free try-ons every month.`
+                      : "Your first 5 try-ons are free, no signup needed. After that, create a free account for 5 free try-ons every month."}
             </p>
           </aside>
         </div>
