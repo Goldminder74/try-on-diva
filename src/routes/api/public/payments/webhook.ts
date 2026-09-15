@@ -65,6 +65,14 @@ async function claimEvent(eventId: string, type: string): Promise<boolean> {
   return true;
 }
 
+/**
+ * Release a claim so the provider's retry of a failed delivery can be applied.
+ */
+async function releaseEvent(eventId: string) {
+  if (!eventId) return;
+  await getSupabase().from("payment_webhook_events").delete().eq("event_id", eventId);
+}
+
 async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
   const { data: row } = await getSupabase()
     .from("subscriptions")

@@ -184,13 +184,17 @@ function Pricing() {
     if (!previewState) return;
     setConfirmingSwitch(true);
     try {
-      await changePlan({
+      const res = (await changePlan({
         data: {
           newPriceId: previewState.priceId,
           environment: getStripeEnvironment(),
           customerType: "consumer",
         },
-      });
+      })) as { error?: string } | undefined;
+      if (res?.error) {
+        toast.error(res.error);
+        return;
+      }
       toast.success("Plan updated. Your account will refresh in a few seconds.");
       setPreviewState(null);
     } catch (e) {
@@ -203,9 +207,13 @@ function Pricing() {
   const onConfirmCancel = async () => {
     setBusyId("cancel");
     try {
-      await cancelSub({
+      const res = (await cancelSub({
         data: { environment: getStripeEnvironment(), customerType: "consumer" },
-      });
+      })) as { error?: string } | undefined;
+      if (res?.error) {
+        toast.error(res.error);
+        return;
+      }
       toast.success("Subscription cancelled. You keep access until the end of your billing period.");
       setConfirmCancel(false);
     } catch (e) {
