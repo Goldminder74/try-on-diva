@@ -350,21 +350,28 @@ async function handleWebhook(req: Request, env: StripeEnv) {
     data: { object: any };
   };
   if (!(await claimEvent(event.id ?? "", event.type))) return;
-  switch (event.type) {
-    case "customer.subscription.created":
-      await handleSubscriptionCreated(event.data.object, env);
-      break;
-    case "customer.subscription.updated":
-      await handleSubscriptionUpdated(event.data.object, env);
-      break;
-    case "customer.subscription.deleted":
-      await handleSubscriptionDeleted(event.data.object, env);
-      break;
-    case "invoice.payment_failed":
-      await handlePaymentFailed(event.data.object, env);
-      break;
-    default:
-      console.log("Unhandled payment event:", event.type);
+  try {
+    switch (event.type) {
+      case "customer.subscription.created":
+        await handleSubscriptionCreated(event.data.object, env);
+        break;
+      case "customer.subscription.updated":
+        await handleSubscriptionUpdated(event.data.object, env);
+        break;
+      case "customer.subscription.deleted":
+        await handleSubscriptionDeleted(event.data.object, env);
+        break;
+      case "invoice.payment_failed":
+        await handlePaymentFailed(event.data.object, env);
+        break;
+      default:
+        console.log("Unhandled payment event:", event.type);
+    }
+  } catch (err) {
+    // Processing failed: drop the claim so the provider's retry is applied
+    // instead of being discarded as a duplicate.
+    await releaseEvent(event.id ?? "");
+    throw err;
   }
 }
 
