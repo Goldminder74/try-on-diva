@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TryOnRouteImport } from './routes/try-on'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as RetailerRouteImport } from './routes/retailer'
@@ -61,6 +62,11 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 import { Route as ApiPublicHooksTrialsTickRouteImport } from './routes/api/public/hooks/trials-tick'
 import { Route as ApiPublicHooksQuotaResetRouteImport } from './routes/api/public/hooks/quota-reset'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TryOnRoute = TryOnRouteImport.update({
   id: '/try-on',
   path: '/try-on',
@@ -336,6 +342,7 @@ export interface FileRoutesByFullPath {
   '/retailer': typeof RetailerRoute
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
@@ -386,6 +393,7 @@ export interface FileRoutesByTo {
   '/retailer': typeof RetailerRoute
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
@@ -440,6 +448,7 @@ export interface FileRoutesById {
   '/retailer': typeof RetailerRoute
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
@@ -494,6 +503,7 @@ export interface FileRouteTypes {
     | '/retailer'
     | '/terms'
     | '/try-on'
+    | '/unsubscribe'
     | '/admin/catalog'
     | '/admin/consumers'
     | '/admin/featured'
@@ -544,6 +554,7 @@ export interface FileRouteTypes {
     | '/retailer'
     | '/terms'
     | '/try-on'
+    | '/unsubscribe'
     | '/admin/catalog'
     | '/admin/consumers'
     | '/admin/featured'
@@ -597,6 +608,7 @@ export interface FileRouteTypes {
     | '/retailer'
     | '/terms'
     | '/try-on'
+    | '/unsubscribe'
     | '/admin/catalog'
     | '/admin/consumers'
     | '/admin/featured'
@@ -651,6 +663,7 @@ export interface RootRouteChildren {
   RetailerRoute: typeof RetailerRoute
   TermsRoute: typeof TermsRoute
   TryOnRoute: typeof TryOnRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
@@ -673,6 +686,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/try-on': {
       id: '/try-on'
       path: '/try-on'
@@ -1116,6 +1136,7 @@ const rootRouteChildren: RootRouteChildren = {
   RetailerRoute: RetailerRoute,
   TermsRoute: TermsRoute,
   TryOnRoute: TryOnRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
