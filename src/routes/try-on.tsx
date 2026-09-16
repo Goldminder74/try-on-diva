@@ -595,7 +595,9 @@ function TryOn() {
               Create a free account to keep going.
             </AlertDialogTitle>
             <AlertDialogDescription className="text-foreground/75">
-              You've used your 5 free try-ons. Create a free account for 5 try-ons every month - no card needed.
+              {anonReason === "network"
+                ? "You've used the free try-ons available here this month. Create a free account for 5 try-ons every month - no card needed."
+                : "You've used your 2 free try-ons for this month. Create a free account for 5 try-ons every month - no card needed."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
