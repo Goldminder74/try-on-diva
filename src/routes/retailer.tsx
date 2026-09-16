@@ -156,9 +156,18 @@ function RetailerLanding() {
           <h2 className="mt-4 font-display text-4xl md:text-5xl">
             Join the first virtual try-on built for Black wig buyers.
           </h2>
-          <Link to="/retailer/signup" className="mt-8 inline-flex rounded-md bg-gold px-7 py-3 text-sm font-medium text-mahogany hover:bg-cream">
-            Create retailer account
-          </Link>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Link to="/retailer/signup" className="inline-flex rounded-md bg-gold px-7 py-3 text-sm font-medium text-mahogany hover:bg-cream">
+              Create retailer account
+            </Link>
+            <a
+              href="/wigsmi-brochure.pdf"
+              download
+              className="inline-flex rounded-md border border-cream/50 px-7 py-3 text-sm font-medium text-cream hover:bg-cream hover:text-mahogany"
+            >
+              Download the brochure (PDF)
+            </a>
+          </div>
         </div>
       </section>
 
