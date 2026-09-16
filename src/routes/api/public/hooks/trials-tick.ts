@@ -156,7 +156,7 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
               .eq("id", r.owner_id)
               .maybeSingle();
             if (profile?.email) {
-              await serverSendTransactionalEmail({
+              const sent = await serverSendTransactionalEmail({
                 baseUrl,
                 templateName: "retailer-trial-ended",
                 recipientEmail: profile.email,
@@ -167,6 +167,9 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
                   upgradeUrl: `${baseUrl}/portal/billing`,
                 },
               });
+              if (!sent.ok) await releaseEvent(r.id, "trial_ended");
+            } else {
+              await releaseEvent(r.id, "trial_ended");
             }
           }
           lockedCount++;
