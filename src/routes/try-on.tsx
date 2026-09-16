@@ -292,6 +292,7 @@ function TryOn() {
       });
       if (out.alreadyUsed) {
         setAnonUsed(true);
+        setAnonReason(out.reason ?? "device");
         setWallPromptOpen(true);
         return;
       }
