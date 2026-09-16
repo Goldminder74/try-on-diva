@@ -29,6 +29,17 @@ async function recordEvent(retailerId: string, eventType: string) {
   return true;
 }
 
+// Undo a recorded lifecycle event so the next tick retries the email
+// instead of permanently skipping it.
+async function releaseEvent(retailerId: string, eventType: string) {
+  const sb = getSupabase();
+  await sb
+    .from("retailer_lifecycle_events")
+    .delete()
+    .eq("retailer_id", retailerId)
+    .eq("event_type", eventType);
+}
+
 async function hasActiveSub(userId: string): Promise<boolean> {
   if (!userId) return false;
   const sb = getSupabase();
