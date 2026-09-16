@@ -87,7 +87,7 @@ function TryOn() {
   const [deviceId, setDeviceId] = useState<string>("");
   const [fingerprint, setFingerprint] = useState<string>("");
   const [anonUsed, setAnonUsed] = useState(false);
-  // Free try-on sets left before an account is required (5 to start).
+  // Free try-on sets left before an account is required (2 per month to start).
   const [anonRemaining, setAnonRemaining] = useState<number | null>(null);
   // Why the free allowance ran out: this device's monthly allowance, or the
   // per-network safety cap.
