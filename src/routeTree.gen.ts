@@ -31,6 +31,7 @@ import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding
 import { Route as PortalBillingRouteImport } from './routes/portal.billing'
 import { Route as PortalApiKeysRouteImport } from './routes/portal.api-keys'
 import { Route as PortalAnalyticsRouteImport } from './routes/portal.analytics'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
@@ -45,6 +46,7 @@ import { Route as PortalCatalogIndexRouteImport } from './routes/portal.catalog.
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
 import { Route as PortalCatalogNewRouteImport } from './routes/portal.catalog.new'
 import { Route as PortalCatalogWigIdRouteImport } from './routes/portal.catalog.$wigId'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as EmbedWidgetTokenRouteImport } from './routes/embed.widget.$token'
 import { Route as AuthenticatedAppWishlistRouteImport } from './routes/_authenticated.app.wishlist'
 import { Route as AuthenticatedAppTryOnRouteImport } from './routes/_authenticated.app.try-on'
@@ -52,6 +54,8 @@ import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_auth
 import { Route as AuthenticatedAppStyleQuizRouteImport } from './routes/_authenticated.app.style-quiz'
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated.app.profile'
 import { Route as AuthenticatedAppCatalogRouteImport } from './routes/_authenticated.app.catalog'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksTrialsTickRouteImport } from './routes/api/public/hooks/trials-tick'
@@ -166,6 +170,11 @@ const PortalAnalyticsRoute = PortalAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => PortalRoute,
 } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   id: '/checkout/success',
   path: '/checkout/success',
@@ -236,6 +245,11 @@ const PortalCatalogWigIdRoute = PortalCatalogWigIdRouteImport.update({
   path: '/catalog/$wigId',
   getParentRoute: () => PortalRoute,
 } as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmbedWidgetTokenRoute = EmbedWidgetTokenRouteImport.update({
   id: '/embed/widget/$token',
   path: '/embed/widget/$token',
@@ -274,6 +288,18 @@ const AuthenticatedAppCatalogRoute = AuthenticatedAppCatalogRouteImport.update({
   path: '/app/catalog',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -320,6 +346,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
@@ -338,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/app/wishlist': typeof AuthenticatedAppWishlistRoute
   '/embed/widget/$token': typeof EmbedWidgetTokenRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -346,6 +374,8 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/trials-tick': typeof ApiPublicHooksTrialsTickRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -366,6 +396,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
@@ -384,6 +415,7 @@ export interface FileRoutesByTo {
   '/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/app/wishlist': typeof AuthenticatedAppWishlistRoute
   '/embed/widget/$token': typeof EmbedWidgetTokenRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -392,6 +424,8 @@ export interface FileRoutesByTo {
   '/api/public/hooks/trials-tick': typeof ApiPublicHooksTrialsTickRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -416,6 +450,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
@@ -434,6 +469,7 @@ export interface FileRoutesById {
   '/_authenticated/app/try-on': typeof AuthenticatedAppTryOnRoute
   '/_authenticated/app/wishlist': typeof AuthenticatedAppWishlistRoute
   '/embed/widget/$token': typeof EmbedWidgetTokenRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -442,6 +478,8 @@ export interface FileRoutesById {
   '/api/public/hooks/trials-tick': typeof ApiPublicHooksTrialsTickRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -466,6 +504,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/email/unsubscribe'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
@@ -484,6 +523,7 @@ export interface FileRouteTypes {
     | '/app/try-on'
     | '/app/wishlist'
     | '/embed/widget/$token'
+    | '/lovable/email/suppression'
     | '/portal/catalog/$wigId'
     | '/portal/catalog/new'
     | '/app/'
@@ -492,6 +532,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/trials-tick'
     | '/api/public/payments/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -512,6 +554,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/email/unsubscribe'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
@@ -530,6 +573,7 @@ export interface FileRouteTypes {
     | '/app/try-on'
     | '/app/wishlist'
     | '/embed/widget/$token'
+    | '/lovable/email/suppression'
     | '/portal/catalog/$wigId'
     | '/portal/catalog/new'
     | '/app'
@@ -538,6 +582,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/trials-tick'
     | '/api/public/payments/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -561,6 +607,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/email/unsubscribe'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
@@ -579,6 +626,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/try-on'
     | '/_authenticated/app/wishlist'
     | '/embed/widget/$token'
+    | '/lovable/email/suppression'
     | '/portal/catalog/$wigId'
     | '/portal/catalog/new'
     | '/_authenticated/app/'
@@ -587,6 +635,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/trials-tick'
     | '/api/public/payments/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -607,14 +657,18 @@ export interface RootRouteChildren {
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   RetailerLoginRoute: typeof RetailerLoginRoute
   RetailerSignupRoute: typeof RetailerSignupRoute
   WigIdRoute: typeof WigIdRoute
   EmbedWidgetTokenRoute: typeof EmbedWidgetTokenRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicHooksQuotaResetRoute: typeof ApiPublicHooksQuotaResetRoute
   ApiPublicHooksTrialsTickRoute: typeof ApiPublicHooksTrialsTickRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -773,6 +827,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalAnalyticsRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout/success': {
       id: '/checkout/success'
       path: '/checkout/success'
@@ -871,6 +932,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalCatalogWigIdRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/embed/widget/$token': {
       id: '/embed/widget/$token'
       path: '/embed/widget/$token'
@@ -919,6 +987,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/catalog'
       preLoaderRoute: typeof AuthenticatedAppCatalogRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
@@ -1040,14 +1122,18 @@ const rootRouteChildren: RootRouteChildren = {
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   RetailerLoginRoute: RetailerLoginRoute,
   RetailerSignupRoute: RetailerSignupRoute,
   WigIdRoute: WigIdRoute,
   EmbedWidgetTokenRoute: EmbedWidgetTokenRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicHooksQuotaResetRoute: ApiPublicHooksQuotaResetRoute,
   ApiPublicHooksTrialsTickRoute: ApiPublicHooksTrialsTickRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
