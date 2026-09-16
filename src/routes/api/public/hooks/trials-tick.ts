@@ -89,8 +89,11 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
             .select("email, display_name")
             .eq("id", r.owner_id)
             .maybeSingle();
-          if (!profile?.email) continue;
-          await serverSendTransactionalEmail({
+          if (!profile?.email) {
+            await releaseEvent(r.id, "trial_ending_3d");
+            continue;
+          }
+          const sent = await serverSendTransactionalEmail({
             baseUrl,
             templateName: "retailer-trial-ending",
             recipientEmail: profile.email,
@@ -102,6 +105,10 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
               upgradeUrl: `${baseUrl}/portal/billing`,
             },
           });
+          if (!sent.ok) {
+            await releaseEvent(r.id, "trial_ending_3d");
+            continue;
+          }
           endingSoonSent++;
         }
 
