@@ -729,7 +729,16 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
 // unaffected.
 // ---------------------------------------------------------------------------
 
-const ANON_FREE_QUOTA = 5;
+const ANON_FREE_QUOTA = 2;
+// Safety net so cycling browsers / private windows on one connection can't
+// mint unlimited free sets. Generous enough for households and offices.
+const ANON_IP_MONTHLY_CAP = 8;
+
+function currentMonthStart(): string {
+  const now = new Date();
+  const m = String(now.getUTCMonth() + 1).padStart(2, "0");
+  return `${now.getUTCFullYear()}-${m}-01`;
+}
 
 async function countAnonymousTryOns(
   supabaseAdmin: { from: (t: string) => any },
@@ -739,7 +748,21 @@ async function countAnonymousTryOns(
   const { count } = await supabaseAdmin
     .from("anonymous_tryons")
     .select("id", { count: "exact", head: true })
+    .eq("month_start", currentMonthStart())
     .or(`device_id.eq.${deviceId},fingerprint_hash.eq.${fingerprintHash}`);
+  return count ?? 0;
+}
+
+async function countAnonymousTryOnsByIp(
+  supabaseAdmin: { from: (t: string) => any },
+  ipHash: string,
+): Promise<number> {
+  if (!ipHash) return 0;
+  const { count } = await supabaseAdmin
+    .from("anonymous_tryons")
+    .select("id", { count: "exact", head: true })
+    .eq("month_start", currentMonthStart())
+    .eq("ip_hash", ipHash);
   return count ?? 0;
 }
 
