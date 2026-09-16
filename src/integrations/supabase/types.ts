@@ -56,7 +56,9 @@ export type Database = {
           fingerprint_hash: string
           id: string
           ip_hash: string | null
+          month_start: string
           result_path: string
+          seq: number
           user_agent: string | null
           wig_id: string | null
         }
@@ -66,7 +68,9 @@ export type Database = {
           fingerprint_hash: string
           id?: string
           ip_hash?: string | null
+          month_start?: string
           result_path: string
+          seq?: number
           user_agent?: string | null
           wig_id?: string | null
         }
@@ -76,7 +80,9 @@ export type Database = {
           fingerprint_hash?: string
           id?: string
           ip_hash?: string | null
+          month_start?: string
           result_path?: string
+          seq?: number
           user_agent?: string | null
           wig_id?: string | null
         }
