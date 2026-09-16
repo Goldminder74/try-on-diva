@@ -29,6 +29,17 @@ async function recordEvent(retailerId: string, eventType: string) {
   return true;
 }
 
+// Undo a recorded lifecycle event so the next tick retries the email
+// instead of permanently skipping it.
+async function releaseEvent(retailerId: string, eventType: string) {
+  const sb = getSupabase();
+  await sb
+    .from("retailer_lifecycle_events")
+    .delete()
+    .eq("retailer_id", retailerId)
+    .eq("event_type", eventType);
+}
+
 async function hasActiveSub(userId: string): Promise<boolean> {
   if (!userId) return false;
   const sb = getSupabase();
@@ -78,8 +89,11 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
             .select("email, display_name")
             .eq("id", r.owner_id)
             .maybeSingle();
-          if (!profile?.email) continue;
-          await serverSendTransactionalEmail({
+          if (!profile?.email) {
+            await releaseEvent(r.id, "trial_ending_3d");
+            continue;
+          }
+          const sent = await serverSendTransactionalEmail({
             baseUrl,
             templateName: "retailer-trial-ending",
             recipientEmail: profile.email,
@@ -91,6 +105,10 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
               upgradeUrl: `${baseUrl}/portal/billing`,
             },
           });
+          if (!sent.ok) {
+            await releaseEvent(r.id, "trial_ending_3d");
+            continue;
+          }
           endingSoonSent++;
         }
 
@@ -138,7 +156,7 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
               .eq("id", r.owner_id)
               .maybeSingle();
             if (profile?.email) {
-              await serverSendTransactionalEmail({
+              const sent = await serverSendTransactionalEmail({
                 baseUrl,
                 templateName: "retailer-trial-ended",
                 recipientEmail: profile.email,
@@ -149,6 +167,9 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
                   upgradeUrl: `${baseUrl}/portal/billing`,
                 },
               });
+              if (!sent.ok) await releaseEvent(r.id, "trial_ended");
+            } else {
+              await releaseEvent(r.id, "trial_ended");
             }
           }
           lockedCount++;

@@ -18,9 +18,13 @@ interface ServerSendParams {
 
 export async function serverSendTransactionalEmail(params: ServerSendParams) {
   try {
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const response = await fetch(`${params.baseUrl}/lovable/email/transactional/send`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(serviceKey ? { Authorization: `Bearer ${serviceKey}` } : {}),
+      },
       body: JSON.stringify({
         templateName: params.templateName,
         recipientEmail: params.recipientEmail,
