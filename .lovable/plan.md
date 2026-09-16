@@ -1,53 +1,39 @@
-# Testing the dunning flow
+# Free try-ons without an account: how it works and what to fix
 
-The card `4000 0027 6000 3184` succeeds on the **first** charge and then declines on the **next** charge. To see your past-due UI and the payment-failed email, you need to (1) subscribe with it, then (2) force Paddle to attempt a renewal early.
+## How it works today (verified in the code and database)
 
-## Step 1 — Subscribe with the dunning card
+1. When someone opens /try-on, the page quietly creates a permanent ID for that browser (saved in the browser) and calculates a "device signature" from things like screen size, language, time zone and browser version.
+2. Every completed try-on set by a visitor with no account is saved in an `anonymous_tryons` record with that browser ID, the signature and a scrambled copy of their network address.
+3. Before each try-on, the server counts existing records matching **either** the browser ID **or** the signature. At 5 or more it refuses and the signup wall appears.
+4. Signing up gives 5 more try-ons per calendar month, counted separately.
 
-In the preview (test mode), at `/portal/billing` (retailer) or `/pricing` (consumer):
+So today: **5 free try-ons with no account (one-time, never resets), then 5 per month after signing up** — a new visitor can get 10 in their first month.
 
-- Pick any plan and check out
-- Card: `4000 0027 6000 3184`
-- Expiry: any future date (e.g. `12/30`)
-- CVC: `123`
-- Name / ZIP: anything
+## Problems found
 
-Checkout completes, `subscription.created` fires, the row lands in `subscriptions` with `status = 'active'` (or `trialing` if you used the retailer trial flow). No dunning yet — the first charge succeeded.
+- **Too generous before signup** — 5 is the same as a whole month of the free account tier, so there is little reason to register.
+- **Easy reset** — the count is tied to the browser only. A private window, a different browser, or a phone all look like a brand-new person and get another 5. The network address is stored but never actually used in the check.
+- **Wording clash** — the site says "5 free try-ons every month", but the no-account allowance never resets, so a returning visitor is blocked forever with no explanation of when it comes back.
+- **Small race gap** — two try-ons fired at the same moment can both slip past the check, because nothing in the database enforces the cap.
 
-## Step 2 — Fast-forward the next billing date
+## What will change (based on your answers)
 
-Paddle won't let me move `next_billed_at` for a trialing subscription, so:
+- **2 free try-ons without an account, resetting each calendar month.**
+- **A network-level cap as a safety net:** a maximum of **8** no-account try-ons per month from the same network address. This stops someone cycling browsers and private windows, while still leaving room for genuine households, offices and shared WiFi.
+- Once either cap is hit, the same friendly signup wall appears, with wording that names the real limit and says it refreshes next month.
+- After signing up, the free account keeps its 5 per month, unchanged.
 
-- **Retailer trial:** in the Payments dashboard, cancel the trial and resubscribe with the dunning card on a monthly plan so it starts as `active` immediately, OR just use the consumer flow which has no trial.
-- **Consumer (Plus/Pro):** subscribes as `active` straight away — easiest path.
+## Copy updates
 
-Once the subscription is `active`, I'll move the next billing date ~31 minutes into the future via the Paddle API (must be >30 min out). Tell me to "fast-forward dunning for &lt;email&gt;" and I'll:
+Everywhere the free allowance is described, it will distinguish the two clearly:
 
-1. Look up the subscription ID for that user
-2. Call `PATCH /subscriptions/{id}` with `next_billed_at` = now + 31 min and `proration_billing_mode = 'do_not_bill'`
-3. Wait ~30 min for Paddle to attempt the renewal
+- /try-on prompts and the signup wall: "2 free try-ons, no account needed" and "Create a free account for 5 try-ons every month".
+- Home page, pricing page and FAQ: keep "5 free try-ons every month" for the free account, and add the 2-without-an-account taster where the visitor-facing copy needs it.
+- The network-cap message stays generic ("you've used the free try-ons available here this month") rather than mentioning networks.
 
-When the renewal attempt declines, Paddle fires:
-- `transaction.payment_failed`
-- `subscription.updated` with `status = 'past_due'`
+## Technical notes
 
-The webhook handler writes `past_due` to the row.
-
-## Step 3 — Verify the UI
-
-- The `PastDueBanner` should appear at the top of the app/portal with "Your last payment failed. Update your card."
-- The link goes to `/portal/billing` (retailer) or `/pricing` (consumer)
-- The consumer or retailer payment-failed email should be queued (check the email log / inbox you used at signup)
-- Access is **not** revoked yet — Paddle keeps retrying for a few days; revocation only happens when Paddle finally marks it `canceled`
-
-## Step 4 — Recover (optional)
-
-Open the Manage Billing portal from `/portal/billing` or `/app/subscription`, swap the card to `4242 4242 4242 4242`, and trigger another renewal (same fast-forward trick). Status flips back to `active` and the banner disappears.
-
-## Shortcut if you don't want to wait
-
-Instead of fast-forwarding, I can fire a simulated `subscription.updated` event with `status: past_due` straight at the webhook via Paddle's Simulations API. That exercises the handler + banner + email immediately but doesn't exercise a real declined charge. Useful for a quick UI check; use the fast-forward path for a true end-to-end test.
-
----
-
-Tell me which path you want (real fast-forward vs simulated event) and the email of the account to use, and I'll run it in build mode.
+- `src/lib/try-on.functions.ts`: `ANON_FREE_QUOTA` 5 → 2; add `ANON_IP_MONTHLY_CAP = 8`; `countAnonymousTryOns` gains a `created_at >= date_trunc('month', now())` filter so the allowance resets monthly, and a second count keyed on `ip_hash` for the same window. The IP hash must be computed before the check, not only at insert time. `getAnonymousTryOnStatus` returns which cap was hit so the wall can show the right wording.
+- Add a database uniqueness/limit guard so concurrent requests cannot exceed the cap (partial unique index on `(device_id, month)` sequence number, or a small counter table) — closes the race the current comment wrongly claims is already handled.
+- `src/routes/try-on.tsx`: no logic change beyond reading the new remaining/limit values and the new wall copy.
+- Signed-in quota (`consume_try_on`, `FREE_QUOTA = 5`) is untouched.
