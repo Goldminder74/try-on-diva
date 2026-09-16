@@ -911,9 +911,9 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
     const path = viewPaths.front;
 
 
-    // 5. Record the anonymous usage. Unique indexes on device_id and
-    //    fingerprint_hash double-guard against concurrent attempts.
-    const ipHash = await sha256HexServer(getClientIPServer());
+    // 5. Record the anonymous usage. The unique index on
+    //    (device_id, month_start, seq) makes two concurrent attempts collide,
+    //    so the cap can't be exceeded by racing requests.
     const userAgent = getRequest()?.headers?.get("user-agent") ?? null;
     const { error: insErr } = await supabaseAdmin.from("anonymous_tryons").insert({
       device_id: data.deviceId,
@@ -922,10 +922,11 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       wig_id: data.wigId,
       result_path: path,
       user_agent: userAgent,
+      seq: usedCount + 1,
     });
     if (insErr) {
       // Race lost - treat as already used.
-      return { alreadyUsed: true as const };
+      return { alreadyUsed: true as const, reason: "device" as const };
     }
 
     // 6. Analytics event (mirrors recordTryOn shape, source = "anon").
