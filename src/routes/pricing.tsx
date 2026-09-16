@@ -62,7 +62,7 @@ const PLANS: {
     priceIds: { monthly: null, yearly: null },
     planKey: "free",
     features: [
-      [true, "5 try-ons per month"],
+      [true, "5 try-ons per month (2 without an account)"],
       [true, "Full catalog access"],
       [true, "Save up to 10 wigs"],
       [false, "Unlimited try-ons"],
