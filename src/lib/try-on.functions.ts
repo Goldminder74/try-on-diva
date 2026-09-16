@@ -729,7 +729,16 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
 // unaffected.
 // ---------------------------------------------------------------------------
 
-const ANON_FREE_QUOTA = 5;
+const ANON_FREE_QUOTA = 2;
+// Safety net so cycling browsers / private windows on one connection can't
+// mint unlimited free sets. Generous enough for households and offices.
+const ANON_IP_MONTHLY_CAP = 8;
+
+function currentMonthStart(): string {
+  const now = new Date();
+  const m = String(now.getUTCMonth() + 1).padStart(2, "0");
+  return `${now.getUTCFullYear()}-${m}-01`;
+}
 
 async function countAnonymousTryOns(
   supabaseAdmin: { from: (t: string) => any },
@@ -739,7 +748,21 @@ async function countAnonymousTryOns(
   const { count } = await supabaseAdmin
     .from("anonymous_tryons")
     .select("id", { count: "exact", head: true })
+    .eq("month_start", currentMonthStart())
     .or(`device_id.eq.${deviceId},fingerprint_hash.eq.${fingerprintHash}`);
+  return count ?? 0;
+}
+
+async function countAnonymousTryOnsByIp(
+  supabaseAdmin: { from: (t: string) => any },
+  ipHash: string,
+): Promise<number> {
+  if (!ipHash) return 0;
+  const { count } = await supabaseAdmin
+    .from("anonymous_tryons")
+    .select("id", { count: "exact", head: true })
+    .eq("month_start", currentMonthStart())
+    .eq("ip_hash", ipHash);
   return count ?? 0;
 }
 
@@ -776,11 +799,16 @@ export const getAnonymousTryOnStatus = createServerFn({ method: "POST" })
       data.deviceId,
       data.fingerprintHash,
     );
+    const ipHash = await sha256HexServer(getClientIPServer());
+    const ipUsed = await countAnonymousTryOnsByIp(supabaseAdmin as any, ipHash);
+    const deviceBlocked = used >= ANON_FREE_QUOTA;
+    const networkBlocked = ipUsed >= ANON_IP_MONTHLY_CAP;
     return {
-      used: used >= ANON_FREE_QUOTA,
+      used: deviceBlocked || networkBlocked,
+      reason: networkBlocked && !deviceBlocked ? ("network" as const) : ("device" as const),
       usedCount: used,
       limit: ANON_FREE_QUOTA,
-      remaining: Math.max(0, ANON_FREE_QUOTA - used),
+      remaining: networkBlocked ? 0 : Math.max(0, ANON_FREE_QUOTA - used),
     };
   });
 
@@ -819,14 +847,19 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // 1. Refuse once this device or fingerprint has used all free try-ons.
+    // 1. Refuse once this device/fingerprint has used its monthly free sets,
+    //    or once this network has hit the monthly abuse cap.
     const usedCount = await countAnonymousTryOns(
       supabaseAdmin as any,
       data.deviceId,
       data.fingerprintHash,
     );
     if (usedCount >= ANON_FREE_QUOTA) {
-      return { alreadyUsed: true as const };
+      return { alreadyUsed: true as const, reason: "device" as const };
+    }
+    const ipHash = await sha256HexServer(getClientIPServer());
+    if (await countAnonymousTryOnsByIp(supabaseAdmin as any, ipHash) >= ANON_IP_MONTHLY_CAP) {
+      return { alreadyUsed: true as const, reason: "network" as const };
     }
 
 
@@ -878,9 +911,9 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
     const path = viewPaths.front;
 
 
-    // 5. Record the anonymous usage. Unique indexes on device_id and
-    //    fingerprint_hash double-guard against concurrent attempts.
-    const ipHash = await sha256HexServer(getClientIPServer());
+    // 5. Record the anonymous usage. The unique index on
+    //    (device_id, month_start, seq) makes two concurrent attempts collide,
+    //    so the cap can't be exceeded by racing requests.
     const userAgent = getRequest()?.headers?.get("user-agent") ?? null;
     const { error: insErr } = await supabaseAdmin.from("anonymous_tryons").insert({
       device_id: data.deviceId,
@@ -889,10 +922,11 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       wig_id: data.wigId,
       result_path: path,
       user_agent: userAgent,
+      seq: usedCount + 1,
     });
     if (insErr) {
       // Race lost - treat as already used.
-      return { alreadyUsed: true as const };
+      return { alreadyUsed: true as const, reason: "device" as const };
     }
 
     // 6. Analytics event (mirrors recordTryOn shape, source = "anon").

@@ -89,6 +89,9 @@ function TryOn() {
   const [anonUsed, setAnonUsed] = useState(false);
   // Free try-on sets left before an account is required (5 to start).
   const [anonRemaining, setAnonRemaining] = useState<number | null>(null);
+  // Why the free allowance ran out: this device's monthly allowance, or the
+  // per-network safety cap.
+  const [anonReason, setAnonReason] = useState<"device" | "network">("device");
   const [applying, setApplying] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [views, setViews] = useState<Record<"front" | "side" | "back", string | null>>({
@@ -122,6 +125,7 @@ function TryOn() {
         if (!cancelled) {
           setAnonUsed(Boolean(status?.used));
           setAnonRemaining(status?.remaining ?? null);
+          if (status?.reason) setAnonReason(status.reason);
         }
       } catch {
         /* non-fatal - apply will revalidate server-side */
@@ -288,6 +292,7 @@ function TryOn() {
       });
       if (out.alreadyUsed) {
         setAnonUsed(true);
+        setAnonReason(out.reason ?? "device");
         setWallPromptOpen(true);
         return;
       }
@@ -544,9 +549,9 @@ function TryOn() {
                 ? "Tap Apply wig to generate your AI try-on."
                   : anonUsed
                     ? "Create a free account to keep trying - 5 free try-ons every month."
-                    : anonRemaining !== null && anonRemaining < 5
+                    : anonRemaining !== null && anonRemaining < 2
                       ? `You have ${anonRemaining} free try-on${anonRemaining === 1 ? "" : "s"} left, no signup needed. After that, create a free account for 5 free try-ons every month.`
-                      : "Your first 5 try-ons are free, no signup needed. After that, create a free account for 5 free try-ons every month."}
+                      : "Your first 2 try-ons are free, no signup needed. After that, create a free account for 5 free try-ons every month."}
             </p>
           </aside>
         </div>
@@ -595,7 +600,9 @@ function TryOn() {
               Create a free account to keep going.
             </AlertDialogTitle>
             <AlertDialogDescription className="text-foreground/75">
-              You've used your 5 free try-ons. Create a free account for 5 try-ons every month - no card needed.
+              {anonReason === "network"
+                ? "You've used the free try-ons available here this month. Create a free account for 5 try-ons every month - no card needed."
+                : "You've used your 2 free try-ons for this month. Create a free account for 5 try-ons every month - no card needed."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
