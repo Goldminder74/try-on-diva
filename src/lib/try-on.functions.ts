@@ -847,14 +847,19 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // 1. Refuse once this device or fingerprint has used all free try-ons.
+    // 1. Refuse once this device/fingerprint has used its monthly free sets,
+    //    or once this network has hit the monthly abuse cap.
     const usedCount = await countAnonymousTryOns(
       supabaseAdmin as any,
       data.deviceId,
       data.fingerprintHash,
     );
     if (usedCount >= ANON_FREE_QUOTA) {
-      return { alreadyUsed: true as const };
+      return { alreadyUsed: true as const, reason: "device" as const };
+    }
+    const ipHash = await sha256HexServer(getClientIPServer());
+    if (await countAnonymousTryOnsByIp(supabaseAdmin as any, ipHash) >= ANON_IP_MONTHLY_CAP) {
+      return { alreadyUsed: true as const, reason: "network" as const };
     }
 
 
