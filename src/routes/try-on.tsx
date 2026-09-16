@@ -89,6 +89,9 @@ function TryOn() {
   const [anonUsed, setAnonUsed] = useState(false);
   // Free try-on sets left before an account is required (5 to start).
   const [anonRemaining, setAnonRemaining] = useState<number | null>(null);
+  // Why the free allowance ran out: this device's monthly allowance, or the
+  // per-network safety cap.
+  const [anonReason, setAnonReason] = useState<"device" | "network">("device");
   const [applying, setApplying] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [views, setViews] = useState<Record<"front" | "side" | "back", string | null>>({
