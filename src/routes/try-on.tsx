@@ -125,6 +125,7 @@ function TryOn() {
         if (!cancelled) {
           setAnonUsed(Boolean(status?.used));
           setAnonRemaining(status?.remaining ?? null);
+          if (status?.reason) setAnonReason(status.reason);
         }
       } catch {
         /* non-fatal - apply will revalidate server-side */
