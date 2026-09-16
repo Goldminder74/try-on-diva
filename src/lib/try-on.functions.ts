@@ -799,11 +799,16 @@ export const getAnonymousTryOnStatus = createServerFn({ method: "POST" })
       data.deviceId,
       data.fingerprintHash,
     );
+    const ipHash = await sha256HexServer(getClientIPServer());
+    const ipUsed = await countAnonymousTryOnsByIp(supabaseAdmin as any, ipHash);
+    const deviceBlocked = used >= ANON_FREE_QUOTA;
+    const networkBlocked = ipUsed >= ANON_IP_MONTHLY_CAP;
     return {
-      used: used >= ANON_FREE_QUOTA,
+      used: deviceBlocked || networkBlocked,
+      reason: networkBlocked && !deviceBlocked ? ("network" as const) : ("device" as const),
       usedCount: used,
       limit: ANON_FREE_QUOTA,
-      remaining: Math.max(0, ANON_FREE_QUOTA - used),
+      remaining: networkBlocked ? 0 : Math.max(0, ANON_FREE_QUOTA - used),
     };
   });
 
