@@ -9,102 +9,66 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
-import { Route as TryOnRouteImport } from './routes/try-on'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as RetailerRouteImport } from './routes/retailer'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PricingRouteImport } from './routes/pricing'
-import { Route as PortalRouteImport } from './routes/portal'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as CatalogRouteImport } from './routes/catalog'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CatalogRouteImport } from './routes/catalog'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RetailerRouteImport } from './routes/retailer'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TryOnRouteImport } from './routes/try-on'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as WigIdRouteImport } from './routes/wig.$id'
-import { Route as RetailerSignupRouteImport } from './routes/retailer_.signup'
-import { Route as RetailerLoginRouteImport } from './routes/retailer_.login'
-import { Route as PortalWidgetRouteImport } from './routes/portal.widget'
-import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
-import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
-import { Route as PortalBillingRouteImport } from './routes/portal.billing'
-import { Route as PortalApiKeysRouteImport } from './routes/portal.api-keys'
-import { Route as PortalAnalyticsRouteImport } from './routes/portal.analytics'
-import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
-import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
-import { Route as AuthSignupRouteImport } from './routes/auth.signup'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
-import { Route as AuthLoginRouteImport } from './routes/auth.login'
-import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
-import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AdminRetailersRouteImport } from './routes/admin.retailers'
-import { Route as AdminFeaturedRouteImport } from './routes/admin.featured'
-import { Route as AdminConsumersRouteImport } from './routes/admin.consumers'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
-import { Route as PortalCatalogIndexRouteImport } from './routes/portal.catalog.index'
+import { Route as AdminConsumersRouteImport } from './routes/admin.consumers'
+import { Route as AdminFeaturedRouteImport } from './routes/admin.featured'
+import { Route as AdminRetailersRouteImport } from './routes/admin.retailers'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AuthLoginRouteImport } from './routes/auth.login'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as AuthSignupRouteImport } from './routes/auth.signup'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as PortalAnalyticsRouteImport } from './routes/portal.analytics'
+import { Route as PortalApiKeysRouteImport } from './routes/portal.api-keys'
+import { Route as PortalBillingRouteImport } from './routes/portal.billing'
+import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
+import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
+import { Route as PortalWidgetRouteImport } from './routes/portal.widget'
+import { Route as RetailerLoginRouteImport } from './routes/retailer_.login'
+import { Route as RetailerSignupRouteImport } from './routes/retailer_.signup'
+import { Route as WigIdRouteImport } from './routes/wig.$id'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
-import { Route as PortalCatalogNewRouteImport } from './routes/portal.catalog.new'
-import { Route as PortalCatalogWigIdRouteImport } from './routes/portal.catalog.$wigId'
-import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
-import { Route as EmbedWidgetTokenRouteImport } from './routes/embed.widget.$token'
-import { Route as AuthenticatedAppWishlistRouteImport } from './routes/_authenticated.app.wishlist'
-import { Route as AuthenticatedAppTryOnRouteImport } from './routes/_authenticated.app.try-on'
-import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_authenticated.app.subscription'
-import { Route as AuthenticatedAppStyleQuizRouteImport } from './routes/_authenticated.app.style-quiz'
-import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated.app.profile'
 import { Route as AuthenticatedAppCatalogRouteImport } from './routes/_authenticated.app.catalog'
-import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
-import { Route as ApiPublicHooksTrialsTickRouteImport } from './routes/api/public/hooks/trials-tick'
+import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated.app.profile'
+import { Route as AuthenticatedAppStyleQuizRouteImport } from './routes/_authenticated.app.style-quiz'
+import { Route as AuthenticatedAppSubscriptionRouteImport } from './routes/_authenticated.app.subscription'
+import { Route as AuthenticatedAppTryOnRouteImport } from './routes/_authenticated.app.try-on'
+import { Route as AuthenticatedAppWishlistRouteImport } from './routes/_authenticated.app.wishlist'
+import { Route as EmbedWidgetTokenRouteImport } from './routes/embed.widget.$token'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as PortalCatalogIndexRouteImport } from './routes/portal.catalog.index'
+import { Route as PortalCatalogWigIdRouteImport } from './routes/portal.catalog.$wigId'
+import { Route as PortalCatalogNewRouteImport } from './routes/portal.catalog.new'
 import { Route as ApiPublicHooksQuotaResetRouteImport } from './routes/api/public/hooks/quota-reset'
+import { Route as ApiPublicHooksTrialsTickRouteImport } from './routes/api/public/hooks/trials-tick'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 
-const UnsubscribeRoute = UnsubscribeRouteImport.update({
-  id: '/unsubscribe',
-  path: '/unsubscribe',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TryOnRoute = TryOnRouteImport.update({
-  id: '/try-on',
-  path: '/try-on',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RetailerRoute = RetailerRouteImport.update({
-  id: '/retailer',
-  path: '/retailer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalRoute = PortalRouteImport.update({
-  id: '/portal',
-  path: '/portal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CatalogRoute = CatalogRouteImport.update({
-  id: '/catalog',
-  path: '/catalog',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -112,118 +76,54 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const CatalogRoute = CatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PortalIndexRoute = PortalIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PortalRoute,
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetailerRoute = RetailerRouteImport.update({
+  id: '/retailer',
+  path: '/retailer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TryOnRoute = TryOnRouteImport.update({
+  id: '/try-on',
+  path: '/try-on',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const WigIdRoute = WigIdRouteImport.update({
-  id: '/wig/$id',
-  path: '/wig/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RetailerSignupRoute = RetailerSignupRouteImport.update({
-  id: '/retailer_/signup',
-  path: '/retailer/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RetailerLoginRoute = RetailerLoginRouteImport.update({
-  id: '/retailer_/login',
-  path: '/retailer/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalWidgetRoute = PortalWidgetRouteImport.update({
-  id: '/widget',
-  path: '/widget',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalSettingsRoute = PortalSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalBillingRoute = PortalBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalApiKeysRoute = PortalApiKeysRouteImport.update({
-  id: '/api-keys',
-  path: '/api-keys',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalAnalyticsRoute = PortalAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => PortalRoute,
-} as any)
-const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
-  id: '/checkout/success',
-  path: '/checkout/success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/auth/signup',
-  path: '/auth/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/auth/forgot-password',
-  path: '/auth/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRetailersRoute = AdminRetailersRouteImport.update({
-  id: '/retailers',
-  path: '/retailers',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminFeaturedRoute = AdminFeaturedRouteImport.update({
-  id: '/featured',
-  path: '/featured',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminConsumersRoute = AdminConsumersRouteImport.update({
-  id: '/consumers',
-  path: '/consumers',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
@@ -231,62 +131,109 @@ const AdminCatalogRoute = AdminCatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => AdminRoute,
 } as any)
-const PortalCatalogIndexRoute = PortalCatalogIndexRouteImport.update({
-  id: '/catalog/',
-  path: '/catalog/',
+const AdminConsumersRoute = AdminConsumersRouteImport.update({
+  id: '/consumers',
+  path: '/consumers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFeaturedRoute = AdminFeaturedRouteImport.update({
+  id: '/featured',
+  path: '/featured',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRetailersRoute = AdminRetailersRouteImport.update({
+  id: '/retailers',
+  path: '/retailers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/checkout/success',
+  path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => PortalRoute,
+} as any)
+const PortalAnalyticsRoute = PortalAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalApiKeysRoute = PortalApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalBillingRoute = PortalBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalSettingsRoute = PortalSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalWidgetRoute = PortalWidgetRouteImport.update({
+  id: '/widget',
+  path: '/widget',
+  getParentRoute: () => PortalRoute,
+} as any)
+const RetailerLoginRoute = RetailerLoginRouteImport.update({
+  id: '/retailer_/login',
+  path: '/retailer/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetailerSignupRoute = RetailerSignupRouteImport.update({
+  id: '/retailer_/signup',
+  path: '/retailer/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WigIdRoute = WigIdRouteImport.update({
+  id: '/wig/$id',
+  path: '/wig/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/app/',
   path: '/app/',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const PortalCatalogNewRoute = PortalCatalogNewRouteImport.update({
-  id: '/catalog/new',
-  path: '/catalog/new',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalCatalogWigIdRoute = PortalCatalogWigIdRouteImport.update({
-  id: '/catalog/$wigId',
-  path: '/catalog/$wigId',
-  getParentRoute: () => PortalRoute,
-} as any)
-const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmbedWidgetTokenRoute = EmbedWidgetTokenRouteImport.update({
-  id: '/embed/widget/$token',
-  path: '/embed/widget/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAppWishlistRoute =
-  AuthenticatedAppWishlistRouteImport.update({
-    id: '/app/wishlist',
-    path: '/app/wishlist',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAppTryOnRoute = AuthenticatedAppTryOnRouteImport.update({
-  id: '/app/try-on',
-  path: '/app/try-on',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAppSubscriptionRoute =
-  AuthenticatedAppSubscriptionRouteImport.update({
-    id: '/app/subscription',
-    path: '/app/subscription',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAppStyleQuizRoute =
-  AuthenticatedAppStyleQuizRouteImport.update({
-    id: '/app/style-quiz',
-    path: '/app/style-quiz',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
-  id: '/app/profile',
-  path: '/app/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAppCatalogRoute = AuthenticatedAppCatalogRouteImport.update({
@@ -294,28 +241,63 @@ const AuthenticatedAppCatalogRoute = AuthenticatedAppCatalogRouteImport.update({
   path: '/app/catalog',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
-    getParentRoute: () => rootRouteImport,
+const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
+  id: '/app/profile',
+  path: '/app/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAppStyleQuizRoute =
+  AuthenticatedAppStyleQuizRouteImport.update({
+    id: '/app/style-quiz',
+    path: '/app/style-quiz',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const LovableEmailTransactionalPreviewRoute =
-  LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
+const AuthenticatedAppSubscriptionRoute =
+  AuthenticatedAppSubscriptionRouteImport.update({
+    id: '/app/subscription',
+    path: '/app/subscription',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
+const AuthenticatedAppTryOnRoute = AuthenticatedAppTryOnRouteImport.update({
+  id: '/app/try-on',
+  path: '/app/try-on',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAppWishlistRoute =
+  AuthenticatedAppWishlistRouteImport.update({
+    id: '/app/wishlist',
+    path: '/app/wishlist',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const ApiPublicPaymentsWebhookRoute =
-  ApiPublicPaymentsWebhookRouteImport.update({
-    id: '/api/public/payments/webhook',
-    path: '/api/public/payments/webhook',
+const EmbedWidgetTokenRoute = EmbedWidgetTokenRouteImport.update({
+  id: '/embed/widget/$token',
+  path: '/embed/widget/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalCatalogIndexRoute = PortalCatalogIndexRouteImport.update({
+  id: '/catalog/',
+  path: '/catalog/',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalCatalogWigIdRoute = PortalCatalogWigIdRouteImport.update({
+  id: '/catalog/$wigId',
+  path: '/catalog/$wigId',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalCatalogNewRoute = PortalCatalogNewRouteImport.update({
+  id: '/catalog/new',
+  path: '/catalog/new',
+  getParentRoute: () => PortalRoute,
+} as any)
+const ApiPublicHooksQuotaResetRoute =
+  ApiPublicHooksQuotaResetRouteImport.update({
+    id: '/api/public/hooks/quota-reset',
+    path: '/api/public/hooks/quota-reset',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksTrialsTickRoute =
@@ -324,10 +306,28 @@ const ApiPublicHooksTrialsTickRoute =
     path: '/api/public/hooks/trials-tick',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksQuotaResetRoute =
-  ApiPublicHooksQuotaResetRouteImport.update({
-    id: '/api/public/hooks/quota-reset',
-    path: '/api/public/hooks/quota-reset',
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -686,74 +686,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/unsubscribe': {
-      id: '/unsubscribe'
-      path: '/unsubscribe'
-      fullPath: '/unsubscribe'
-      preLoaderRoute: typeof UnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/try-on': {
-      id: '/try-on'
-      path: '/try-on'
-      fullPath: '/try-on'
-      preLoaderRoute: typeof TryOnRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/retailer': {
-      id: '/retailer'
-      path: '/retailer'
-      fullPath: '/retailer'
-      preLoaderRoute: typeof RetailerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal': {
-      id: '/portal'
-      path: '/portal'
-      fullPath: '/portal'
-      preLoaderRoute: typeof PortalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/catalog': {
-      id: '/catalog'
-      path: '/catalog'
-      fullPath: '/catalog'
-      preLoaderRoute: typeof CatalogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -763,158 +700,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/portal/': {
-      id: '/portal/'
-      path: '/'
-      fullPath: '/portal/'
-      preLoaderRoute: typeof PortalIndexRouteImport
-      parentRoute: typeof PortalRoute
+    '/catalog': {
+      id: '/catalog'
+      path: '/catalog'
+      fullPath: '/catalog'
+      preLoaderRoute: typeof CatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retailer': {
+      id: '/retailer'
+      path: '/retailer'
+      fullPath: '/retailer'
+      preLoaderRoute: typeof RetailerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/try-on': {
+      id: '/try-on'
+      path: '/try-on'
+      fullPath: '/try-on'
+      preLoaderRoute: typeof TryOnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/wig/$id': {
-      id: '/wig/$id'
-      path: '/wig/$id'
-      fullPath: '/wig/$id'
-      preLoaderRoute: typeof WigIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/retailer_/signup': {
-      id: '/retailer_/signup'
-      path: '/retailer/signup'
-      fullPath: '/retailer/signup'
-      preLoaderRoute: typeof RetailerSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/retailer_/login': {
-      id: '/retailer_/login'
-      path: '/retailer/login'
-      fullPath: '/retailer/login'
-      preLoaderRoute: typeof RetailerLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal/widget': {
-      id: '/portal/widget'
-      path: '/widget'
-      fullPath: '/portal/widget'
-      preLoaderRoute: typeof PortalWidgetRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/settings': {
-      id: '/portal/settings'
-      path: '/settings'
-      fullPath: '/portal/settings'
-      preLoaderRoute: typeof PortalSettingsRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/onboarding': {
-      id: '/portal/onboarding'
-      path: '/onboarding'
-      fullPath: '/portal/onboarding'
-      preLoaderRoute: typeof PortalOnboardingRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/billing': {
-      id: '/portal/billing'
-      path: '/billing'
-      fullPath: '/portal/billing'
-      preLoaderRoute: typeof PortalBillingRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/api-keys': {
-      id: '/portal/api-keys'
-      path: '/api-keys'
-      fullPath: '/portal/api-keys'
-      preLoaderRoute: typeof PortalApiKeysRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/analytics': {
-      id: '/portal/analytics'
-      path: '/analytics'
-      fullPath: '/portal/analytics'
-      preLoaderRoute: typeof PortalAnalyticsRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/email/unsubscribe': {
-      id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
-      fullPath: '/email/unsubscribe'
-      preLoaderRoute: typeof EmailUnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout/success': {
-      id: '/checkout/success'
-      path: '/checkout/success'
-      fullPath: '/checkout/success'
-      preLoaderRoute: typeof CheckoutSuccessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/signup': {
-      id: '/auth/signup'
-      path: '/auth/signup'
-      fullPath: '/auth/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/auth/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/forgot-password': {
-      id: '/auth/forgot-password'
-      path: '/auth/forgot-password'
-      fullPath: '/auth/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/retailers': {
-      id: '/admin/retailers'
-      path: '/retailers'
-      fullPath: '/admin/retailers'
-      preLoaderRoute: typeof AdminRetailersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/featured': {
-      id: '/admin/featured'
-      path: '/featured'
-      fullPath: '/admin/featured'
-      preLoaderRoute: typeof AdminFeaturedRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/consumers': {
-      id: '/admin/consumers'
-      path: '/consumers'
-      fullPath: '/admin/consumers'
-      preLoaderRoute: typeof AdminConsumersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/catalog': {
@@ -924,81 +784,151 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCatalogRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/portal/catalog/': {
-      id: '/portal/catalog/'
-      path: '/catalog'
-      fullPath: '/portal/catalog/'
-      preLoaderRoute: typeof PortalCatalogIndexRouteImport
+    '/admin/consumers': {
+      id: '/admin/consumers'
+      path: '/consumers'
+      fullPath: '/admin/consumers'
+      preLoaderRoute: typeof AdminConsumersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/featured': {
+      id: '/admin/featured'
+      path: '/featured'
+      fullPath: '/admin/featured'
+      preLoaderRoute: typeof AdminFeaturedRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/retailers': {
+      id: '/admin/retailers'
+      path: '/retailers'
+      fullPath: '/admin/retailers'
+      preLoaderRoute: typeof AdminRetailersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/checkout/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
       parentRoute: typeof PortalRoute
+    }
+    '/portal/analytics': {
+      id: '/portal/analytics'
+      path: '/analytics'
+      fullPath: '/portal/analytics'
+      preLoaderRoute: typeof PortalAnalyticsRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/api-keys': {
+      id: '/portal/api-keys'
+      path: '/api-keys'
+      fullPath: '/portal/api-keys'
+      preLoaderRoute: typeof PortalApiKeysRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/billing': {
+      id: '/portal/billing'
+      path: '/billing'
+      fullPath: '/portal/billing'
+      preLoaderRoute: typeof PortalBillingRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/onboarding': {
+      id: '/portal/onboarding'
+      path: '/onboarding'
+      fullPath: '/portal/onboarding'
+      preLoaderRoute: typeof PortalOnboardingRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/settings': {
+      id: '/portal/settings'
+      path: '/settings'
+      fullPath: '/portal/settings'
+      preLoaderRoute: typeof PortalSettingsRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/widget': {
+      id: '/portal/widget'
+      path: '/widget'
+      fullPath: '/portal/widget'
+      preLoaderRoute: typeof PortalWidgetRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/retailer_/login': {
+      id: '/retailer_/login'
+      path: '/retailer/login'
+      fullPath: '/retailer/login'
+      preLoaderRoute: typeof RetailerLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retailer_/signup': {
+      id: '/retailer_/signup'
+      path: '/retailer/signup'
+      fullPath: '/retailer/signup'
+      preLoaderRoute: typeof RetailerSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wig/$id': {
+      id: '/wig/$id'
+      path: '/wig/$id'
+      fullPath: '/wig/$id'
+      preLoaderRoute: typeof WigIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/app/': {
       id: '/_authenticated/app/'
       path: '/app'
       fullPath: '/app/'
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/portal/catalog/new': {
-      id: '/portal/catalog/new'
-      path: '/catalog/new'
-      fullPath: '/portal/catalog/new'
-      preLoaderRoute: typeof PortalCatalogNewRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/catalog/$wigId': {
-      id: '/portal/catalog/$wigId'
-      path: '/catalog/$wigId'
-      fullPath: '/portal/catalog/$wigId'
-      preLoaderRoute: typeof PortalCatalogWigIdRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/lovable/email/suppression': {
-      id: '/lovable/email/suppression'
-      path: '/lovable/email/suppression'
-      fullPath: '/lovable/email/suppression'
-      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/embed/widget/$token': {
-      id: '/embed/widget/$token'
-      path: '/embed/widget/$token'
-      fullPath: '/embed/widget/$token'
-      preLoaderRoute: typeof EmbedWidgetTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/app/wishlist': {
-      id: '/_authenticated/app/wishlist'
-      path: '/app/wishlist'
-      fullPath: '/app/wishlist'
-      preLoaderRoute: typeof AuthenticatedAppWishlistRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/app/try-on': {
-      id: '/_authenticated/app/try-on'
-      path: '/app/try-on'
-      fullPath: '/app/try-on'
-      preLoaderRoute: typeof AuthenticatedAppTryOnRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/app/subscription': {
-      id: '/_authenticated/app/subscription'
-      path: '/app/subscription'
-      fullPath: '/app/subscription'
-      preLoaderRoute: typeof AuthenticatedAppSubscriptionRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/app/style-quiz': {
-      id: '/_authenticated/app/style-quiz'
-      path: '/app/style-quiz'
-      fullPath: '/app/style-quiz'
-      preLoaderRoute: typeof AuthenticatedAppStyleQuizRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/app/profile': {
-      id: '/_authenticated/app/profile'
-      path: '/app/profile'
-      fullPath: '/app/profile'
-      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/app/catalog': {
@@ -1008,32 +938,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppCatalogRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/lovable/email/transactional/send': {
-      id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
-      fullPath: '/lovable/email/transactional/send'
-      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+    '/_authenticated/app/profile': {
+      id: '/_authenticated/app/profile'
+      path: '/app/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/style-quiz': {
+      id: '/_authenticated/app/style-quiz'
+      path: '/app/style-quiz'
+      fullPath: '/app/style-quiz'
+      preLoaderRoute: typeof AuthenticatedAppStyleQuizRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/subscription': {
+      id: '/_authenticated/app/subscription'
+      path: '/app/subscription'
+      fullPath: '/app/subscription'
+      preLoaderRoute: typeof AuthenticatedAppSubscriptionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/try-on': {
+      id: '/_authenticated/app/try-on'
+      path: '/app/try-on'
+      fullPath: '/app/try-on'
+      preLoaderRoute: typeof AuthenticatedAppTryOnRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app/wishlist': {
+      id: '/_authenticated/app/wishlist'
+      path: '/app/wishlist'
+      fullPath: '/app/wishlist'
+      preLoaderRoute: typeof AuthenticatedAppWishlistRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/embed/widget/$token': {
+      id: '/embed/widget/$token'
+      path: '/embed/widget/$token'
+      fullPath: '/embed/widget/$token'
+      preLoaderRoute: typeof EmbedWidgetTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/preview': {
-      id: '/lovable/email/transactional/preview'
-      path: '/lovable/email/transactional/preview'
-      fullPath: '/lovable/email/transactional/preview'
-      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
-      parentRoute: typeof rootRouteImport
+    '/portal/catalog/': {
+      id: '/portal/catalog/'
+      path: '/catalog'
+      fullPath: '/portal/catalog/'
+      preLoaderRoute: typeof PortalCatalogIndexRouteImport
+      parentRoute: typeof PortalRoute
     }
-    '/api/public/payments/webhook': {
-      id: '/api/public/payments/webhook'
-      path: '/api/public/payments/webhook'
-      fullPath: '/api/public/payments/webhook'
-      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+    '/portal/catalog/$wigId': {
+      id: '/portal/catalog/$wigId'
+      path: '/catalog/$wigId'
+      fullPath: '/portal/catalog/$wigId'
+      preLoaderRoute: typeof PortalCatalogWigIdRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/catalog/new': {
+      id: '/portal/catalog/new'
+      path: '/catalog/new'
+      fullPath: '/portal/catalog/new'
+      preLoaderRoute: typeof PortalCatalogNewRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/api/public/hooks/quota-reset': {
+      id: '/api/public/hooks/quota-reset'
+      path: '/api/public/hooks/quota-reset'
+      fullPath: '/api/public/hooks/quota-reset'
+      preLoaderRoute: typeof ApiPublicHooksQuotaResetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/trials-tick': {
@@ -1043,11 +1022,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTrialsTickRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/quota-reset': {
-      id: '/api/public/hooks/quota-reset'
-      path: '/api/public/hooks/quota-reset'
-      fullPath: '/api/public/hooks/quota-reset'
-      preLoaderRoute: typeof ApiPublicHooksQuotaResetRouteImport
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
