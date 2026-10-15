@@ -41,7 +41,7 @@ export const Route = createFileRoute("/wig/$id")({
         <Header />
         <div className="mx-auto max-w-md px-5 py-24 text-center">
           <h1 className="font-display text-3xl text-mahogany">Couldn't load this wig.</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
           <button
             onClick={() => { router.invalidate(); reset(); }}
             className="mt-6 rounded-md bg-mahogany px-5 py-2 text-sm text-cream"
