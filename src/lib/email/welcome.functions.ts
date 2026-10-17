@@ -16,28 +16,28 @@ export const sendWelcomeEmail = createServerFn({ method: "POST" })
     if (!email) return { ok: false };
     const { serverSendTransactionalEmail } = await import("./server-send");
 
-    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-    const isRetailer = (roles ?? []).some((r: { role: string }) => r.role === "retailer");
+    const { buildWelcomeEmail } = await import("./welcome-payload");
+    const { data: roleRows } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const roles = (roleRows ?? []).map((r: { role: string }) => r.role);
     const meta = (claims?.user_metadata ?? {}) as Record<string, unknown>;
-    const displayName = (meta.display_name as string | undefined) ?? email.split("@")[0];
 
-    if (isRetailer) {
+    let businessName: string | null = null;
+    if (roles.includes("retailer")) {
       const { data: retailer } = await supabase
         .from("retailers")
         .select("business_name")
         .eq("owner_id", userId)
         .maybeSingle();
-      return serverSendTransactionalEmail({
-        templateName: "retailer-welcome",
-        recipientEmail: email,
-        idempotencyKey: `retailer-welcome-${userId}`,
-        templateData: { name: displayName, businessName: retailer?.business_name, portalUrl: `${data.origin}/portal` },
-      });
+      businessName = retailer?.business_name ?? null;
     }
-    return serverSendTransactionalEmail({
-      templateName: "consumer-welcome",
-      recipientEmail: email,
-      idempotencyKey: `consumer-welcome-${userId}`,
-      templateData: { name: displayName, appUrl: `${data.origin}/app` },
-    });
+    return serverSendTransactionalEmail(
+      buildWelcomeEmail({
+        userId,
+        email,
+        roles,
+        displayName: meta.display_name as string | undefined,
+        businessName,
+        origin: data.origin,
+      }),
+    );
   });
