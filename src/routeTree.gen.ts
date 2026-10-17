@@ -25,6 +25,7 @@ import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as AdminConsumersRouteImport } from './routes/admin.consumers'
 import { Route as AdminFeaturedRouteImport } from './routes/admin.featured'
 import { Route as AdminRetailersRouteImport } from './routes/admin.retailers'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
@@ -135,6 +136,11 @@ const AdminRetailersRoute = AdminRetailersRouteImport.update({
   id: '/retailers',
   path: '/retailers',
   getParentRoute: () => AdminRoute,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/auth/forgot-password',
@@ -314,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
   '/admin/retailers': typeof AdminRetailersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -360,6 +367,7 @@ export interface FileRoutesByTo {
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
   '/admin/retailers': typeof AdminRetailersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -410,6 +418,7 @@ export interface FileRoutesById {
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
   '/admin/retailers': typeof AdminRetailersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -460,6 +469,7 @@ export interface FileRouteTypes {
     | '/admin/consumers'
     | '/admin/featured'
     | '/admin/retailers'
+    | '/auth/callback'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -506,6 +516,7 @@ export interface FileRouteTypes {
     | '/admin/consumers'
     | '/admin/featured'
     | '/admin/retailers'
+    | '/auth/callback'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -555,6 +566,7 @@ export interface FileRouteTypes {
     | '/admin/consumers'
     | '/admin/featured'
     | '/admin/retailers'
+    | '/auth/callback'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -601,6 +613,7 @@ export interface RootRouteChildren {
   RetailerRoute: typeof RetailerRoute
   TermsRoute: typeof TermsRoute
   TryOnRoute: typeof TryOnRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
@@ -730,6 +743,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/retailers'
       preLoaderRoute: typeof AdminRetailersRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/forgot-password': {
       id: '/auth/forgot-password'
@@ -1034,6 +1054,7 @@ const rootRouteChildren: RootRouteChildren = {
   RetailerRoute: RetailerRoute,
   TermsRoute: TermsRoute,
   TryOnRoute: TryOnRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
