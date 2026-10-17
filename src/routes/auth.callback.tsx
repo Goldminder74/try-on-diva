@@ -3,6 +3,21 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { sendWelcomeEmail } from "@/lib/email/welcome.functions";
 
+export const Route = createFileRoute("/auth/callback")({
+  component: Callback,
+  head: () => ({
+    meta: [
+      { title: "Signing in | Wigsmi" },
+      { name: "description", content: "Complete your Wigsmi sign-in and return to your account." },
+      { property: "og:title", content: "Signing in | Wigsmi" },
+      { property: "og:description", content: "Complete your Wigsmi sign-in and return to your account." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+});
+
 // Send a welcome email once per user - keyed by user id so multiple logins
 // don't trigger duplicates; the send is also idempotent server-side.
 async function maybeSendWelcome(session: { user: { id: string } }) {
