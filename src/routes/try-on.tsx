@@ -309,7 +309,7 @@ function TryOn() {
       // Don't open the prompt immediately - let the user see their result first.
       // The prompt is opened by a 4s timer or any user interaction (see effect below).
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Try-on generation failed.");
+      setError(err instanceof Error && /limit reached/i.test(err.message) ? err.message : "Something went wrong generating your try-on. Please try again in a moment.");
     } finally {
       setApplying(false);
     }

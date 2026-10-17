@@ -487,6 +487,25 @@ export const getTryOnSignedUrl = createServerFn({ method: "GET" })
  * image). A billing cap is set on the Google Cloud / Gemini API project so a
  * traffic spike cannot run up an unbounded bill.
  */
+export const FRIENDLY_GENERATION_ERROR =
+  "Something went wrong generating your try-on. Please try again in a moment.";
+
+// Logs the full technical error on the server only and sends the client a
+// single friendly message, so model, provider and billing details never leak.
+function safeGeneration<A extends unknown[], R>(flow: string, fn: (...args: A) => Promise<R>) {
+  return async (...args: A): Promise<R> => {
+    try {
+      return await fn(...args);
+    } catch (err) {
+      if (err instanceof Response) throw err;
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/limit reached/i.test(msg)) throw new Error("Free try-on limit reached this month.");
+      console.error(`[try-on:${flow}] generation failed`, err);
+      throw new Error(FRIENDLY_GENERATION_ERROR);
+    }
+  };
+}
+
 export const generateTryOn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
@@ -519,7 +538,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
         })
         .parse(d),
   )
-  .handler(async ({ data, context }) => {
+  .handler(safeGeneration("authenticated", async ({ data, context }) => {
     const { supabase, userId } = context;
 
     // 0. Reserve the quota slot atomically BEFORE spending money on generation.
@@ -631,7 +650,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
       await refund();
       throw err;
     }
-  });
+  }));
 
 
 export const recordTryOn = createServerFn({ method: "POST" })
@@ -844,7 +863,7 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
         })
         .parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(safeGeneration("anonymous", async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // 1. Refuse once this device/fingerprint has used its monthly free sets,
@@ -964,5 +983,5 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       remaining: Math.max(0, ANON_FREE_QUOTA - (usedCount + 1)),
     };
 
-  });
+  }));
 
