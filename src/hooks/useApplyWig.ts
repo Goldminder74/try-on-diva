@@ -124,7 +124,7 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
       setResultUrl(out.signedUrl);
     } catch (err) {
       if (view === "front") setResultUrl(null);
-      setError(err instanceof Error ? err.message : "Try-on generation failed.");
+      setError(err instanceof Error && /limit reached/i.test(err.message) ? err.message : "Something went wrong generating your try-on. Please try again in a moment.");
     } finally {
       setGeneratingView(null);
       setApplying(false);
