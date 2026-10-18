@@ -64,21 +64,21 @@ Before you output, compare your result against the product images: if the length
 
 // Gemini image-generation model candidates, tried in order until one returns an
 // image. Swapping the backend later only touches callGeminiImageAPI below.
-// Current Nano Banana image models in the Gemini 3 family, verified against
-// https://ai.google.dev/gemini-api/docs/models (updated 2026-06-15):
-//   gemini-3.1-flash-image = Nano Banana 2 (stable)
+// Current Nano Banana image models, verified against
+// https://ai.google.dev/gemini-api/docs/image-generation:
+//   gemini-nano-banana-2.1 = Nano Banana 2.1
 //   gemini-3-pro-image     = Nano Banana Pro (stable)
 const GEMINI_MODELS = [
-  "gemini-3.1-flash-image",
+  "gemini-nano-banana-2.1",
   "gemini-3-pro-image",
 ] as const;
 
 // The front view is the one the shopper judges the product by, so it runs on the
-// higher-fidelity Pro model first and falls back to Flash. Side and back views
+// higher-fidelity Pro model first and falls back to Nano Banana 2.1. Side and back views
 // keep the faster ordering; all three still run in parallel.
 const FRONT_MODELS = [
   "gemini-3-pro-image",
-  "gemini-3.1-flash-image",
+  "gemini-nano-banana-2.1",
 ] as const;
 
 function modelsForView(view: TryOnView): readonly string[] {
