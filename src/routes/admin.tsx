@@ -15,6 +15,7 @@ import { getAdminContext } from "@/lib/admin.functions";
 import { LayoutDashboard, Users, Store, Package, Star, LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
+  ssr: false,
   beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
