@@ -77,7 +77,7 @@ function PortalIndex() {
           </h1>
         </div>
         <Link
-          to="/portal/catalog/new"
+          to="/portal/catalog/$wigId" params={{ wigId: "new" }}
           className="inline-flex items-center gap-1.5 rounded-md bg-mahogany px-4 py-2 text-sm text-cream hover:bg-mahogany-soft"
         >
           <Plus className="h-4 w-4" /> Add wig
@@ -134,7 +134,7 @@ function ActivationCard({ activation }: { activation: Activation }) {
       done: activation.hasWig,
       title: "Add your first wig",
       helper: "Photos, price, style - at least one wig.",
-      to: "/portal/catalog/new",
+      to: "/portal/catalog/$wigId", params: { wigId: "new" },
       cta: "Add a wig",
     },
     {

@@ -94,6 +94,7 @@ function BillingPage() {
       .select("plan, status, stripe_subscription_id, current_period_end, billing_interval")
       .eq("user_id", user.id)
       .eq("customer_type", "retailer")
+      .not("stripe_subscription_id", "is", null)
       .eq("environment", env)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -158,12 +159,16 @@ function BillingPage() {
 
   const onManage = async () => {
     setBusy("portal");
+    // Open the tab synchronously so the browser doesn't block it as a popup.
+    const tab = window.open("", "_blank");
     try {
       const { url } = await portal({
         data: { environment: getStripeEnvironment(), customerType: "retailer" },
       });
-      window.open(url, "_blank", "noopener");
+      if (tab) tab.location.href = url;
+      else window.location.href = url;
     } catch (e) {
+      tab?.close();
       toast.error(e instanceof Error ? e.message : "Couldn't open portal");
     } finally {
       setBusy(null);
