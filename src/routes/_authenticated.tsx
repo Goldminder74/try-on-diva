@@ -7,6 +7,7 @@ import { Wordmark } from "@/components/wigsmi/Wordmark";
 import { PastDueBanner } from "@/components/PastDueBanner";
 
 export const Route = createFileRoute("/_authenticated")({
+  ssr: false,
   beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {

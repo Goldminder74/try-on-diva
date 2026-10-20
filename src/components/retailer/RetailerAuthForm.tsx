@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { retailerAuthRedirect } from "@/lib/retailer-auth-redirect";
 
 type Mode = "login" | "signup";
 
 export function RetailerAuthForm({ mode }: { mode: Mode }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [business, setBusiness] = useState("");
@@ -18,15 +20,7 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
   // the same params so checkout opens automatically.
   const getPostAuthRedirect = (): string => {
     if (typeof window === "undefined") return "/portal";
-    const params = new URLSearchParams(window.location.search);
-    const plan = params.get("plan");
-    const interval = params.get("interval");
-    if (plan) {
-      const qp = new URLSearchParams({ plan });
-      if (interval) qp.set("interval", interval);
-      return `/portal/billing?${qp.toString()}`;
-    }
-    return "/portal";
+    return retailerAuthRedirect(window.location.search);
   };
 
   const onSubmit = async (e: FormEvent) => {
@@ -57,7 +51,7 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        window.location.assign(redirectPath);
+        await navigate({ to: redirectPath });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");

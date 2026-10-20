@@ -17,6 +17,8 @@ import { useRetailerStatus } from "@/hooks/use-retailer-status";
 
 
 export const Route = createFileRoute("/portal")({
+  // The session is browser-stored; a server guard cannot see it on a hard refresh.
+  ssr: false,
   beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
