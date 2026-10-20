@@ -1,9 +1,32 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Wordmark } from "./Wordmark";
 import { useAuth } from "@/contexts/auth-context";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Header() {
   const { user, loading } = useAuth();
+  const [isRetailer, setIsRetailer] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setIsRetailer(false);
+      return;
+    }
+    let cancelled = false;
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        if (cancelled) return;
+        setIsRetailer((data ?? []).some((r) => r.role === "retailer" || r.role === "admin"));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-cream/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5">
@@ -18,12 +41,21 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           {loading ? null : user ? (
-            <Link
-              to="/app"
-              className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
-            >
-              My Wigsmi
-            </Link>
+            isRetailer ? (
+              <Link
+                to="/portal"
+                className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
+              >
+                Retailer Portal
+              </Link>
+            ) : (
+              <Link
+                to="/app"
+                className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
+              >
+                My Wigsmi
+              </Link>
+            )
           ) : (
             <>
               <Link
