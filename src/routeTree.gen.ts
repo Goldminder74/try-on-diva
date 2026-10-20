@@ -52,7 +52,6 @@ import { Route as EmbedWidgetTokenRouteImport } from './routes/embed.widget.$tok
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as PortalCatalogIndexRouteImport } from './routes/portal.catalog.index'
 import { Route as PortalCatalogWigIdRouteImport } from './routes/portal.catalog.$wigId'
-import { Route as PortalCatalogNewRouteImport } from './routes/portal.catalog.new'
 import { Route as ApiPublicHooksQuotaResetRouteImport } from './routes/api/public/hooks/quota-reset'
 import { Route as ApiPublicHooksTrialsTickRouteImport } from './routes/api/public/hooks/trials-tick'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -275,11 +274,6 @@ const PortalCatalogWigIdRoute = PortalCatalogWigIdRouteImport.update({
   path: '/catalog/$wigId',
   getParentRoute: () => PortalRoute,
 } as any)
-const PortalCatalogNewRoute = PortalCatalogNewRouteImport.update({
-  id: '/catalog/new',
-  path: '/catalog/new',
-  getParentRoute: () => PortalRoute,
-} as any)
 const ApiPublicHooksQuotaResetRoute =
   ApiPublicHooksQuotaResetRouteImport.update({
     id: '/api/public/hooks/quota-reset',
@@ -346,7 +340,6 @@ export interface FileRoutesByFullPath {
   '/embed/widget/$token': typeof EmbedWidgetTokenRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
-  '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/portal/catalog/': typeof PortalCatalogIndexRoute
   '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
@@ -393,7 +386,6 @@ export interface FileRoutesByTo {
   '/embed/widget/$token': typeof EmbedWidgetTokenRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
-  '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/portal/catalog': typeof PortalCatalogIndexRoute
   '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
@@ -444,7 +436,6 @@ export interface FileRoutesById {
   '/embed/widget/$token': typeof EmbedWidgetTokenRoute
   '/lovable/email/events': typeof LovableEmailEventsRoute
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
-  '/portal/catalog/new': typeof PortalCatalogNewRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/portal/catalog/': typeof PortalCatalogIndexRoute
   '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
@@ -495,7 +486,6 @@ export interface FileRouteTypes {
     | '/embed/widget/$token'
     | '/lovable/email/events'
     | '/portal/catalog/$wigId'
-    | '/portal/catalog/new'
     | '/app/'
     | '/portal/catalog/'
     | '/api/public/hooks/quota-reset'
@@ -542,7 +532,6 @@ export interface FileRouteTypes {
     | '/embed/widget/$token'
     | '/lovable/email/events'
     | '/portal/catalog/$wigId'
-    | '/portal/catalog/new'
     | '/app'
     | '/portal/catalog'
     | '/api/public/hooks/quota-reset'
@@ -592,7 +581,6 @@ export interface FileRouteTypes {
     | '/embed/widget/$token'
     | '/lovable/email/events'
     | '/portal/catalog/$wigId'
-    | '/portal/catalog/new'
     | '/_authenticated/app/'
     | '/portal/catalog/'
     | '/api/public/hooks/quota-reset'
@@ -933,13 +921,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalCatalogWigIdRouteImport
       parentRoute: typeof PortalRoute
     }
-    '/portal/catalog/new': {
-      id: '/portal/catalog/new'
-      path: '/catalog/new'
-      fullPath: '/portal/catalog/new'
-      preLoaderRoute: typeof PortalCatalogNewRouteImport
-      parentRoute: typeof PortalRoute
-    }
     '/api/public/hooks/quota-reset': {
       id: '/api/public/hooks/quota-reset'
       path: '/api/public/hooks/quota-reset'
@@ -1022,7 +1003,6 @@ interface PortalRouteChildren {
   PortalWidgetRoute: typeof PortalWidgetRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalCatalogWigIdRoute: typeof PortalCatalogWigIdRoute
-  PortalCatalogNewRoute: typeof PortalCatalogNewRoute
   PortalCatalogIndexRoute: typeof PortalCatalogIndexRoute
 }
 
@@ -1035,7 +1015,6 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalWidgetRoute: PortalWidgetRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalCatalogWigIdRoute: PortalCatalogWigIdRoute,
-  PortalCatalogNewRoute: PortalCatalogNewRoute,
   PortalCatalogIndexRoute: PortalCatalogIndexRoute,
 }
 

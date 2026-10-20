@@ -39,7 +39,7 @@ function CatalogList() {
           <h1 className="mt-1 font-display text-4xl text-mahogany">Your wigs.</h1>
         </div>
         <Link
-          to="/portal/catalog/new"
+          to="/portal/catalog/$wigId" params={{ wigId: "new" }}
           className="inline-flex items-center gap-1.5 rounded-md bg-mahogany px-4 py-2 text-sm text-cream hover:bg-mahogany-soft"
         >
           <Plus className="h-4 w-4" /> Add wig
@@ -57,7 +57,7 @@ function CatalogList() {
             Add your first wig and we'll help shoppers try it on.
           </p>
           <Link
-            to="/portal/catalog/new"
+            to="/portal/catalog/$wigId" params={{ wigId: "new" }}
             className="mt-6 inline-flex items-center gap-1.5 rounded-md bg-mahogany px-5 py-2.5 text-sm text-cream hover:bg-mahogany-soft"
           >
             <Plus className="h-4 w-4" /> Add your first wig
