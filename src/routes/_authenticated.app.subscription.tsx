@@ -80,7 +80,8 @@ function SubscriptionPage() {
     setPortalBusy(true);
     try {
       const result = await portal({ data: { environment: getStripeEnvironment(), customerType: "consumer" } });
-      window.open(url, "_blank", "noopener");
+      if ("error" in result) throw new Error(result.error);
+      window.open(result.url, "_blank", "noopener");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't open billing portal");
     } finally {

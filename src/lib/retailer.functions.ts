@@ -134,9 +134,10 @@ export const updateRetailer = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { vat_number: _vatNumber, ...retailerPatch } = data;
     const { error } = await supabase
       .from("retailers")
-      .update(Object.fromEntries(Object.entries(data).filter(([key]) => key !== "vat_number")))
+      .update(retailerPatch)
       .eq("owner_id", userId);
     if (error) throw error;
     if (data.vat_number !== undefined) {
