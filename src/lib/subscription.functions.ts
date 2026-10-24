@@ -42,7 +42,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
     (d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
       z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
-  .handler(async ({ data, context }): Promise<{ url: string }> => {
+  .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
     const { supabase, userId } = context;
     const { data: sub } = await supabase
       .from("subscriptions")
@@ -62,7 +62,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
       });
       return { url: portal.url };
     } catch (error) {
-      throw new Error(getStripeErrorMessage(error));
+      return { error: getStripeErrorMessage(error) };
     }
   });
 
@@ -150,6 +150,7 @@ export const previewPlanChange = createServerFn({ method: "POST" })
       throw new Error("No active subscription.");
     }
 
+    try {
     await checkPlanChange(supabase, userId, data.newPriceId, data.customerType);
     const stripe = createStripeClient(data.environment as StripeEnv);
     const price = await resolvePriceByLookupKey(stripe, data.newPriceId);
@@ -176,6 +177,7 @@ export const previewPlanChange = createServerFn({ method: "POST" })
       nextAmount: Number(price.unit_amount ?? 0),
       nextBilledAt: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
     };
+    } catch (error) { return { error: getStripeErrorMessage(error) }; }
   });
 
 /** Cancel the user's subscription at period end (keeps access until then). */
@@ -229,7 +231,7 @@ export const listInvoices = createServerFn({ method: "GET" })
     (d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
       z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
-  .handler(async ({ data, context }): Promise<InvoiceRow[]> => {
+  .handler(async ({ data, context }): Promise<InvoiceRow[] | { error: string }> => {
     const { supabase, userId } = context;
     const { data: sub } = await supabase
       .from("subscriptions")
@@ -242,6 +244,7 @@ export const listInvoices = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!sub?.stripe_customer_id) return [];
 
+    try {
     const stripe = createStripeClient(data.environment as StripeEnv);
     const list = await stripe.invoices.list({
       customer: sub.stripe_customer_id,
@@ -257,4 +260,5 @@ export const listInvoices = createServerFn({ method: "GET" })
       billedAt: inv.created ? new Date(inv.created * 1000).toISOString() : null,
       invoiceUrl: inv.hosted_invoice_url ?? inv.invoice_pdf ?? null,
     }));
+    } catch (error) { return { error: getStripeErrorMessage(error) }; }
   });

@@ -156,6 +156,7 @@ function Pricing() {
         const p = await preview({
           data: { newPriceId: priceId, environment: env, customerType: "consumer" },
         });
+        if ("error" in p) throw new Error(p.error);
         setPreviewState({
           planKey,
           planName,
@@ -226,10 +227,11 @@ function Pricing() {
   const onManage = async () => {
     setBusyId("portal");
     try {
-      const { url } = await portal({
+      const result = await portal({
         data: { environment: getStripeEnvironment(), customerType: "consumer" },
       });
-      window.open(url, "_blank", "noopener");
+      if ("error" in result) throw new Error(result.error);
+      window.open(result.url, "_blank", "noopener");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't open portal");
     } finally {
