@@ -18,6 +18,7 @@ import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RetailerRouteImport } from './routes/retailer'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TryOnRouteImport } from './routes/try-on'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -99,6 +100,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const RetailerRoute = RetailerRouteImport.update({
   id: '/retailer',
   path: '/retailer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -308,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/retailer': typeof RetailerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
@@ -354,6 +361,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/retailer': typeof RetailerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
@@ -404,6 +412,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/retailer': typeof RetailerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
@@ -454,6 +463,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/retailer'
+    | '/sitemap.xml'
     | '/terms'
     | '/try-on'
     | '/admin/catalog'
@@ -500,6 +510,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/retailer'
+    | '/sitemap.xml'
     | '/terms'
     | '/try-on'
     | '/admin/catalog'
@@ -549,6 +560,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/retailer'
+    | '/sitemap.xml'
     | '/terms'
     | '/try-on'
     | '/admin/catalog'
@@ -599,6 +611,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RetailerRoute: typeof RetailerRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TryOnRoute: typeof TryOnRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -681,6 +694,13 @@ declare module '@tanstack/react-router' {
       path: '/retailer'
       fullPath: '/retailer'
       preLoaderRoute: typeof RetailerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -1031,6 +1051,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RetailerRoute: RetailerRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TryOnRoute: TryOnRoute,
   AuthCallbackRoute: AuthCallbackRoute,
