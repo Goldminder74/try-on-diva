@@ -33,6 +33,8 @@ function formatGBP(pence: number) {
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
+      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" },
       { title: "Pricing - Wigsmi" },
       { name: "description", content: "Wigsmi pricing for consumers. Start free with 5 try-ons a month, or go unlimited from £4.99/month." },
       { property: "og:title", content: "Pricing - Wigsmi" },

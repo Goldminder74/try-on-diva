@@ -13,6 +13,10 @@ const FREE_TRY_ON_LIMIT = 5;
 export const Route = createFileRoute("/_authenticated/app/subscription")({
   head: () => ({
     meta: [
+      { property: "og:title", content: "Your subscription | Wigsmi" },
+      { property: "og:description", content: "Manage your Wigsmi plan and billing." },
+      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" },
       { title: "Subscription - Wigsmi" },
       { name: "description", content: "Manage your Wigsmi plan, try-on quota, and billing." },
     ],

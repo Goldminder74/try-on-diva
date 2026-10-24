@@ -5,6 +5,8 @@ import { Footer } from "@/components/wigsmi/Footer";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
+      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" },
       { title: "Terms of Service - Wigsmi" },
       { name: "description", content: "The terms that govern your use of Wigsmi's virtual wig try-on service." },
       { property: "og:title", content: "Terms of Service - Wigsmi" },

@@ -5,6 +5,8 @@ import { Footer } from "@/components/wigsmi/Footer";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
+      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" },
       { title: "Privacy Policy - Wigsmi" },
       { name: "description", content: "How Wigsmi collects, uses, and protects your personal data under UK GDPR and the Data Protection Act 2018." },
       { property: "og:title", content: "Privacy Policy - Wigsmi" },

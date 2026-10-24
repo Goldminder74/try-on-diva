@@ -224,6 +224,8 @@ async function getRetailerEntitlement(
     .select("plan, status, current_period_end")
     .eq("user_id", userId)
     .eq("customer_type", "retailer")
+    .eq("environment", import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN?.startsWith("pk_live_") ? "live" : "sandbox")
+    .not("stripe_subscription_id", "is", null)
     .order("created_at", { ascending: false })
     .limit(1);
   const sub = subRows?.[0];

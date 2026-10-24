@@ -45,13 +45,14 @@ async function releaseEvent(retailerId: string, eventType: string) {
 async function hasActiveSub(userId: string): Promise<boolean> {
   if (!userId) return false;
   const sb = getSupabase();
-  const { data } = await sb
+  const { data, error } = await sb
     .from("subscriptions")
     .select("status, current_period_end")
     .eq("user_id", userId)
     .eq("customer_type", "retailer")
     .eq("environment", "live")
     .not("stripe_subscription_id", "is", null);
+  if (error) throw error;
   return (data ?? []).some(subscriptionIsValid);
 }
 

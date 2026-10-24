@@ -7,7 +7,7 @@ import {
 } from "@/lib/retailer.functions";
 
 export const Route = createFileRoute("/portal/onboarding")({
-  head: () => ({ meta: [{ title: "Onboarding - Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ title: "Retailer onboarding | Wigsmi" }, { name: "description", content: "Manage your Wigsmi retailer onboarding." }, { property: "og:title", content: "Retailer onboarding | Wigsmi" }, { property: "og:description", content: "Manage your Wigsmi retailer onboarding." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Onboarding,
 });
 
