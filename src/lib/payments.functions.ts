@@ -159,7 +159,7 @@ export const syncMySubscription = createServerFn({ method: "POST" })
       const periodEnd = (item as any)?.current_period_end ?? (sub as any).current_period_end;
 
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await (supabaseAdmin as any).from("subscriptions").upsert(
+      await (supabaseAdmin as any).from("subscriptions").upsert( // throwOnError below
         {
           user_id: userId,
           profile_id: userId,
