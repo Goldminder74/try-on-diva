@@ -6,7 +6,8 @@ import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/app/profile")({
-  head: () => ({ meta: [{ title: "Profile - Wigsmi" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "description", content: "Manage profile with Wigsmi." }, { property: "og:title", content: "Profile - Wigsmi" }, { property: "og:description", content: "Manage profile with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Profile - Wigsmi" }] }),
   component: Profile,
 });
 

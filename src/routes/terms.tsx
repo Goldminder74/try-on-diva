@@ -3,8 +3,11 @@ import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 
 export const Route = createFileRoute("/terms")({
+  staticData: { sitemap: true },
   head: () => ({
+    links: [{ rel: "canonical", href: "https://wigsmi.com/terms" }],
     meta: [
+      { property: "og:url", content: "https://wigsmi.com/terms" },
       { name: "twitter:card", content: "summary" },
       { property: "og:type", content: "website" },
       { title: "Terms of Service - Wigsmi" },

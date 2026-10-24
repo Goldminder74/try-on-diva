@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AuthShell } from "@/components/auth/AuthShell";
 
 export const Route = createFileRoute("/auth/reset-password")({
-  head: () => ({ meta: [{ title: "Set a new password - Wigsmi" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "robots", content: "noindex" }, { name: "description", content: "Manage set a new password with Wigsmi." }, { property: "og:title", content: "Set a new password - Wigsmi" }, { property: "og:description", content: "Manage set a new password with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Set a new password - Wigsmi" }] }),
   component: ResetPassword,
 });
 

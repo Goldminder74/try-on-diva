@@ -7,7 +7,8 @@ import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig } from "@/lib/wigs";
 import { useAsync } from "@/lib/use-async";
 
 export const Route = createFileRoute("/_authenticated/app/catalog")({
-  head: () => ({ meta: [{ title: "Catalog - Wigsmi" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "description", content: "Manage your wig catalogue with Wigsmi." }, { property: "og:title", content: "Your wig catalogue - Wigsmi" }, { property: "og:description", content: "Manage your wig catalogue with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Catalog - Wigsmi" }] }),
   component: AppCatalog,
 });
 

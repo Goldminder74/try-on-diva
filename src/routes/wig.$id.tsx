@@ -5,23 +5,47 @@ import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
 import { fetchWigById, fetchRelatedWigs, formatPrice, type Wig } from "@/lib/wigs";
+import { absoluteImage, pageUrl, productShareImage } from "@/lib/seo";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/wig/$id")({
+  staticData: { sitemap: true },
   loader: async ({ params }) => {
     const wig = await fetchWigById(params.id);
     if (!wig) throw notFound();
     const related = await fetchRelatedWigs(wig.style_type, wig.id, 4);
     return { wig, related };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [
-      { title: `${loaderData.wig.name} - Wigsmi` },
-      { name: "description", content: loaderData.wig.description },
-      { property: "og:title", content: `${loaderData.wig.name} - Wigsmi` },
-      { property: "og:description", content: loaderData.wig.description },
-      { property: "og:image", content: loaderData.wig.images[0] },
-    ] : [],
-  }),
+  head: ({ loaderData, params }) => {
+    if (!loaderData) return { meta: [{ title: "Wig not found - Wigsmi" }, { name: "robots", content: "noindex" }] };
+    const { wig } = loaderData;
+    const url = pageUrl(`/wig/${encodeURIComponent(params.id)}`);
+    const title = `${wig.name.slice(0, 50)} - Wigsmi`;
+    const description = wig.description || `Explore ${wig.name} from ${wig.retailer} and try it on with Wigsmi.`;
+    const image = productShareImage(wig.images[0]);
+    return {
+      links: [{ rel: "canonical", href: url }],
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "product" },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(image ? [{ property: "og:image", content: image }, { name: "twitter:image", content: image }] : []),
+      ],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify({
+        "@context": "https://schema.org", "@type": "Product", name: wig.name,
+        description, url, image: wig.images.map(absoluteImage),
+        offers: { "@type": "Offer", price: wig.price, priceCurrency: wig.currency,
+          url: wig.product_url || url,
+          availability: wig.in_stock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          seller: { "@type": "Organization", name: wig.retailer },
+        },
+      }) }],
+    };
+  },
   component: WigDetail,
   notFoundComponent: () => (
     <div className="min-h-screen bg-cream">
@@ -74,13 +98,16 @@ function WigDetail() {
             {wig.images.length > 1 && (
               <div className="mt-3 flex gap-2">
                 {wig.images.map((src: string, i: number) => (
-                  <button
+                  <Button
                     key={i}
+                    variant="ghost"
+                    aria-label={`View photo ${i + 1} of ${wig.name}`}
+                    aria-pressed={i === active}
                     onClick={() => setActive(i)}
-                    className={`h-16 w-16 overflow-hidden rounded-md border-2 ${i === active ? "border-mahogany" : "border-transparent"}`}
+                    className={`h-16 w-16 overflow-hidden rounded-md border-2 p-0 ${i === active ? "border-mahogany" : "border-transparent"}`}
                   >
                     <img src={src} alt="" className="h-full w-full object-cover" />
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

@@ -42,13 +42,18 @@ import {
 type Search = { wig?: string; widget?: string; r?: string };
 
 export const Route = createFileRoute("/try-on")({
+  staticData: { sitemap: true },
   validateSearch: (s: Record<string, unknown>): Search => ({
     wig: typeof s.wig === "string" ? s.wig : undefined,
     widget: typeof s.widget === "string" ? s.widget : undefined,
     r: typeof s.r === "string" ? s.r : undefined,
   }),
   head: () => ({
+    links: [{ rel: "canonical", href: "https://wigsmi.com/try-on" }],
     meta: [
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://wigsmi.com/try-on" },
       { title: "Try a wig on - Wigsmi" },
       { name: "description", content: "Upload a selfie and see any wig on your skin in seconds. Free to try, no account needed." },
       { property: "og:title", content: "Try a wig on - Wigsmi" },

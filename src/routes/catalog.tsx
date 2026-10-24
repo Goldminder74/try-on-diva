@@ -9,8 +9,13 @@ import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig } from "@/lib/wigs";
 import { useAsync } from "@/lib/use-async";
 
 export const Route = createFileRoute("/catalog")({
+  staticData: { sitemap: true },
   head: () => ({
+    links: [{ rel: "canonical", href: "https://wigsmi.com/catalog" }],
     meta: [
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://wigsmi.com/catalog" },
       { title: "Wig Catalog - Wigsmi" },
       { name: "description", content: "Browse hundreds of wigs from trusted Black-owned and Black-focused retailers. Filter by style, texture, length and price." },
       { property: "og:title", content: "Wig Catalog - Wigsmi" },
@@ -67,6 +72,7 @@ function Catalog() {
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
+              aria-label="Search wigs by name or retailer"
               placeholder="Search by name or retailer"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -80,6 +86,7 @@ function Catalog() {
             <SlidersHorizontal className="h-4 w-4" /> Filters
           </button>
           <select
+            aria-label="Sort wigs"
             value={sort}
             onChange={(e) => setSort(e.target.value as typeof sort)}
             className="rounded-md border border-border bg-card px-3 py-2.5 text-sm focus:border-mahogany focus:outline-none"

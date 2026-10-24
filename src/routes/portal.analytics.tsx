@@ -18,7 +18,8 @@ import {
 } from "@/lib/analytics.functions";
 
 export const Route = createFileRoute("/portal/analytics")({
-  head: () => ({ meta: [{ title: "Analytics - Wigsmi Retailer" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "description", content: "Manage analytics with Wigsmi." }, { property: "og:title", content: "Analytics - Wigsmi Retailer" }, { property: "og:description", content: "Manage analytics with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Analytics - Wigsmi Retailer" }] }),
   component: AnalyticsPage,
 });
 

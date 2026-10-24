@@ -8,7 +8,8 @@ import { getMyConsumerProfile } from "@/lib/consumer-profile.functions";
 import { useAuth } from "@/contexts/auth-context";
 
 export const Route = createFileRoute("/_authenticated/app/")({
-  head: () => ({ meta: [{ title: "For You - Wigsmi" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "description", content: "Manage for you with Wigsmi." }, { property: "og:title", content: "For You - Wigsmi" }, { property: "og:description", content: "Manage for you with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "For You - Wigsmi" }] }),
   component: ForYou,
 });
 

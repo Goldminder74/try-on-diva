@@ -4,8 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { getPublicWidgetData } from "@/lib/widget-public.functions";
 
 export const Route = createFileRoute("/embed/widget/$token")({
+  staticData: { sitemap: false },
   head: () => ({
-    meta: [
+    meta: [{ name: "description", content: "Manage wigsmi try-on with Wigsmi." }, { property: "og:title", content: "Wigsmi try-on" }, { property: "og:description", content: "Manage wigsmi try-on with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
       { title: "Wigsmi try-on" },
       { name: "robots", content: "noindex" },
     ],

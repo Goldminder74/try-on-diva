@@ -72,24 +72,17 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Wigsmi - Try every wig before you buy it" },
-      { name: "description", content: "Wigsmi is a virtual wig try-on platform built for Black women and the retailers who serve them." },
       { name: "author", content: "Wigsmi" },
-      { property: "og:title", content: "Wigsmi - Try every wig before you buy it" },
-      { property: "og:description", content: "Wigsmi is a virtual wig try-on platform built for Black women and the retailers who serve them." },
+      { name: "google-site-verification", content: "oSVB3wCKAgD4950oq5S_xcdffARBY1KIi-PcqjndOdI" },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://www.wigsmi.com" },
       { property: "og:site_name", content: "Wigsmi" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@wigsmi" },
-      { name: "twitter:title", content: "Wigsmi - Try every wig before you buy it" },
-      { name: "twitter:description", content: "Wigsmi is a virtual wig try-on platform built for Black women and the retailers who serve them." },
-      { property: "og:image", content: "https://www.wigsmi.com/og-image.jpg" },
-      { name: "twitter:image", content: "https://www.wigsmi.com/og-image.jpg" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -111,10 +104,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <title>Wigsmi - Try every wig before you buy it</title>
-        <meta name="twitter:site" content="@wigsmi" />
-        <meta name="twitter:title" content="Wigsmi - Try every wig before you buy it" />
-        <meta property="og:image" content="https://www.wigsmi.com/og-image.jpg" />
         <HeadContent />
       </head>
       <body>

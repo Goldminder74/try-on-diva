@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { ArrowUp, ArrowDown, X, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/admin/featured")({
+  head: () => ({ meta: [{ title: "Wigsmi Admin featured" }, { name: "description", content: "Manage wigsmi admin featured with Wigsmi." }, { property: "og:title", content: "Wigsmi Admin featured" }, { property: "og:description", content: "Manage wigsmi admin featured with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  staticData: { sitemap: false },
   component: FeaturedPage,
 });
 

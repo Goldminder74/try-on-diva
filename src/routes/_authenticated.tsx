@@ -7,6 +7,8 @@ import { Wordmark } from "@/components/wigsmi/Wordmark";
 import { PastDueBanner } from "@/components/PastDueBanner";
 
 export const Route = createFileRoute("/_authenticated")({
+  head: () => ({ meta: [{ title: "Wigsmi _authenticated" }, { name: "description", content: "Manage wigsmi _authenticated with Wigsmi." }, { property: "og:title", content: "Wigsmi _authenticated" }, { property: "og:description", content: "Manage wigsmi _authenticated with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  staticData: { sitemap: "exclude-subtree" },
   ssr: false,
   beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 const FREE_TRY_ON_LIMIT = 5;
 
 export const Route = createFileRoute("/_authenticated/app/subscription")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { property: "og:title", content: "Your subscription | Wigsmi" },

@@ -7,7 +7,8 @@ import { listMyWigs, getMyRetailerContext } from "@/lib/retailer.functions";
 type Wig = Awaited<ReturnType<typeof listMyWigs>>["wigs"][number];
 
 export const Route = createFileRoute("/portal/catalog/")({
-  head: () => ({ meta: [{ title: "Catalog - Wigsmi Retailer" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "description", content: "Manage catalog with Wigsmi." }, { property: "og:title", content: "Catalog - Wigsmi Retailer" }, { property: "og:description", content: "Manage catalog with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Catalog - Wigsmi Retailer" }] }),
   component: CatalogList,
 });
 

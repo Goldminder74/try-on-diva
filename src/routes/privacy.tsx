@@ -3,8 +3,11 @@ import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 
 export const Route = createFileRoute("/privacy")({
+  staticData: { sitemap: true },
   head: () => ({
+    links: [{ rel: "canonical", href: "https://wigsmi.com/privacy" }],
     meta: [
+      { property: "og:url", content: "https://wigsmi.com/privacy" },
       { name: "twitter:card", content: "summary" },
       { property: "og:type", content: "website" },
       { title: "Privacy Policy - Wigsmi" },

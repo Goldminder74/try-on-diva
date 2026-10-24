@@ -14,6 +14,7 @@ function getSupabase(): any {
 }
 
 export const Route = createFileRoute("/api/public/hooks/quota-reset")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {
