@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792865715707,
+      "tag": "0000_billing_audit_safety",
+      "breakpoints": true
+    }
+  ]
+}
