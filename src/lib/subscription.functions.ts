@@ -56,7 +56,6 @@ export const createPortalSession = createServerFn({ method: "POST" })
     if (!sub?.stripe_customer_id) throw new Error("No subscription found.");
 
     try {
-      await checkPlanChange(supabase, userId, data.newPriceId, data.customerType);
       const stripe = createStripeClient(data.environment as StripeEnv);
       const portal = await stripe.billingPortal.sessions.create({
         customer: sub.stripe_customer_id,
@@ -101,6 +100,7 @@ export const changeSubscriptionPlan = createServerFn({ method: "POST" })
     }
 
     try {
+      await checkPlanChange(supabase, userId, data.newPriceId, data.customerType);
       const stripe = createStripeClient(data.environment as StripeEnv);
       const price = await resolvePriceByLookupKey(stripe, data.newPriceId);
       const current = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
