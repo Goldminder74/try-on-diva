@@ -8,6 +8,13 @@
       "when": 1792865715707,
       "tag": "0000_billing_audit_safety",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792865916912,
+      "tag": "0001_private_retailer_vat_details",
+      "breakpoints": true
     }
   ]
 }

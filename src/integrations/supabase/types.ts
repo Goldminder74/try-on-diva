@@ -312,6 +312,29 @@ export type Database = {
         }
         Relationships: []
       }
+      retailer_billing_details: {
+        Row: {
+          retailer_id: string
+          vat_number: string | null
+        }
+        Insert: {
+          retailer_id: string
+          vat_number?: string | null
+        }
+        Update: {
+          retailer_id?: string
+          vat_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retailer_billing_details_retailer_id_fkey"
+            columns: ["retailer_id"]
+            isOneToOne: true
+            referencedRelation: "retailers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       retailer_lifecycle_events: {
         Row: {
           event_type: string
