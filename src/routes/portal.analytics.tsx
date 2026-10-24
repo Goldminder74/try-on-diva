@@ -19,7 +19,7 @@ import {
 
 export const Route = createFileRoute("/portal/analytics")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Manage analytics with Wigsmi." }, { property: "og:title", content: "Analytics - Wigsmi Retailer" }, { property: "og:description", content: "Manage analytics with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Analytics - Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ name: "description", content: "Track try-ons, product views and engagement across your Wigsmi retailer catalogue." }, { property: "og:title", content: "Analytics - Wigsmi Retailer" }, { property: "og:description", content: "Track try-ons, product views and engagement across your Wigsmi retailer catalogue." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Analytics - Wigsmi Retailer" }] }),
   component: AnalyticsPage,
 });
 

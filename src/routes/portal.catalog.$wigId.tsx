@@ -15,7 +15,7 @@ type Params = { wigId: string };
 
 export const Route = createFileRoute("/portal/catalog/$wigId")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Manage edit wig with Wigsmi." }, { property: "og:title", content: "Edit wig - Wigsmi Retailer" }, { property: "og:description", content: "Manage edit wig with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Edit wig - Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ name: "description", content: "Add or edit a wig listing: photos, price, description and stock status." }, { property: "og:title", content: "Edit wig - Wigsmi Retailer" }, { property: "og:description", content: "Add or edit a wig listing: photos, price, description and stock status." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Edit wig - Wigsmi Retailer" }] }),
   component: WigEditor,
 });
 

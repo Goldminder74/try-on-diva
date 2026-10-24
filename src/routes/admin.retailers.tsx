@@ -5,7 +5,7 @@ import { listRetailers, setRetailerActive, extendRetailerTrial } from "@/lib/adm
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/retailers")({
-  head: () => ({ meta: [{ title: "Wigsmi Admin retailers" }, { name: "description", content: "Manage wigsmi admin retailers with Wigsmi." }, { property: "og:title", content: "Wigsmi Admin retailers" }, { property: "og:description", content: "Manage wigsmi admin retailers with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Retailers - Wigsmi Admin" }, { name: "description", content: "Review and manage retailer accounts on Wigsmi." }, { property: "og:title", content: "Retailers - Wigsmi Admin" }, { property: "og:description", content: "Review and manage retailer accounts on Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   staticData: { sitemap: false },
   component: RetailersPage,
 });

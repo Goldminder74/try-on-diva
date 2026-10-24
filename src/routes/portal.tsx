@@ -17,7 +17,7 @@ import { useRetailerStatus } from "@/hooks/use-retailer-status";
 
 
 export const Route = createFileRoute("/portal")({
-  head: () => ({ meta: [{ title: "Wigsmi portal" }, { name: "description", content: "Manage wigsmi portal with Wigsmi." }, { property: "og:title", content: "Wigsmi portal" }, { property: "og:description", content: "Manage wigsmi portal with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Retailer portal - Wigsmi" }, { name: "description", content: "Manage your Wigsmi retailer catalogue, widget, billing and analytics." }, { property: "og:title", content: "Retailer portal - Wigsmi" }, { property: "og:description", content: "Manage your Wigsmi retailer catalogue, widget, billing and analytics." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   staticData: { sitemap: "exclude-subtree" },
   // The session is browser-stored; a server guard cannot see it on a hard refresh.
   ssr: false,

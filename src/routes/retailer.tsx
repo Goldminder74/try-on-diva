@@ -69,7 +69,7 @@ function RetailerLanding() {
             },
           ].map((item, i) => (
             <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-              <h3 className="font-display text-xl text-mahogany">{item.title}</h3>
+              <h2 className="font-display text-xl text-mahogany">{item.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{item.body}</p>
             </div>
           ))}
