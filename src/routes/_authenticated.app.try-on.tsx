@@ -15,10 +15,11 @@ import { Link } from "@tanstack/react-router";
 import { useApplyWig, type TryOnView } from "@/hooks/useApplyWig";
 
 export const Route = createFileRoute("/_authenticated/app/try-on")({
+  staticData: { sitemap: false },
   validateSearch: (s: Record<string, unknown>) => ({
     wig: typeof s.wig === "string" ? s.wig : undefined,
   }),
-  head: () => ({ meta: [{ title: "Try on - Wigsmi" }] }),
+  head: () => ({ meta: [{ name: "description", content: "Manage try on with Wigsmi." }, { property: "og:title", content: "Try on - Wigsmi" }, { property: "og:description", content: "Manage try on with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Try on - Wigsmi" }] }),
   component: AppTryOn,
 });
 

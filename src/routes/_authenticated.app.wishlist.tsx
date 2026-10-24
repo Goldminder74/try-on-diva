@@ -6,7 +6,8 @@ import { formatPrice } from "@/lib/wigs";
 import { Heart } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/wishlist")({
-  head: () => ({ meta: [{ title: "Wishlist - Wigsmi" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "description", content: "Manage wishlist with Wigsmi." }, { property: "og:title", content: "Wishlist - Wigsmi" }, { property: "og:description", content: "Manage wishlist with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Wishlist - Wigsmi" }] }),
   component: Wishlist,
 });
 

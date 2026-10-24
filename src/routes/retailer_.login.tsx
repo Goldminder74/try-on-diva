@@ -3,8 +3,9 @@ import { AuthShell } from "@/components/auth/AuthShell";
 import { RetailerAuthForm } from "@/components/retailer/RetailerAuthForm";
 
 export const Route = createFileRoute("/retailer_/login")({
+  staticData: { sitemap: false },
   head: () => ({
-    meta: [
+    meta: [{ property: "og:title", content: "Retailer login - Wigsmi" }, { property: "og:description", content: "Manage retailer login with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
       { title: "Retailer login - Wigsmi" },
       { name: "description", content: "Log in to your Wigsmi retailer dashboard." },
     ],

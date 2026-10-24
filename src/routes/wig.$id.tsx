@@ -7,6 +7,7 @@ import { WigCard } from "@/components/wigsmi/WigCard";
 import { fetchWigById, fetchRelatedWigs, formatPrice, type Wig } from "@/lib/wigs";
 
 export const Route = createFileRoute("/wig/$id")({
+  staticData: { sitemap: true },
   loader: async ({ params }) => {
     const wig = await fetchWigById(params.id);
     if (!wig) throw notFound();

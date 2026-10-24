@@ -5,6 +5,7 @@ import { sendWelcomeEmail } from "@/lib/email/welcome.functions";
 import { resolveCallback } from "@/lib/auth-callback";
 
 export const Route = createFileRoute("/auth/callback")({
+  staticData: { sitemap: false },
   component: Callback,
   head: () => ({
     meta: [

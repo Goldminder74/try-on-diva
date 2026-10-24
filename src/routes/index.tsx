@@ -9,8 +9,18 @@ import { fetchFeaturedWigs, type Wig } from "@/lib/wigs";
 import { useAsync } from "@/lib/use-async";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
+    links: [{ rel: "canonical", href: "https://wigsmi.com/" }],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "Organization", "@id": "https://wigsmi.com/#organization", name: "Wigsmi", legalName: "SHERWOOD CONSULTING SERVICES LTD", url: "https://wigsmi.com/" },
+        { "@type": "WebSite", "@id": "https://wigsmi.com/#website", name: "Wigsmi", url: "https://wigsmi.com/", publisher: { "@id": "https://wigsmi.com/#organization" } },
+      ],
+    }) }],
     meta: [
+      { property: "og:url", content: "https://wigsmi.com/" },
       { property: "og:type", content: "website" },
       { title: "Wigsmi - Try every wig before you buy it" },
       { name: "description", content: "Virtual wig try-on built for Black women. Browse hundreds of styles, see them on your skin in seconds, then buy from the retailer you trust." },

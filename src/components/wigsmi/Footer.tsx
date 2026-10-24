@@ -35,7 +35,7 @@ export function Footer() {
       <div className="border-t border-border">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5 text-xs text-muted-foreground">
           <span>© {new Date().getFullYear()} Wigsmi</span>
-          <a href="#" className="hover:text-mahogany"><Instagram className="h-4 w-4" /></a>
+          <a href="#" aria-label="Wigsmi on Instagram" className="hover:text-mahogany"><Instagram className="h-4 w-4" /></a>
         </div>
       </div>
     </footer>

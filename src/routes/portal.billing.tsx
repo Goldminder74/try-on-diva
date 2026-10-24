@@ -50,6 +50,7 @@ function formatGBP(amountMinor: number) {
 }
 
 export const Route = createFileRoute("/portal/billing")({
+  staticData: { sitemap: false },
   head: () => ({ meta: [{ title: "Retailer billing | Wigsmi" }, { name: "description", content: "Manage your Wigsmi retailer billing." }, { property: "og:title", content: "Retailer billing | Wigsmi" }, { property: "og:description", content: "Manage your Wigsmi retailer billing." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: BillingPage,
 });

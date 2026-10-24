@@ -57,6 +57,7 @@ async function hasActiveSub(userId: string): Promise<boolean> {
 }
 
 export const Route = createFileRoute("/api/public/hooks/trials-tick")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: async ({ request }) => {

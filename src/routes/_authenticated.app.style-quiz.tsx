@@ -4,7 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { saveStyleQuiz } from "@/lib/consumer-profile.functions";
 
 export const Route = createFileRoute("/_authenticated/app/style-quiz")({
-  head: () => ({ meta: [{ title: "Style Quiz - Wigsmi" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "description", content: "Manage style quiz with Wigsmi." }, { property: "og:title", content: "Style Quiz - Wigsmi" }, { property: "og:description", content: "Manage style quiz with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Style Quiz - Wigsmi" }] }),
   component: Quiz,
 });
 

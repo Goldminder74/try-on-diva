@@ -31,8 +31,11 @@ function formatGBP(pence: number) {
 }
 
 export const Route = createFileRoute("/pricing")({
+  staticData: { sitemap: true },
   head: () => ({
+    links: [{ rel: "canonical", href: "https://wigsmi.com/pricing" }],
     meta: [
+      { property: "og:url", content: "https://wigsmi.com/pricing" },
       { name: "twitter:card", content: "summary" },
       { property: "og:type", content: "website" },
       { title: "Pricing - Wigsmi" },

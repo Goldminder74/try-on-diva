@@ -9,7 +9,8 @@ import {
 import { Plus, TrendingUp, Eye, MousePointerClick, Package, Check, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/portal/")({
-  head: () => ({ meta: [{ title: "Dashboard - Wigsmi Retailer" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "description", content: "Manage dashboard with Wigsmi." }, { property: "og:title", content: "Dashboard - Wigsmi Retailer" }, { property: "og:description", content: "Manage dashboard with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Dashboard - Wigsmi Retailer" }] }),
   component: PortalIndex,
 });
 

@@ -5,6 +5,8 @@ import { getAdminOverview, getRecentSignups } from "@/lib/admin.functions";
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
 export const Route = createFileRoute("/admin/")({
+  head: () => ({ meta: [{ title: "Wigsmi Admin index" }, { name: "description", content: "Manage wigsmi admin index with Wigsmi." }, { property: "og:title", content: "Wigsmi Admin index" }, { property: "og:description", content: "Manage wigsmi admin index with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  staticData: { sitemap: false },
   component: OverviewPage,
 });
 

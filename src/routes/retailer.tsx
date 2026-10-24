@@ -5,8 +5,13 @@ import { Footer } from "@/components/wigsmi/Footer";
 import { RetailerPlanCards } from "@/components/retailer/RetailerPlanCards";
 
 export const Route = createFileRoute("/retailer")({
+  staticData: { sitemap: true },
   head: () => ({
+    links: [{ rel: "canonical", href: "https://wigsmi.com/retailer" }],
     meta: [
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://wigsmi.com/retailer" },
       { title: "For Retailers - Wigsmi" },
       { name: "description", content: "Add the virtual try-on built for Black wig buyers to your store. Reduce returns, lift conversion. Free 1-month trial." },
       { property: "og:title", content: "Wigsmi for Retailers" },

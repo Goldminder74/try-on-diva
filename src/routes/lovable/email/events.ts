@@ -50,6 +50,7 @@ async function record(event: any, reason: Reason) {
 }
 
 export const Route = createFileRoute("/lovable/email/events")({
+  staticData: { sitemap: false },
   server: {
     handlers: {
       POST: ({ request }) => {

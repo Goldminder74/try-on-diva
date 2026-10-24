@@ -10,7 +10,8 @@ import {
 import { Copy, Check, RefreshCw, AlertTriangle, X } from "lucide-react";
 
 export const Route = createFileRoute("/portal/widget")({
-  head: () => ({ meta: [{ title: "Widget - Wigsmi Retailer" }] }),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [{ name: "description", content: "Manage widget with Wigsmi." }, { property: "og:title", content: "Widget - Wigsmi Retailer" }, { property: "og:description", content: "Manage widget with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Widget - Wigsmi Retailer" }] }),
   component: WidgetPage,
 });
 

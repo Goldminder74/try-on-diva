@@ -10,3 +10,7 @@
 - Scheduled HTTP hooks require CRON_SECRET; pg_cron reads its private service-role-only credential row rather than storing a literal in job commands.
 - Keep existing cron cadences: daily trial handling and monthly quota reset; new polling jobs are unnecessary.
 - Stripe tax codes are assigned upfront per offering and environment, never patched during checkout; eligible consumer AI service and retailer SaaS remain distinct classifications.
+# SEO
+
+- Keep page-specific metadata and canonical URLs on leaf routes; the root supplies sitewide defaults only to prevent duplicate titles and shared previews.
+- Every route declares staticData.sitemap; private layouts exclude their subtrees, and published, undeleted products are read with public credentials and full pagination, never admin access or generation-time lastmod.

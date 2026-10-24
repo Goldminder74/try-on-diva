@@ -7,8 +7,9 @@ import { syncMySubscription } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/checkout/success")({
+  staticData: { sitemap: false },
   head: () => ({
-    meta: [
+    meta: [{ name: "description", content: "Manage payment successful with Wigsmi." }, { property: "og:title", content: "Payment successful - Wigsmi" }, { property: "og:description", content: "Manage payment successful with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
       { title: "Payment successful - Wigsmi" },
       { name: "robots", content: "noindex" },
     ],

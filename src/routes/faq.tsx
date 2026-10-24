@@ -11,8 +11,11 @@ import {
 } from "@/components/ui/accordion";
 
 export const Route = createFileRoute("/faq")({
+  staticData: { sitemap: true },
   head: () => ({
+    links: [{ rel: "canonical", href: "https://wigsmi.com/faq" }],
     meta: [
+      { property: "og:url", content: "https://wigsmi.com/faq" },
       { name: "twitter:card", content: "summary" },
       { property: "og:type", content: "website" },
       { title: "FAQ - Wigsmi" },
@@ -162,6 +165,7 @@ function FAQPage() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search frequently asked questions"
             placeholder="Search questions…"
             className="w-full rounded-md border border-border bg-input py-2.5 pl-9 pr-4 text-sm placeholder:text-muted-foreground focus:border-mahogany focus:outline-none focus:ring-2 focus:ring-mahogany/20"
           />
