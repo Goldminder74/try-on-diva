@@ -9,4 +9,4 @@
 - [x] Deprecate unused Paddle columns safely without breaking the published app.
 - [x] Run 22 focused tests; verify authenticated settings, billing and Stripe checkout opening.
 - [ ] Complete a payment and confirm provider-delivered recovery events, tax calculation and invoice contents: requires a completed checkout; no purchase was made.
-- [ ] Publish updated app: awaiting explicit publish request. Scheduled callers now require the updated handlers.
+- [ ] Publish updated app: awaiting explicit publish request; callers retain the public compatibility header for the old deployment while the new handlers require the private credential.
