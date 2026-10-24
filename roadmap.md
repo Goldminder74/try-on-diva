@@ -13,9 +13,9 @@
 
 # SEO corrections
 
-- [ ] Remove duplicate titles and add self-referencing page metadata.
-- [ ] Label catalogue/FAQ search, gallery buttons and the Instagram link.
-- [ ] Add Organization/WebSite and product structured data; assess the stale FAQ recommendation without adding FAQPage.
-- [ ] Install a public router-derived sitemap and crawler rules.
+- [x] Remove duplicate titles and add self-referencing page metadata.
+- [x] Label catalogue/FAQ search, gallery buttons and the Instagram link.
+- [x] Add Organization/WebSite and product structured data; stale composite finding remains unresolved because FAQPage is not an appropriate SEO addition.
+- [x] Install a public router-derived sitemap and crawler rules.
 - [ ] Connect and verify Google Search Console, then submit the live sitemap.
-- [ ] Verify rendered pages, sitemap exclusions and tests; record completed findings.
+- [x] Verify 56 rendered pages, sitemap exclusions and 17 tests; record six completed findings.
