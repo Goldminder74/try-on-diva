@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/app/try-on")({
   validateSearch: (s: Record<string, unknown>) => ({
     wig: typeof s.wig === "string" ? s.wig : undefined,
   }),
-  head: () => ({ meta: [{ name: "description", content: "Manage try on with Wigsmi." }, { property: "og:title", content: "Try on - Wigsmi" }, { property: "og:description", content: "Manage try on with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Try on - Wigsmi" }] }),
+  head: () => ({ meta: [{ name: "description", content: "Upload a selfie and see how a chosen wig looks on you." }, { property: "og:title", content: "Try on - Wigsmi" }, { property: "og:description", content: "Upload a selfie and see how a chosen wig looks on you." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Try on - Wigsmi" }] }),
   component: AppTryOn,
 });
 

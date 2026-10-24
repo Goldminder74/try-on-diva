@@ -8,7 +8,7 @@ type Wig = Awaited<ReturnType<typeof listMyWigs>>["wigs"][number];
 
 export const Route = createFileRoute("/portal/catalog/")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Manage catalog with Wigsmi." }, { property: "og:title", content: "Catalog - Wigsmi Retailer" }, { property: "og:description", content: "Manage catalog with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Catalog - Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ name: "description", content: "View, publish and organise every wig in your retailer catalogue." }, { property: "og:title", content: "Catalog - Wigsmi Retailer" }, { property: "og:description", content: "View, publish and organise every wig in your retailer catalogue." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Catalog - Wigsmi Retailer" }] }),
   component: CatalogList,
 });
 

@@ -15,7 +15,7 @@ import { getAdminContext } from "@/lib/admin.functions";
 import { LayoutDashboard, Users, Store, Package, Star, LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Wigsmi admin" }, { name: "description", content: "Manage wigsmi admin with Wigsmi." }, { property: "og:title", content: "Wigsmi admin" }, { property: "og:description", content: "Manage wigsmi admin with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Admin - Wigsmi" }, { name: "description", content: "Wigsmi platform administration." }, { property: "og:title", content: "Admin - Wigsmi" }, { property: "og:description", content: "Wigsmi platform administration." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   staticData: { sitemap: "exclude-subtree" },
   ssr: false,
   beforeLoad: async ({ location }) => {

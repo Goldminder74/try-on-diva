@@ -8,7 +8,7 @@ import { useAsync } from "@/lib/use-async";
 
 export const Route = createFileRoute("/_authenticated/app/catalog")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Manage your wig catalogue with Wigsmi." }, { property: "og:title", content: "Your wig catalogue - Wigsmi" }, { property: "og:description", content: "Manage your wig catalogue with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Catalog - Wigsmi" }] }),
+  head: () => ({ meta: [{ name: "description", content: "Browse wigs from Wigsmi retailers and pick styles to try on." }, { property: "og:title", content: "Your wig catalogue - Wigsmi" }, { property: "og:description", content: "Browse wigs from Wigsmi retailers and pick styles to try on." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Your wig catalogue - Wigsmi" }] }),
   component: AppCatalog,
 });
 

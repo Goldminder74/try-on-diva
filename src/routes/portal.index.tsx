@@ -10,7 +10,7 @@ import { Plus, TrendingUp, Eye, MousePointerClick, Package, Check, ArrowRight } 
 
 export const Route = createFileRoute("/portal/")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Manage dashboard with Wigsmi." }, { property: "og:title", content: "Dashboard - Wigsmi Retailer" }, { property: "og:description", content: "Manage dashboard with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Dashboard - Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ name: "description", content: "See your retailer trial status, catalogue size and try-on activity at a glance." }, { property: "og:title", content: "Dashboard - Wigsmi Retailer" }, { property: "og:description", content: "See your retailer trial status, catalogue size and try-on activity at a glance." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Dashboard - Wigsmi Retailer" }] }),
   component: PortalIndex,
 });
 

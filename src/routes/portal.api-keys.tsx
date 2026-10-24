@@ -22,7 +22,7 @@ import {
 export const Route = createFileRoute("/portal/api-keys")({
   staticData: { sitemap: false },
   head: () => ({
-    meta: [{ property: "og:title", content: "API keys - Wigsmi" }, { property: "og:description", content: "Manage api keys with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
+    meta: [{ property: "og:title", content: "API keys - Wigsmi" }, { property: "og:description", content: "Create and revoke API keys for connecting your shop to Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
       { title: "API keys - Wigsmi" },
       { name: "description", content: "Manage API keys for headless Wigsmi access." },
     ],

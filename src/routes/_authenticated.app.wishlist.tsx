@@ -7,7 +7,7 @@ import { Heart } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/wishlist")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Manage wishlist with Wigsmi." }, { property: "og:title", content: "Wishlist - Wigsmi" }, { property: "og:description", content: "Manage wishlist with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Wishlist - Wigsmi" }] }),
+  head: () => ({ meta: [{ name: "description", content: "The wigs you've saved to try on or buy later." }, { property: "og:title", content: "Wishlist - Wigsmi" }, { property: "og:description", content: "The wigs you've saved to try on or buy later." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Wishlist - Wigsmi" }] }),
   component: Wishlist,
 });
 

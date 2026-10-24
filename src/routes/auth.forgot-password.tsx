@@ -5,7 +5,7 @@ import { AuthShell } from "@/components/auth/AuthShell";
 
 export const Route = createFileRoute("/auth/forgot-password")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "robots", content: "noindex" }, { name: "description", content: "Manage reset your password with Wigsmi." }, { property: "og:title", content: "Reset your password - Wigsmi" }, { property: "og:description", content: "Manage reset your password with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Reset your password - Wigsmi" }] }),
+  head: () => ({ meta: [{ name: "robots", content: "noindex" }, { name: "description", content: "Request a link by email to reset your Wigsmi password." }, { property: "og:title", content: "Reset your password - Wigsmi" }, { property: "og:description", content: "Request a link by email to reset your Wigsmi password." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Reset your password - Wigsmi" }] }),
   component: ForgotPassword,
 });
 

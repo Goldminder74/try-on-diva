@@ -5,7 +5,7 @@ import { RetailerAuthForm } from "@/components/retailer/RetailerAuthForm";
 export const Route = createFileRoute("/retailer_/signup")({
   staticData: { sitemap: false },
   head: () => ({
-    meta: [{ property: "og:title", content: "Become a Wigsmi retailer - Free 1-month trial" }, { property: "og:description", content: "Manage become a wigsmi retailer with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
+    meta: [{ property: "og:title", content: "Become a Wigsmi retailer - Free 1-month trial" }, { property: "og:description", content: "Register your wig shop with Wigsmi and start a free 1-month retailer trial." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
       { title: "Become a Wigsmi retailer - Free 1-month trial" },
       {
         name: "description",

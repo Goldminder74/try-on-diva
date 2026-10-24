@@ -5,7 +5,7 @@ import { listAdminCatalog, setWigPublished, deleteWig } from "@/lib/admin.functi
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/catalog")({
-  head: () => ({ meta: [{ title: "Wigsmi Admin catalog" }, { name: "description", content: "Manage wigsmi admin catalog with Wigsmi." }, { property: "og:title", content: "Wigsmi Admin catalog" }, { property: "og:description", content: "Manage wigsmi admin catalog with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "All wigs - Wigsmi Admin" }, { name: "description", content: "Review every wig listing across Wigsmi retailers." }, { property: "og:title", content: "All wigs - Wigsmi Admin" }, { property: "og:description", content: "Review every wig listing across Wigsmi retailers." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   staticData: { sitemap: false },
   component: CatalogPage,
 });

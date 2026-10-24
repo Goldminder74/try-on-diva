@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listConsumers } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin/consumers")({
-  head: () => ({ meta: [{ title: "Wigsmi Admin consumers" }, { name: "description", content: "Manage wigsmi admin consumers with Wigsmi." }, { property: "og:title", content: "Wigsmi Admin consumers" }, { property: "og:description", content: "Manage wigsmi admin consumers with Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Shoppers - Wigsmi Admin" }, { name: "description", content: "Review and manage shopper accounts on Wigsmi." }, { property: "og:title", content: "Shoppers - Wigsmi Admin" }, { property: "og:description", content: "Review and manage shopper accounts on Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   staticData: { sitemap: false },
   component: ConsumersPage,
 });
