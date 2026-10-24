@@ -54,8 +54,8 @@ function Onboarding() {
         const retailer = ctx.retailer;
         setForm((f) => ({
           ...f,
-          business_name: ctx.retailer.business_name ?? "",
-          vat_number: ctx.retailer.vat_number ?? "",
+          business_name: retailer.business_name ?? "",
+          vat_number: retailer.vat_number ?? "",
           legal_business_name:
             (ctx.retailer as { legal_business_name?: string | null })
               .legal_business_name ?? "",

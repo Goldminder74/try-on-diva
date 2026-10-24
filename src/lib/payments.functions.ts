@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import Stripe from "stripe";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   type StripeEnv,
@@ -43,6 +44,7 @@ async function resolveOrCreateCustomer(
 }
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator(
     (data: {
       priceId: string;
@@ -51,11 +53,16 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       returnUrl: string;
       environment: StripeEnv;
     }) => {
-      if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
-      return data;
+      return z.object({
+        priceId: z.string().regex(/^(consumer_(plus|pro)|retailer_(starter|growth|scale))_(monthly|yearly)$/),
+        customerEmail: z.string().email().max(254).optional(), userId: z.string().uuid().optional(),
+        returnUrl: z.string().url().max(2048), environment: z.enum(["sandbox", "live"]),
+      }).parse(data);
     },
   )
-  .handler(async ({ data }): Promise<CheckoutSessionResult> => {
+  .handler(async ({ data, context }): Promise<CheckoutSessionResult> => {
+    data.userId = context.userId;
+    data.customerEmail = context.claims.email as string | undefined;
     try {
       const stripe = createStripeClient(data.environment);
 

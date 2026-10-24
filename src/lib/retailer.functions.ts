@@ -30,7 +30,8 @@ export const getMyRetailerContext = createServerFn({ method: "GET" })
       .eq("owner_id", userId)
       .maybeSingle();
 
-    return { isRetailer, isAdmin, retailer };
+    const { data: billing } = retailer ? await supabase.from("retailer_billing_details").select("vat_number").eq("retailer_id", retailer.id).maybeSingle() : { data: null };
+    return { isRetailer, isAdmin, retailer: retailer ? { ...retailer, vat_number: billing?.vat_number ?? null } : null };
   });
 
 const onboardingSchema = z.object({
@@ -72,7 +73,6 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
       owner_id: userId,
       business_name: data.business_name,
       legal_business_name: data.legal_business_name,
-      vat_number: data.vat_number || null,
       display_name: data.display_name,
       website: data.website || null,
       country: data.country || null,
@@ -89,6 +89,8 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
         .update(payload)
         .eq("id", existing.id);
       if (error) throw error;
+      const billing = await supabase.from("retailer_billing_details").upsert({ retailer_id: existing.id, vat_number: data.vat_number || null });
+      if (billing.error) throw billing.error;
       return { id: existing.id };
     }
 
@@ -106,6 +108,8 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw error;
+    const billing = await supabase.from("retailer_billing_details").upsert({ retailer_id: created.id, vat_number: data.vat_number || null });
+    if (billing.error) throw billing.error;
     return { id: created.id };
   });
 
@@ -132,9 +136,15 @@ export const updateRetailer = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { error } = await supabase
       .from("retailers")
-      .update(data)
+      .update(Object.fromEntries(Object.entries(data).filter(([key]) => key !== "vat_number")))
       .eq("owner_id", userId);
     if (error) throw error;
+    if (data.vat_number !== undefined) {
+      const { data: retailer } = await supabase.from("retailers").select("id").eq("owner_id", userId).maybeSingle();
+      if (!retailer) throw new Error("Finish onboarding first.");
+      const billing = await supabase.from("retailer_billing_details").upsert({ retailer_id: retailer.id, vat_number: data.vat_number || null });
+      if (billing.error) throw billing.error;
+    }
     return { ok: true };
   });
 
