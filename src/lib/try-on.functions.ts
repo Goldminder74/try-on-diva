@@ -402,8 +402,9 @@ export const uploadTryOnResult = createServerFn({ method: "POST" })
       };
     }
 
-    // Anonymous path: anon client + anon/ folder. No row inserted.
-    const supabase = makeSupabaseClient();
+    // Anonymous path: server-side storage access to the anon/ folder (no public
+    // storage rules for visitors). No row inserted.
+    const { supabaseAdmin: supabase } = await import("@/integrations/supabase/client.server");
     const path = `anon/${objectId}.png`;
 
     const { error: uploadError } = await supabase.storage
