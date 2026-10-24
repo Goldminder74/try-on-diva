@@ -10,3 +10,12 @@
 - [x] Run 22 focused tests; verify authenticated settings, billing and Stripe checkout opening.
 - [x] Complete a payment and confirm recovery sync, tax calculation and invoice: sandbox Starter purchase completed; found and fixed a silent upsert failure (partial unique index broke ON CONFLICT); subscription row written, billing page shows active plan, paid invoice £59.29 with tax. Webhook delivery itself is untestable from localhost (Stripe delivers to the preview/published URL).
 - [ ] Publish updated app: awaiting explicit publish request; callers retain the public compatibility header for the old deployment while the new handlers require the private credential.
+
+# SEO corrections
+
+- [ ] Remove duplicate titles and add self-referencing page metadata.
+- [ ] Label catalogue/FAQ search, gallery buttons and the Instagram link.
+- [ ] Add Organization/WebSite and product structured data; assess the stale FAQ recommendation without adding FAQPage.
+- [ ] Install a public router-derived sitemap and crawler rules.
+- [ ] Connect and verify Google Search Console, then submit the live sitemap.
+- [ ] Verify rendered pages, sitemap exclusions and tests; record completed findings.
