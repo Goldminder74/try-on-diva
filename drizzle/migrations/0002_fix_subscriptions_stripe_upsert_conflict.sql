@@ -1,0 +1,2 @@
+drop index if exists public.subscriptions_stripe_subscription_id_key;
+create unique index subscriptions_stripe_subscription_id_key on public.subscriptions (stripe_subscription_id);

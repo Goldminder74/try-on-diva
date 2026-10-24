@@ -15,6 +15,13 @@
       "when": 1792865916912,
       "tag": "0001_private_retailer_vat_details",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792868870447,
+      "tag": "0002_fix_subscriptions_stripe_upsert_conflict",
+      "breakpoints": true
     }
   ]
 }

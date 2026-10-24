@@ -135,7 +135,6 @@ export const syncMySubscription = createServerFn({ method: "POST" })
         limit: 1,
       });
       const customer = customers.data[0];
-      console.log("syncMySubscription debug:", { userId, customers: customers.data.length });
       if (!customer) return { synced: false };
 
       const subs = await stripe.subscriptions.list({
@@ -146,7 +145,6 @@ export const syncMySubscription = createServerFn({ method: "POST" })
       const sub = subs.data.find((s) =>
         ["active", "trialing", "past_due"].includes(s.status),
       );
-      console.log("syncMySubscription debug subs:", subs.data.map((s) => s.status));
       if (!sub) return { synced: false };
 
       const item = sub.items.data[0];
