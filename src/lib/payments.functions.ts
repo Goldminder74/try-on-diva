@@ -159,7 +159,7 @@ export const syncMySubscription = createServerFn({ method: "POST" })
       const periodEnd = (item as any)?.current_period_end ?? (sub as any).current_period_end;
 
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await (supabaseAdmin as any).from("subscriptions").upsert( // throwOnError below
+      const { error: upsertError } = await (supabaseAdmin as any).from("subscriptions").upsert(
         {
           user_id: userId,
           profile_id: userId,
@@ -181,6 +181,7 @@ export const syncMySubscription = createServerFn({ method: "POST" })
         },
         { onConflict: "stripe_subscription_id" },
       );
+      if (upsertError) throw new Error(upsertError.message);
 
       if (ctype === "retailer") {
         await (supabaseAdmin as any)
