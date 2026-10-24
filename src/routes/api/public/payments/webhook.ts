@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
-import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
+import { type StripeEnv, verifyWebhook, createStripeClient } from "@/lib/stripe.server";
 import { serverSendTransactionalEmail } from "@/lib/email/server-send";
+import { PLAN_WIG_CAPS, paymentCanSync, subscriptionIdFromPayment } from "@/lib/billing-rules";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase(): any {
@@ -59,8 +60,8 @@ async function claimEvent(eventId: string, type: string): Promise<boolean> {
     .from("payment_webhook_events")
     .insert({ event_id: eventId, event_type: type });
   if (error) {
-    console.log("Duplicate payment event ignored:", eventId, error.message);
-    return false;
+    if (error.code === "23505") return false;
+    throw error;
   }
   return true;
 }
@@ -70,7 +71,7 @@ async function claimEvent(eventId: string, type: string): Promise<boolean> {
  */
 async function releaseEvent(eventId: string) {
   if (!eventId) return;
-  await getSupabase().from("payment_webhook_events").delete().eq("event_id", eventId);
+  await getSupabase().from("payment_webhook_events").delete().eq("event_id", eventId).throwOnError();
 }
 
 async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
@@ -95,9 +96,7 @@ async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
       ...(ended && { is_active: false, trial_ends_at: null }),
       updated_at: new Date().toISOString(),
     })
-    .eq("owner_id", row.user_id);
-
-  if (!ended) return;
+    .eq("owner_id", row.user_id).throwOnError();
 
   // Pause their listings so nothing paid-for stays live after access ends.
   const { data: retailer } = await sb
@@ -106,6 +105,17 @@ async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
     .eq("owner_id", row.user_id)
     .maybeSingle();
   if (retailer?.id) {
+    if (!ended) {
+      // Provider-portal downgrades cannot bypass the published catalogue cap.
+      const cap = PLAN_WIG_CAPS[row.plan] ?? 0;
+      if (Number.isFinite(cap)) {
+        const { data: excess } = await sb.from("wigs").select("id").eq("retailer_id", retailer.id)
+          .eq("is_published", true).order("created_at", { ascending: true }).order("id").range(cap, 100000).throwOnError();
+        if (excess?.length) await sb.from("wigs").update({ is_published: false, auto_unpublished_at: new Date().toISOString() })
+          .in("id", excess.map((wig: { id: string }) => wig.id)).throwOnError();
+      }
+      return;
+    }
     await sb
       .from("wigs")
       .update({
@@ -114,7 +124,7 @@ async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
         updated_at: new Date().toISOString(),
       })
       .eq("retailer_id", retailer.id)
-      .eq("is_published", true);
+      .eq("is_published", true).throwOnError();
   }
 }
 
@@ -152,7 +162,7 @@ async function handleSubscriptionCreated(sub: any, env: StripeEnv) {
         updated_at: new Date().toISOString(),
       },
       { onConflict: "stripe_subscription_id" },
-    );
+    ).throwOnError();
 
   if (ctype === "consumer") {
     const sb = getSupabase();
@@ -181,7 +191,7 @@ async function handleSubscriptionCreated(sub: any, env: StripeEnv) {
     await sb
       .from("retailers")
       .update({ plan, is_active: true, updated_at: new Date().toISOString() })
-      .eq("owner_id", userId);
+      .eq("owner_id", userId).throwOnError();
 
     const { data: retailer } = await sb
       .from("retailers")
@@ -227,6 +237,7 @@ async function handleSubscriptionCreated(sub: any, env: StripeEnv) {
       }
     }
   }
+  await syncRetailerPlanFromSub(sub.id, env);
 }
 
 async function handleSubscriptionUpdated(sub: any, env: StripeEnv) {
@@ -268,7 +279,7 @@ async function handleSubscriptionUpdated(sub: any, env: StripeEnv) {
     .from("subscriptions")
     .update(update)
     .eq("stripe_subscription_id", sub.id)
-    .eq("environment", env);
+    .eq("environment", env).throwOnError();
   await syncRetailerPlanFromSub(sub.id, env);
 }
 
@@ -284,7 +295,7 @@ async function handleSubscriptionDeleted(sub: any, env: StripeEnv) {
     .from("subscriptions")
     .update(update)
     .eq("stripe_subscription_id", sub.id)
-    .eq("environment", env);
+    .eq("environment", env).throwOnError();
   await syncRetailerPlanFromSub(sub.id, env);
 }
 
@@ -364,6 +375,17 @@ async function handleWebhook(req: Request, env: StripeEnv) {
       case "invoice.payment_failed":
         await handlePaymentFailed(event.data.object, env);
         break;
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded":
+      case "invoice.paid": {
+        if (!paymentCanSync(event.type, event.data.object)) break;
+        const id = subscriptionIdFromPayment(event.data.object);
+        if (id) {
+          const subscription = await createStripeClient(env).subscriptions.retrieve(id);
+          await handleSubscriptionUpdated(subscription, env);
+        }
+        break;
+      }
       default:
         console.log("Unhandled payment event:", event.type);
     }

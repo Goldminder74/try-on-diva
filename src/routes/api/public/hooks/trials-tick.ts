@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { serverSendTransactionalEmail } from "@/lib/email/server-send";
+import { cronAuthorized } from "@/lib/cron-auth";
+import { subscriptionIsValid } from "@/lib/entitlements";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase(): any {
@@ -47,21 +49,17 @@ async function hasActiveSub(userId: string): Promise<boolean> {
     .from("subscriptions")
     .select("status, current_period_end")
     .eq("user_id", userId)
-    .in("status", ["active", "trialing", "past_due"])
-    .limit(1)
-    .maybeSingle();
-  return Boolean(data);
+    .eq("customer_type", "retailer")
+    .eq("environment", "live")
+    .not("stripe_subscription_id", "is", null);
+  return (data ?? []).some(subscriptionIsValid);
 }
 
 export const Route = createFileRoute("/api/public/hooks/trials-tick")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Only callable by pg_cron / trusted schedulers that present the
-        // Supabase publishable key in the apikey header. Public callers 401.
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        const provided = request.headers.get("apikey") ?? request.headers.get("x-cron-key");
-        if (!expected || provided !== expected) {
+        if (!cronAuthorized(request, process.env.CRON_SECRET)) {
           return new Response("Unauthorized", { status: 401 });
         }
         const sb = getSupabase();
@@ -116,13 +114,14 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
         const { data: expired } = await sb
           .from("retailers")
           .select("id, owner_id, business_name, display_name, trial_ends_at, is_active")
-          .eq("is_active", true)
           .lt("trial_ends_at", now.toISOString());
 
         let lockedCount = 0;
         for (const r of expired ?? []) {
           if (await hasActiveSub(r.owner_id)) continue;
 
+          // Inactive rows remain eligible for a failed trial-ended email retry.
+          if (r.is_active) {
           // Suspend the retailer (hides from public reads via RLS).
           await sb
             .from("retailers")
@@ -147,6 +146,7 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
             event_type: "trial_expired",
             payload: { trial_ends_at: r.trial_ends_at },
           });
+          }
 
           const inserted = await recordEvent(r.id, "trial_ended");
           if (inserted) {

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
+import { cronAuthorized } from "@/lib/cron-auth";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase(): any {
@@ -16,9 +17,7 @@ export const Route = createFileRoute("/api/public/hooks/quota-reset")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        const provided = request.headers.get("apikey") ?? request.headers.get("x-cron-key");
-        if (!expected || provided !== expected) {
+        if (!cronAuthorized(request, process.env.CRON_SECRET)) {
           return new Response("Unauthorized", { status: 401 });
         }
         const sb = getSupabase();
