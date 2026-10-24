@@ -13,6 +13,8 @@ import {
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
+      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" },
       { title: "FAQ - Wigsmi" },
       { name: "description", content: "Answers to common questions for wig buyers and retailers using Wigsmi." },
       { property: "og:title", content: "FAQ - Wigsmi" },

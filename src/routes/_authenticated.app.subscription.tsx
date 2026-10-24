@@ -13,6 +13,10 @@ const FREE_TRY_ON_LIMIT = 5;
 export const Route = createFileRoute("/_authenticated/app/subscription")({
   head: () => ({
     meta: [
+      { property: "og:title", content: "Your subscription | Wigsmi" },
+      { property: "og:description", content: "Manage your Wigsmi plan and billing." },
+      { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" },
       { title: "Subscription - Wigsmi" },
       { name: "description", content: "Manage your Wigsmi plan, try-on quota, and billing." },
     ],
@@ -79,8 +83,9 @@ function SubscriptionPage() {
   const onManage = async () => {
     setPortalBusy(true);
     try {
-      const { url } = await portal({ data: { environment: getStripeEnvironment(), customerType: "consumer" } });
-      window.open(url, "_blank", "noopener");
+      const result = await portal({ data: { environment: getStripeEnvironment(), customerType: "consumer" } });
+      if ("error" in result) throw new Error(result.error);
+      window.open(result.url, "_blank", "noopener");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't open billing portal");
     } finally {

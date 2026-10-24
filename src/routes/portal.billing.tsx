@@ -10,6 +10,7 @@ import {
   previewPlanChange,
   changeSubscriptionPlan,
 } from "@/lib/subscription.functions";
+import { subscriptionIsValid } from "@/lib/entitlements";
 import { useCheckout } from "@/hooks/useCheckout";
 import { Loader2, ExternalLink, FileText, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -49,6 +50,7 @@ function formatGBP(amountMinor: number) {
 }
 
 export const Route = createFileRoute("/portal/billing")({
+  head: () => ({ meta: [{ title: "Retailer billing | Wigsmi" }, { name: "description", content: "Manage your Wigsmi retailer billing." }, { property: "og:title", content: "Retailer billing | Wigsmi" }, { property: "og:description", content: "Manage your Wigsmi retailer billing." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: BillingPage,
 });
 
@@ -122,14 +124,14 @@ function BillingPage() {
   useEffect(() => {
     if (!user) return;
     invoicesFn({ data: { environment: getStripeEnvironment(), customerType: "retailer" } })
-      .then(setInvoices)
+      .then((result) => { if ("error" in result) throw new Error(result.error); setInvoices(result); })
       .catch(() => setInvoices([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, sub?.stripe_subscription_id]);
 
   const isPaidActive =
     !!sub &&
-    ["active", "trialing", "past_due"].includes(sub.status) &&
+    subscriptionIsValid(sub) &&
     PAID_PLAN_IDS.includes(sub.plan as RetailerPlanId);
 
   const currentPlanId = isPaidActive ? (sub!.plan as RetailerPlanId) : null;
@@ -162,11 +164,12 @@ function BillingPage() {
     // Open the tab synchronously so the browser doesn't block it as a popup.
     const tab = window.open("", "_blank");
     try {
-      const { url } = await portal({
+      const result = await portal({
         data: { environment: getStripeEnvironment(), customerType: "retailer" },
       });
-      if (tab) tab.location.href = url;
-      else window.location.href = url;
+      if ("error" in result) throw new Error(result.error);
+      if (tab) tab.location.href = result.url;
+      else window.location.href = result.url;
     } catch (e) {
       tab?.close();
       toast.error(e instanceof Error ? e.message : "Couldn't open portal");
@@ -182,6 +185,7 @@ function BillingPage() {
       const p = await preview({
         data: { newPriceId: priceId, environment: env, customerType: "retailer" },
       });
+      if ("error" in p) throw new Error(p.error);
       setSwitchPreview({
         planId,
         planName,
@@ -309,7 +313,7 @@ function BillingPage() {
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">VAT included where applicable.</p>
+          <p className="mt-2 text-xs text-muted-foreground">Applicable taxes are shown on your Stripe invoice.</p>
         </div>
       )}
 

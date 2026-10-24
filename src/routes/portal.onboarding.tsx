@@ -7,7 +7,7 @@ import {
 } from "@/lib/retailer.functions";
 
 export const Route = createFileRoute("/portal/onboarding")({
-  head: () => ({ meta: [{ title: "Onboarding - Wigsmi Retailer" }] }),
+  head: () => ({ meta: [{ title: "Retailer onboarding | Wigsmi" }, { name: "description", content: "Manage your Wigsmi retailer onboarding." }, { property: "og:title", content: "Retailer onboarding | Wigsmi" }, { property: "og:description", content: "Manage your Wigsmi retailer onboarding." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Onboarding,
 });
 
@@ -54,8 +54,8 @@ function Onboarding() {
         const retailer = ctx.retailer;
         setForm((f) => ({
           ...f,
-          business_name: ctx.retailer.business_name ?? "",
-          vat_number: ctx.retailer.vat_number ?? "",
+          business_name: retailer.business_name ?? "",
+          vat_number: retailer.vat_number ?? "",
           legal_business_name:
             (ctx.retailer as { legal_business_name?: string | null })
               .legal_business_name ?? "",
