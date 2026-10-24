@@ -99,7 +99,7 @@ const RETAILER_QA: QA[] = [
   },
   {
     q: "Can I upgrade or downgrade my plan later?",
-    a: "Yes, anytime from your billing portal. Changes are prorated automatically.",
+    a: "Yes. Changes are prorated. Before switching to a smaller plan, unpublish any wigs above its limit. If a change is made through Stripe, excess listings are paused, not deleted.",
   },
   {
     q: "Do I keep ownership of my product images and descriptions?",
@@ -111,7 +111,7 @@ const RETAILER_QA: QA[] = [
   },
   {
     q: "Who handles payments and is it secure?",
-    a: "All payments are processed by Stripe, who acts as the merchant of record and handles billing, tax compliance and refunds securely on our behalf.",
+    a: "Payments are processed securely using Stripe. Applicable taxes, the final price and payment terms are shown at checkout. Contact support@wigsmi.com for help with your Wigsmi service.",
   },
   {
     q: "How do I get help if I'm stuck?",
