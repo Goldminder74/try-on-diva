@@ -16,6 +16,7 @@ type Step = 1 | 2 | 3 | 4 | 5;
 interface Form {
   business_name: string;
   legal_business_name: string;
+  vat_number: string;
   display_name: string;
   website: string;
   country: string;
@@ -36,6 +37,7 @@ function Onboarding() {
 
   const [form, setForm] = useState<Form>({
     business_name: "",
+    vat_number: "",
     legal_business_name: "",
     display_name: "",
     website: "",
@@ -49,18 +51,20 @@ function Onboarding() {
   useEffect(() => {
     getCtx().then((ctx) => {
       if (ctx.retailer) {
+        const retailer = ctx.retailer;
         setForm((f) => ({
           ...f,
-          business_name: ctx.retailer!.business_name ?? "",
+          business_name: ctx.retailer.business_name ?? "",
+          vat_number: ctx.retailer.vat_number ?? "",
           legal_business_name:
             (ctx.retailer as { legal_business_name?: string | null })
               .legal_business_name ?? "",
-          display_name: ctx.retailer!.display_name ?? "",
-          website: ctx.retailer!.website ?? "",
-          country: ctx.retailer!.country ?? "",
-          contact_name: ctx.retailer!.contact_name ?? "",
-          currency: (ctx.retailer!.currency as Form["currency"]) ?? "GBP",
-          brand_primary: ctx.retailer!.brand_primary ?? "#3D1C02",
+          display_name: retailer.display_name ?? "",
+          website: retailer.website ?? "",
+          country: retailer.country ?? "",
+          contact_name: retailer.contact_name ?? "",
+          currency: (retailer.currency as Form["currency"]) ?? "GBP",
+          brand_primary: retailer.brand_primary ?? "#3D1C02",
         }));
         if (ctx.retailer.onboarding_completed) {
           navigate({ to: "/portal" });
@@ -139,6 +143,9 @@ function Onboarding() {
                 Your registered legal entity name. Required for billing and tax
                 compliance. Not shown to shoppers.
               </p>
+            </Field>
+            <Field label="VAT number (optional)">
+              <input value={form.vat_number} onChange={(e) => set("vat_number", e.target.value)} maxLength={32} pattern="[A-Za-z0-9 -]*" className={inputCls} />
             </Field>
             <Field label="Display name (shown to shoppers)">
               <input

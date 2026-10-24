@@ -14,7 +14,7 @@ export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
 });
 
-const UPDATED = "10 May 2026";
+const UPDATED = "24 October 2026";
 
 function PrivacyPage() {
   return (
@@ -54,7 +54,7 @@ function PrivacyPage() {
               <li><strong>Profile data:</strong> optional preferences, style quiz answers, wishlist.</li>
               <li><strong>Photos:</strong> selfies you upload for try-on. Stored only as long as needed to render the result and any photos you choose to save.</li>
               <li><strong>Usage data:</strong> try-on counts, pages visited, device and browser info, IP address.</li>
-              <li><strong>Retailer data:</strong> business name, contact details, catalog content, payment metadata (handled by our payment processor - we do not store card numbers).</li>
+              <li><strong>Retailer data:</strong> business name, optional VAT number, contact details, catalog content, payment metadata (handled by our payment processor - we do not store card numbers).</li>
             </ul>
           </section>
 
@@ -83,7 +83,7 @@ function PrivacyPage() {
             <p>We share data only with processors that help us run the Service:</p>
             <ul className="list-disc space-y-2 pl-6">
               <li>Cloud hosting and database providers.</li>
-              <li>Stripe (stripe.com) - our payment processor and merchant of record, who handles all billing for retailer and consumer subscriptions. Stripe is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See stripe.com/privacy.</li>
+              <li>Stripe (stripe.com) processes payment information and supports billing for retailer and consumer subscriptions. Its role and applicable transaction terms are shown at checkout. See stripe.com/privacy.</li>
               <li>Google LLC (Gemini image API) - processes selfie photos you upload solely to generate your virtual try-on result. Google is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See policies.google.com/privacy. Photos are not retained by Google beyond the processing request.</li>
               <li>Email delivery providers.</li>
               <li>Analytics providers (aggregated, where possible).</li>

@@ -356,6 +356,7 @@ export type Database = {
           slug: string
           trial_ends_at: string | null
           updated_at: string
+          vat_number: string | null
           website: string | null
           widget_calls_month_reset: string
           widget_calls_this_month: number
@@ -380,6 +381,7 @@ export type Database = {
           slug: string
           trial_ends_at?: string | null
           updated_at?: string
+          vat_number?: string | null
           website?: string | null
           widget_calls_month_reset?: string
           widget_calls_this_month?: number
@@ -404,10 +406,26 @@ export type Database = {
           slug?: string
           trial_ends_at?: string | null
           updated_at?: string
+          vat_number?: string | null
           website?: string | null
           widget_calls_month_reset?: string
           widget_calls_this_month?: number
           widget_cta_text?: string | null
+        }
+        Relationships: []
+      }
+      scheduled_hook_credentials: {
+        Row: {
+          name: string
+          secret: string
+        }
+        Insert: {
+          name: string
+          secret: string
+        }
+        Update: {
+          name?: string
+          secret?: string
         }
         Relationships: []
       }

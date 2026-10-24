@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { PLAN_WIG_CAPS } from "@/lib/billing-rules";
+import { retailerPlanFromSub } from "@/lib/entitlements";
 
 const slugify = (s: string) =>
   s
@@ -34,6 +36,7 @@ export const getMyRetailerContext = createServerFn({ method: "GET" })
 const onboardingSchema = z.object({
   business_name: z.string().min(2).max(120),
   legal_business_name: z.string().min(2).max(200),
+  vat_number: z.string().trim().max(32).regex(/^[A-Za-z0-9 -]*$/).optional(),
   display_name: z.string().min(2).max(120),
   website: z.string().url().optional().or(z.literal("")),
   country: z.string().max(80).optional(),
@@ -69,6 +72,7 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
       owner_id: userId,
       business_name: data.business_name,
       legal_business_name: data.legal_business_name,
+      vat_number: data.vat_number || null,
       display_name: data.display_name,
       website: data.website || null,
       country: data.country || null,
@@ -108,6 +112,8 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
 const updateRetailerSchema = z.object({
   display_name: z.string().min(2).optional(),
   business_name: z.string().min(2).optional(),
+  legal_business_name: z.string().min(2).max(200).optional(),
+  vat_number: z.string().trim().max(32).regex(/^[A-Za-z0-9 -]*$/).nullable().optional(),
   website: z.string().url().nullable().optional(),
   country: z.string().nullable().optional(),
   contact_name: z.string().nullable().optional(),
@@ -191,12 +197,6 @@ const wigSchema = z.object({
   is_featured: z.boolean().default(false),
 });
 
-const PLAN_WIG_CAPS: Record<string, number> = {
-  starter: 30,
-  growth: 150,
-  scale: Number.POSITIVE_INFINITY,
-};
-
 async function getRetailerEntitlement(
   supabase: any,
   userId: string,
@@ -216,17 +216,11 @@ async function getRetailerEntitlement(
     .order("created_at", { ascending: false })
     .limit(1);
   const sub = subRows?.[0];
-  const subValid =
-    !!sub &&
-    ((["active", "trialing", "past_due"].includes(sub.status) &&
-      (!sub.current_period_end || new Date(sub.current_period_end) > new Date())) ||
-      (sub.status === "canceled" &&
-        sub.current_period_end &&
-        new Date(sub.current_period_end) > new Date()));
-  const hasPaidSub = !!subValid && (sub!.plan === "starter" || sub!.plan === "growth" || sub!.plan === "scale");
+  const paidPlan = retailerPlanFromSub(sub);
+  const hasPaidSub = !!paidPlan;
   const trialActive =
     !!retailer.trial_ends_at && new Date(retailer.trial_ends_at) > new Date();
-  const effectivePlan = hasPaidSub ? sub!.plan : trialActive ? "starter" : "expired";
+  const effectivePlan = paidPlan ?? (trialActive ? "starter" : "expired");
   const cap = PLAN_WIG_CAPS[effectivePlan] ?? 0;
   return { retailerId: retailer.id, effectivePlan, cap, trialActive, hasPaidSub };
 }
@@ -264,12 +258,14 @@ export const saveMyWig = createServerFn({ method: "POST" })
       throw new Error("Your trial has ended. Upgrade to a paid plan to manage your catalog.");
     }
 
-    // For new wigs, enforce the cap.
-    if (!data.id) {
+    // Publishing an existing draft must obey the same cap as a new listing.
+    if (data.is_published) {
       const { count } = await supabase
         .from("wigs")
         .select("id", { count: "exact", head: true })
-        .eq("retailer_id", ent.retailerId);
+        .eq("retailer_id", ent.retailerId)
+        .eq("is_published", true)
+        .neq("id", data.id ?? "00000000-0000-0000-0000-000000000000");
       if ((count ?? 0) >= ent.cap) {
         throw new Error(
           `You've reached the ${ent.effectivePlan} plan limit of ${ent.cap} wigs. Upgrade to add more.`,

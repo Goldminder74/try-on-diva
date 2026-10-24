@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { planChangeError } from "@/lib/billing-rules";
 import {
   type StripeEnv,
   createStripeClient,
@@ -9,6 +10,21 @@ import {
 
 const envSchema = z.enum(["sandbox", "live"]);
 const customerTypeSchema = z.enum(["consumer", "retailer"]);
+
+async function checkPlanChange(supabase: any, userId: string, priceId: string, type: string) {
+  let published = 0;
+  if (type === "retailer") {
+    const { data: retailer, error } = await supabase.from("retailers").select("id").eq("owner_id", userId).maybeSingle();
+    if (error) throw error;
+    if (retailer) {
+      const result = await supabase.from("wigs").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id).eq("is_published", true);
+      if (result.error) throw result.error;
+      published = result.count ?? 0;
+    }
+  }
+  const error = planChangeError(priceId, type, published);
+  if (error) throw new Error(error);
+}
 
 async function resolvePriceByLookupKey(
   stripe: ReturnType<typeof createStripeClient>,
@@ -84,6 +100,7 @@ export const changeSubscriptionPlan = createServerFn({ method: "POST" })
     }
 
     try {
+      await checkPlanChange(supabase, userId, data.newPriceId, data.customerType);
       const stripe = createStripeClient(data.environment as StripeEnv);
       const price = await resolvePriceByLookupKey(stripe, data.newPriceId);
       const current = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
@@ -133,6 +150,7 @@ export const previewPlanChange = createServerFn({ method: "POST" })
       throw new Error("No active subscription.");
     }
 
+    await checkPlanChange(supabase, userId, data.newPriceId, data.customerType);
     const stripe = createStripeClient(data.environment as StripeEnv);
     const price = await resolvePriceByLookupKey(stripe, data.newPriceId);
     const current = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);

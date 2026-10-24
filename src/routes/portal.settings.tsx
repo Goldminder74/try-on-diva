@@ -20,6 +20,8 @@ function Settings() {
   const [form, setForm] = useState({
     display_name: "",
     business_name: "",
+    vat_number: "",
+    legal_business_name: "",
     website: "",
     country: "",
     contact_name: "",
@@ -37,6 +39,8 @@ function Settings() {
       setForm({
         display_name: ctx.retailer.display_name ?? "",
         business_name: ctx.retailer.business_name ?? "",
+        legal_business_name: ctx.retailer.legal_business_name ?? "",
+        vat_number: ctx.retailer.vat_number ?? "",
         website: ctx.retailer.website ?? "",
         country: ctx.retailer.country ?? "",
         contact_name: ctx.retailer.contact_name ?? "",
@@ -57,6 +61,8 @@ function Settings() {
         data: {
           display_name: form.display_name,
           business_name: form.business_name,
+          legal_business_name: form.legal_business_name,
+          vat_number: form.vat_number || null,
           website: form.website || null,
           country: form.country || null,
           contact_name: form.contact_name || null,
@@ -89,12 +95,18 @@ function Settings() {
               className={inputCls}
             />
           </Field>
-          <Field label="Legal business name">
+          <Field label="Business name">
             <input
               value={form.business_name}
               onChange={(e) => setForm({ ...form, business_name: e.target.value })}
               className={inputCls}
             />
+          </Field>
+          <Field label="Legal business name">
+            <input value={form.legal_business_name} onChange={(e) => setForm({ ...form, legal_business_name: e.target.value })} required maxLength={200} className={inputCls} />
+          </Field>
+          <Field label="VAT number (optional)">
+            <input value={form.vat_number} onChange={(e) => setForm({ ...form, vat_number: e.target.value })} maxLength={32} pattern="[A-Za-z0-9 -]*" className={inputCls} />
           </Field>
           <Field label="Website">
             <input
