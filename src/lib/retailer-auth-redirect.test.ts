@@ -9,30 +9,32 @@ describe("retailer login return destination", () => {
   it("preserves plan checkout selection", () => {
     expect(retailerAuthRedirect("?plan=growth&interval=yearly&redirect=%2Fportal")).toBe("/portal/billing?plan=growth&interval=yearly");
   });
-  it("passes the selected plan and interval through actual router URL parsing", () => {
+  it("passes the selected plan and interval through actual router URL parsing", async () => {
     const root = createRootRoute();
-    const billing = createRoute({ getParentRoute: () => root, path: "/portal/billing" });
+    const billing = createRoute({ getParentRoute: () => root, path: "/portal/billing", staticData: { sitemap: false } });
     const router = createRouter({
       routeTree: root.addChildren([billing]),
       history: createMemoryHistory({ initialEntries: ["/retailer/login"] }),
     });
-    const location = router.buildLocation({
+    await router.navigate({
       href: retailerAuthRedirect("?plan=growth&interval=yearly"),
     });
+    const location = router.state.location;
     expect(location.pathname).toBe("/portal/billing");
     expect(location.search).toEqual({ plan: "growth", interval: "yearly" });
     expect(location.href).toBe("/portal/billing?plan=growth&interval=yearly");
   });
-  it("preserves query strings and hashes on protected return destinations", () => {
+  it("preserves query strings and hashes on protected return destinations", async () => {
     const root = createRootRoute();
-    const catalog = createRoute({ getParentRoute: () => root, path: "/portal/catalog" });
+    const catalog = createRoute({ getParentRoute: () => root, path: "/portal/catalog", staticData: { sitemap: false } });
     const router = createRouter({
       routeTree: root.addChildren([catalog]),
       history: createMemoryHistory({ initialEntries: ["/retailer/login"] }),
     });
-    const location = router.buildLocation({
+    await router.navigate({
       href: retailerAuthRedirect(`?redirect=${encodeURIComponent("/portal/catalog?filter=published#styles")}`),
     });
+    const location = router.state.location;
     expect(location.pathname).toBe("/portal/catalog");
     expect(location.search).toEqual({ filter: "published" });
     expect(location.hash).toBe("styles");
