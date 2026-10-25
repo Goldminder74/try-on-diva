@@ -19,6 +19,7 @@ describe("retailer login return destination", () => {
     await router.navigate({
       href: retailerAuthRedirect("?plan=growth&interval=yearly"),
     });
+    await router.load();
     const location = router.state.location;
     expect(location.pathname).toBe("/portal/billing");
     expect(location.search).toEqual({ plan: "growth", interval: "yearly" });
@@ -34,6 +35,7 @@ describe("retailer login return destination", () => {
     await router.navigate({
       href: retailerAuthRedirect(`?redirect=${encodeURIComponent("/portal/catalog?filter=published#styles")}`),
     });
+    await router.load();
     const location = router.state.location;
     expect(location.pathname).toBe("/portal/catalog");
     expect(location.search).toEqual({ filter: "published" });
