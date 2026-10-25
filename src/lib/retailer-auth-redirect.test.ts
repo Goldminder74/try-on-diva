@@ -18,7 +18,7 @@ describe("retailer login return destination", () => {
     });
     const destination = {
       href: retailerAuthRedirect("?plan=growth&interval=yearly"),
-      replace: false,
+      to: "/portal/billing",
     };
     const location = router.buildLocation(destination);
     expect(location.pathname).toBe("/portal/billing");
@@ -34,7 +34,7 @@ describe("retailer login return destination", () => {
     });
     const destination = {
       href: retailerAuthRedirect(`?redirect=${encodeURIComponent("/portal/catalog?filter=published#styles")}`),
-      replace: false,
+      to: "/portal/catalog",
     };
     const location = router.buildLocation(destination);
     expect(location.pathname).toBe("/portal/catalog");
