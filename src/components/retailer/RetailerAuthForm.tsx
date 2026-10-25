@@ -51,7 +51,7 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        await navigate({ to: redirectPath });
+        await navigate({ href: redirectPath });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");

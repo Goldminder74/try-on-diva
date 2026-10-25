@@ -1,3 +1,8 @@
+# Monitoring billing findings
+
+- [x] Verify Stripe upsert conflict target against the current database: the non-partial unique index already exists; finding is stale.
+- [ ] Preserve selected-plan and protected-page query strings after retailer login; run router regression tests.
+
 # Billing audit fixes
 
 - [x] Recover subscription state from checkout and paid-invoice webhooks; surface database failures for retry.
