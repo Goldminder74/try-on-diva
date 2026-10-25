@@ -15,6 +15,7 @@ describe("retailer login return destination", () => {
     const router = createRouter({
       routeTree: root.addChildren([billing]),
       history: createMemoryHistory({ initialEntries: ["/retailer/login"] }),
+      isServer: false,
     });
     await router.navigate({
       href: retailerAuthRedirect("?plan=growth&interval=yearly"),
@@ -31,6 +32,7 @@ describe("retailer login return destination", () => {
     const router = createRouter({
       routeTree: root.addChildren([catalog]),
       history: createMemoryHistory({ initialEntries: ["/retailer/login"] }),
+      isServer: false,
     });
     await router.navigate({
       href: retailerAuthRedirect(`?redirect=${encodeURIComponent("/portal/catalog?filter=published#styles")}`),
