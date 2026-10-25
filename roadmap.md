@@ -1,7 +1,7 @@
 # Monitoring billing findings
 
 - [x] Verify Stripe upsert conflict target against the current database: the non-partial unique index already exists; finding is stale.
-- [ ] Preserve selected-plan and protected-page query strings after retailer login; run router regression tests.
+- [x] Preserve selected-plan and protected-page query strings after retailer login; six retailer redirect tests and eleven callback tests passed. Signed-in preview opened the selected Growth yearly checkout; preview validation passed.
 
 # Billing audit fixes
 
