@@ -11,6 +11,8 @@ import { takeSelfie } from "@/lib/selfie-handoff";
 import { useServerFn } from "@tanstack/react-start";
 import { getTryOnQuota } from "@/lib/try-on.functions";
 import { Link } from "@tanstack/react-router";
+import { useCheckout } from "@/hooks/useCheckout";
+import { TRYON_PACKS, formatPackPrice } from "@/lib/topup";
 // Apply-wig generation logic lives in a hook outside this Lovable-managed file.
 import { useApplyWig, type TryOnView } from "@/hooks/useApplyWig";
 
@@ -34,6 +36,21 @@ function AppTryOn() {
   const [error, setError] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ remaining: number | null; isPaid: boolean } | null>(null);
   const { features: planFeats } = usePlanFeatures();
+  const { openCheckout } = useCheckout();
+  const [packBusy, setPackBusy] = useState(false);
+
+  // One-off top-up: adds try-ons on top of this month's allowance.
+  const onBuyPack = async () => {
+    setPackBusy(true);
+    try {
+      await openCheckout({
+        priceId: TRYON_PACKS[0].priceId,
+        successUrl: `${window.location.origin}/checkout/success?type=topup`,
+      });
+    } finally {
+      setPackBusy(false);
+    }
+  };
 
   // Apply-wig flow (gate + selfie conversion + generateTryOn) lives in the hook.
   const {
@@ -141,8 +158,21 @@ function AppTryOn() {
       {blocked && (
         <div className="mt-6 rounded-xl border border-gold/30 bg-gold/10 p-5">
           <p className="font-display text-2xl text-mahogany">You've used this month's try-ons.</p>
-          <p className="mt-2 text-sm text-foreground/80">Free accounts get 5 a month, Plus gets 35 and Pro gets 100. Upgrade for more, or wait until the 1st.</p>
-          <Link to="/pricing" className="mt-4 inline-flex rounded-md bg-mahogany px-4 py-2 text-sm text-cream">See plans</Link>
+          <p className="mt-2 text-sm text-foreground/80">
+            Free accounts get 5 a month, Plus gets 35 and Pro gets 100. Add a one-off
+            pack now, upgrade for more, or wait until the 1st.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              onClick={onBuyPack}
+              disabled={packBusy}
+              className="inline-flex items-center gap-2 rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
+            >
+              {packBusy && <RefreshCw className="h-4 w-4 animate-spin" />}
+              Add {TRYON_PACKS[0].credits} try-ons for {formatPackPrice(TRYON_PACKS[0])}
+            </button>
+            <Link to="/pricing" className="inline-flex rounded-md border border-mahogany px-4 py-2 text-sm text-mahogany hover:bg-mahogany hover:text-cream">See plans</Link>
+          </div>
         </div>
       )}
 

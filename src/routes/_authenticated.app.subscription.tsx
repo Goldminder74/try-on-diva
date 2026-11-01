@@ -8,6 +8,9 @@ import { createPortalSession } from "@/lib/subscription.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { toast } from "sonner";
 import { planFeatures } from "@/lib/entitlements";
+import { useCheckout } from "@/hooks/useCheckout";
+import { getMyTryOnCredits } from "@/lib/topup.functions";
+import { TRYON_PACKS, formatPackPrice } from "@/lib/topup";
 
 
 export const Route = createFileRoute("/_authenticated/app/subscription")({
@@ -36,6 +39,41 @@ function SubscriptionPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [portalBusy, setPortalBusy] = useState(false);
+  const creditsFn = useServerFn(getMyTryOnCredits);
+  const { openCheckout } = useCheckout();
+  const [creditCount, setCreditCount] = useState(0);
+  const [packBusy, setPackBusy] = useState(false);
+
+  // Purchased top-up packs sit on top of the monthly allowance.
+  useEffect(() => {
+    let on = true;
+    creditsFn()
+      .then((r) => on && setCreditCount(r.remaining))
+      .catch(() => {});
+    return () => {
+      on = false;
+    };
+  }, [creditsFn]);
+
+  const onBuyPack = async () => {
+    setPackBusy(true);
+    try {
+      await openCheckout({
+        priceId: TRYON_PACKS[0].priceId,
+        successUrl: `${window.location.origin}/checkout/success?type=topup`,
+      });
+      // The provider's notification lands a moment later; re-read the balance.
+      setTimeout(() => {
+        creditsFn()
+          .then((r) => setCreditCount(r.remaining))
+          .catch(() => {});
+      }, 4000);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't start checkout");
+    } finally {
+      setPackBusy(false);
+    }
+  };
 
   useEffect(() => {
     let on = true;
@@ -176,6 +214,28 @@ function SubscriptionPage() {
           })}
           .
         </p>
+
+        {/* Purchased top-ups: tried after the monthly allowance runs out. */}
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-sand/40 p-4">
+          <div>
+            <p className="text-sm font-medium text-mahogany">
+              {creditCount > 0
+                ? `${creditCount} extra try-on${creditCount === 1 ? "" : "s"} ready to use`
+                : "No extra try-ons yet"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              One-off pack, used only after this month's allowance. No renewal.
+            </p>
+          </div>
+          <button
+            onClick={onBuyPack}
+            disabled={packBusy}
+            className="inline-flex items-center gap-2 rounded-md bg-mahogany px-4 py-2 text-xs font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50"
+          >
+            {packBusy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            Add {TRYON_PACKS[0].credits} for {formatPackPrice(TRYON_PACKS[0])}
+          </button>
+        </div>
       </section>
 
       {/* Compare plans */}

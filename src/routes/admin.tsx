@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { Wordmark } from "@/components/wigsmi/Wordmark";
 import { getAdminContext } from "@/lib/admin.functions";
-import { LayoutDashboard, Users, Store, Package, Star, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Store, Package, Star, LogOut, Percent } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin - Wigsmi" }, { name: "description", content: "Wigsmi platform administration." }, { property: "og:title", content: "Admin - Wigsmi" }, { property: "og:description", content: "Wigsmi platform administration." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -96,6 +96,7 @@ function AdminLayout() {
             <SideLink to="/admin/consumers" icon={<Users className="h-4 w-4" />} label="Consumers" active={pathname.startsWith("/admin/consumers")} />
             <SideLink to="/admin/catalog" icon={<Package className="h-4 w-4" />} label="Catalog" active={pathname.startsWith("/admin/catalog")} />
             <SideLink to="/admin/featured" icon={<Star className="h-4 w-4" />} label="Featured" active={pathname.startsWith("/admin/featured")} />
+            <SideLink to="/admin/commission" icon={<Percent className="h-4 w-4" />} label="Commission" active={pathname.startsWith("/admin/commission")} />
           </nav>
         </aside>
         <main className="flex-1 min-w-0">

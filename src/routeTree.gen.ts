@@ -23,6 +23,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TryOnRouteImport } from './routes/try-on'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
+import { Route as AdminCommissionRouteImport } from './routes/admin.commission'
 import { Route as AdminConsumersRouteImport } from './routes/admin.consumers'
 import { Route as AdminFeaturedRouteImport } from './routes/admin.featured'
 import { Route as AdminRetailersRouteImport } from './routes/admin.retailers'
@@ -32,10 +33,12 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as GoWigIdRouteImport } from './routes/go.$wigId'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PortalAnalyticsRouteImport } from './routes/portal.analytics'
 import { Route as PortalApiKeysRouteImport } from './routes/portal.api-keys'
 import { Route as PortalBillingRouteImport } from './routes/portal.billing'
+import { Route as PortalCommissionRouteImport } from './routes/portal.commission'
 import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
 import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalWidgetRouteImport } from './routes/portal.widget'
@@ -127,6 +130,11 @@ const AdminCatalogRoute = AdminCatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCommissionRoute = AdminCommissionRouteImport.update({
+  id: '/commission',
+  path: '/commission',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminConsumersRoute = AdminConsumersRouteImport.update({
   id: '/consumers',
   path: '/consumers',
@@ -172,6 +180,11 @@ const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   path: '/checkout/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GoWigIdRoute = GoWigIdRouteImport.update({
+  id: '/go/$wigId',
+  path: '/go/$wigId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalIndexRoute = PortalIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -190,6 +203,11 @@ const PortalApiKeysRoute = PortalApiKeysRouteImport.update({
 const PortalBillingRoute = PortalBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalCommissionRoute = PortalCommissionRouteImport.update({
+  id: '/commission',
+  path: '/commission',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
@@ -318,6 +336,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/commission': typeof AdminCommissionRoute
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
   '/admin/retailers': typeof AdminRetailersRoute
@@ -327,9 +346,11 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/go/$wigId': typeof GoWigIdRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
+  '/portal/commission': typeof PortalCommissionRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/portal/widget': typeof PortalWidgetRoute
@@ -365,6 +386,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/commission': typeof AdminCommissionRoute
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
   '/admin/retailers': typeof AdminRetailersRoute
@@ -374,9 +396,11 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/go/$wigId': typeof GoWigIdRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
+  '/portal/commission': typeof PortalCommissionRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/portal/widget': typeof PortalWidgetRoute
@@ -416,6 +440,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/commission': typeof AdminCommissionRoute
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
   '/admin/retailers': typeof AdminRetailersRoute
@@ -425,9 +450,11 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/go/$wigId': typeof GoWigIdRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
+  '/portal/commission': typeof PortalCommissionRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/portal/widget': typeof PortalWidgetRoute
@@ -467,6 +494,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/try-on'
     | '/admin/catalog'
+    | '/admin/commission'
     | '/admin/consumers'
     | '/admin/featured'
     | '/admin/retailers'
@@ -476,9 +504,11 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/go/$wigId'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
+    | '/portal/commission'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/portal/widget'
@@ -514,6 +544,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/try-on'
     | '/admin/catalog'
+    | '/admin/commission'
     | '/admin/consumers'
     | '/admin/featured'
     | '/admin/retailers'
@@ -523,9 +554,11 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/go/$wigId'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
+    | '/portal/commission'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/portal/widget'
@@ -564,6 +597,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/try-on'
     | '/admin/catalog'
+    | '/admin/commission'
     | '/admin/consumers'
     | '/admin/featured'
     | '/admin/retailers'
@@ -573,9 +607,11 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/go/$wigId'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
+    | '/portal/commission'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/portal/widget'
@@ -620,6 +656,7 @@ export interface RootRouteChildren {
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+  GoWigIdRoute: typeof GoWigIdRoute
   RetailerLoginRoute: typeof RetailerLoginRoute
   RetailerSignupRoute: typeof RetailerSignupRoute
   WigIdRoute: typeof WigIdRoute
@@ -731,6 +768,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCatalogRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/commission': {
+      id: '/admin/commission'
+      path: '/commission'
+      fullPath: '/admin/commission'
+      preLoaderRoute: typeof AdminCommissionRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/consumers': {
       id: '/admin/consumers'
       path: '/consumers'
@@ -794,6 +838,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/go/$wigId': {
+      id: '/go/$wigId'
+      path: '/go/$wigId'
+      fullPath: '/go/$wigId'
+      preLoaderRoute: typeof GoWigIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal/': {
       id: '/portal/'
       path: '/'
@@ -820,6 +871,13 @@ declare module '@tanstack/react-router' {
       path: '/billing'
       fullPath: '/portal/billing'
       preLoaderRoute: typeof PortalBillingRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/commission': {
+      id: '/portal/commission'
+      path: '/commission'
+      fullPath: '/portal/commission'
+      preLoaderRoute: typeof PortalCommissionRouteImport
       parentRoute: typeof PortalRoute
     }
     '/portal/onboarding': {
@@ -998,6 +1056,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminCatalogRoute: typeof AdminCatalogRoute
+  AdminCommissionRoute: typeof AdminCommissionRoute
   AdminConsumersRoute: typeof AdminConsumersRoute
   AdminFeaturedRoute: typeof AdminFeaturedRoute
   AdminRetailersRoute: typeof AdminRetailersRoute
@@ -1006,6 +1065,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogRoute: AdminCatalogRoute,
+  AdminCommissionRoute: AdminCommissionRoute,
   AdminConsumersRoute: AdminConsumersRoute,
   AdminFeaturedRoute: AdminFeaturedRoute,
   AdminRetailersRoute: AdminRetailersRoute,
@@ -1018,6 +1078,7 @@ interface PortalRouteChildren {
   PortalAnalyticsRoute: typeof PortalAnalyticsRoute
   PortalApiKeysRoute: typeof PortalApiKeysRoute
   PortalBillingRoute: typeof PortalBillingRoute
+  PortalCommissionRoute: typeof PortalCommissionRoute
   PortalOnboardingRoute: typeof PortalOnboardingRoute
   PortalSettingsRoute: typeof PortalSettingsRoute
   PortalWidgetRoute: typeof PortalWidgetRoute
@@ -1030,6 +1091,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalAnalyticsRoute: PortalAnalyticsRoute,
   PortalApiKeysRoute: PortalApiKeysRoute,
   PortalBillingRoute: PortalBillingRoute,
+  PortalCommissionRoute: PortalCommissionRoute,
   PortalOnboardingRoute: PortalOnboardingRoute,
   PortalSettingsRoute: PortalSettingsRoute,
   PortalWidgetRoute: PortalWidgetRoute,
@@ -1060,6 +1122,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
+  GoWigIdRoute: GoWigIdRoute,
   RetailerLoginRoute: RetailerLoginRoute,
   RetailerSignupRoute: RetailerSignupRoute,
   WigIdRoute: WigIdRoute,

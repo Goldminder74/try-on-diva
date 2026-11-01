@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import { type StripeEnv, verifyWebhook, createStripeClient } from "@/lib/stripe.server";
 import { serverSendTransactionalEmail } from "@/lib/email/server-send";
 import { PLAN_WIG_CAPS, paymentCanSync, subscriptionIdFromPayment } from "@/lib/billing-rules";
+import { getPackByPriceId, packExpiresAt } from "@/lib/topup";
+import { grantPackCredits } from "@/lib/topup.grant";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase(): any {
@@ -354,6 +356,71 @@ async function handlePaymentFailed(invoice: any, env: StripeEnv) {
   }
 }
 
+/**
+ * A one-off purchase (a try-on pack) has settled. Add the try-ons it bought to
+ * the shopper's balance and tell them what they now have.
+ */
+async function handleOneOffPurchase(session: any, env: StripeEnv) {
+  const stripe = createStripeClient(env);
+  const full = await stripe.checkout.sessions.retrieve(session.id, {
+    expand: ["line_items.data.price"],
+  });
+
+  const userId = full.metadata?.userId;
+  if (!userId) {
+    console.error("Webhook: one-off purchase with no userId metadata:", full.id);
+    return;
+  }
+
+  const item = full.line_items?.data?.[0];
+  const priceId: string | null =
+    item?.price?.lookup_key ??
+    item?.price?.metadata?.lovable_external_id ??
+    full.metadata?.packPriceId ??
+    null;
+
+  const purchasedAt = full.created ? new Date(full.created * 1000) : new Date();
+  const result = await grantPackCredits(getSupabase(), {
+    userId,
+    priceId: priceId ?? "",
+    sessionId: full.id,
+    amountGbp: full.amount_total ? full.amount_total / 100 : null,
+    currency: full.currency?.toUpperCase() ?? "GBP",
+    purchasedAt,
+  });
+  if ("error" in result) throw new Error(result.error);
+
+  const pack = getPackByPriceId(priceId);
+  if (!pack) return;
+
+  const sb = getSupabase();
+  const { data: profile } = await sb
+    .from("profiles")
+    .select("email, display_name")
+    .eq("id", userId)
+    .maybeSingle();
+  if (!profile?.email) return;
+
+  const expires = packExpiresAt(purchasedAt, pack.validMonths);
+  await serverSendTransactionalEmail({
+    baseUrl: "https://wigsmi.com",
+    templateName: "consumer-topup",
+    recipientEmail: profile.email,
+    idempotencyKey: `topup-${full.id}`,
+    templateData: {
+      name: profile.display_name,
+      credits: pack.credits,
+      priceGbp: pack.amountGbp,
+      expiresOn: expires.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+      appUrl: "https://wigsmi.com/app/try-on",
+    },
+  });
+}
+
 async function handleWebhook(req: Request, env: StripeEnv) {
   const event = (await verifyWebhook(req, env)) as {
     id?: string;
@@ -379,6 +446,12 @@ async function handleWebhook(req: Request, env: StripeEnv) {
       case "checkout.session.async_payment_succeeded":
       case "invoice.paid": {
         if (!paymentCanSync(event.type, event.data.object)) break;
+        // A one-off charge (try-on pack) is not a subscription: grant what it
+        // bought instead of trying to sync subscription state.
+        if (event.data.object?.mode === "payment") {
+          await handleOneOffPurchase(event.data.object, env);
+          break;
+        }
         const id = subscriptionIdFromPayment(event.data.object);
         if (id) {
           const subscription = await createStripeClient(env).subscriptions.retrieve(id);

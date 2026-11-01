@@ -555,15 +555,20 @@ export const generateTryOn = createServerFn({ method: "POST" })
     if (!reserved?.allowed) {
       throw new Error(
         tier === "free"
-          ? "Free try-on limit reached this month."
-          : `Monthly try-on limit reached (${features.monthlyTryOns} on your plan). It resets on the 1st.`,
+          ? "Free try-on limit reached this month. Buy a 10 try-on pack for £2.99, or it resets on the 1st."
+          : `Monthly try-on limit reached (${features.monthlyTryOns} on your plan). Buy a 10 try-on pack for £2.99, or it resets on the 1st.`,
       );
     }
+
+    // Which bucket paid for this try-on: the plan's monthly allowance or a
+    // purchased pack. A refund has to go back to the same one.
+    const paidFrom: string = reserved.source ?? "quota";
+    const creditId: string | null = reserved.credit_id ?? null;
 
     // Any failure past this point refunds the reserved try-on.
     const refund = async () => {
       try {
-        await supabase.rpc("refund_try_on");
+        await supabase.rpc("refund_try_on", { _source: paidFrom, _credit_id: creditId ?? undefined });
       } catch {
         /* best effort */
       }
@@ -684,8 +689,12 @@ export const recordTryOn = createServerFn({ method: "POST" })
     }
 
     const cap = planFeatures(await getConsumerTier(supabase, userId)).monthlyTryOns;
+    const { data: creditBalance } = await supabase.rpc("get_try_on_credit_balance");
+    const credits = creditBalance ?? 0;
 
-    if (count >= cap) {
+    // The plan's monthly allowance is spent first; a purchased pack covers
+    // anything beyond it.
+    if (count >= cap && credits <= 0) {
       return { allowed: false as const, reason: "quota", remaining: 0 };
     }
 
@@ -694,7 +703,7 @@ export const recordTryOn = createServerFn({ method: "POST" })
     // generation neither inflates retailer analytics nor burns a free try-on.
     return {
       allowed: true as const,
-      remaining: Math.max(0, cap - (count + 1)),
+      remaining: Math.max(0, cap - (count + 1)) + credits,
     };
 
   });
@@ -730,10 +739,16 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
     const tier = consumerTier(subRows?.[0]);
     const features = planFeatures(tier);
     const isPaid = tier !== "free";
+    const { data: creditBalance } = await supabase.rpc("get_try_on_credit_balance");
+    const credits = creditBalance ?? 0;
+    const planRemaining = Math.max(0, features.monthlyTryOns - count);
     return {
       count,
-      remaining: Math.max(0, features.monthlyTryOns - count),
+      // What the shopper can still do this month: plan allowance plus packs.
+      remaining: planRemaining + credits,
       limit: features.monthlyTryOns,
+      planRemaining,
+      creditsRemaining: credits,
       isPaid,
       tier,
       features,

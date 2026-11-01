@@ -29,6 +29,27 @@
       "when": 1792871654207,
       "tag": "0003_tighten_storage_and_analytics_rules",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793496888223,
+      "tag": "0004_add_tryon_credits_and_affiliate_commissions",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793496985770,
+      "tag": "0005_add_wig_checkout_target_lookup",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793496997606,
+      "tag": "0006_add_wig_click_increment",
+      "breakpoints": true
     }
   ]
 }

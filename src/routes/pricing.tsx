@@ -14,6 +14,7 @@ import {
   previewPlanChange,
 } from "@/lib/subscription.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { TRYON_PACKS, formatPackPrice } from "@/lib/topup";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -179,6 +180,27 @@ function Pricing() {
         customerEmail: user.email ?? undefined,
         customData: { userId: user.id, plan: planName },
         successUrl: `${window.location.origin}/checkout/success?type=consumer`,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const onBuyPack = async () => {
+    if (!user) {
+      navigate({ to: "/auth/login" });
+      return;
+    }
+    const pack = TRYON_PACKS[0];
+    setBusyId("pack");
+    try {
+      await openCheckout({
+        priceId: pack.priceId,
+        customerEmail: user.email ?? undefined,
+        customData: { userId: user.id },
+        successUrl: `${window.location.origin}/checkout/success?type=topup`,
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Something went wrong");
@@ -367,6 +389,27 @@ function Pricing() {
               </div>
             );
           })}
+        </div>
+
+        <div className="mt-8 rounded-xl border border-gold/40 bg-gold/10 p-6 md:flex md:items-center md:justify-between md:gap-6">
+          <div>
+            <p className="font-display text-2xl text-mahogany">
+              Need more this month?
+            </p>
+            <p className="mt-1 text-sm text-foreground/80">
+              {TRYON_PACKS[0].label} for {formatPackPrice(TRYON_PACKS[0])} - a one-off
+              top-up on any plan, yours to use for {TRYON_PACKS[0].validMonths} months.
+              Your monthly allowance is always used first.
+            </p>
+          </div>
+          <button
+            onClick={onBuyPack}
+            disabled={busyId === "pack"}
+            className="mt-4 inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-mahogany px-5 py-2.5 text-sm font-medium text-cream hover:bg-mahogany-soft disabled:opacity-50 md:mt-0"
+          >
+            {busyId === "pack" && <Loader2 className="h-4 w-4 animate-spin" />}
+            Add {TRYON_PACKS[0].credits} try-ons
+          </button>
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
