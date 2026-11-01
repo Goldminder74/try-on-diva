@@ -37,6 +37,7 @@ import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PortalAnalyticsRouteImport } from './routes/portal.analytics'
 import { Route as PortalApiKeysRouteImport } from './routes/portal.api-keys'
 import { Route as PortalBillingRouteImport } from './routes/portal.billing'
+import { Route as PortalCommissionRouteImport } from './routes/portal.commission'
 import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
 import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalWidgetRouteImport } from './routes/portal.widget'
@@ -198,6 +199,11 @@ const PortalBillingRoute = PortalBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalCommissionRoute = PortalCommissionRouteImport.update({
+  id: '/commission',
+  path: '/commission',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -337,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
+  '/portal/commission': typeof PortalCommissionRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/portal/widget': typeof PortalWidgetRoute
@@ -385,6 +392,7 @@ export interface FileRoutesByTo {
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
+  '/portal/commission': typeof PortalCommissionRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/portal/widget': typeof PortalWidgetRoute
@@ -437,6 +445,7 @@ export interface FileRoutesById {
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
+  '/portal/commission': typeof PortalCommissionRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/portal/widget': typeof PortalWidgetRoute
@@ -489,6 +498,7 @@ export interface FileRouteTypes {
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
+    | '/portal/commission'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/portal/widget'
@@ -537,6 +547,7 @@ export interface FileRouteTypes {
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
+    | '/portal/commission'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/portal/widget'
@@ -588,6 +599,7 @@ export interface FileRouteTypes {
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
+    | '/portal/commission'
     | '/portal/onboarding'
     | '/portal/settings'
     | '/portal/widget'
@@ -842,6 +854,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalBillingRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/commission': {
+      id: '/portal/commission'
+      path: '/commission'
+      fullPath: '/portal/commission'
+      preLoaderRoute: typeof PortalCommissionRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/onboarding': {
       id: '/portal/onboarding'
       path: '/onboarding'
@@ -1038,6 +1057,7 @@ interface PortalRouteChildren {
   PortalAnalyticsRoute: typeof PortalAnalyticsRoute
   PortalApiKeysRoute: typeof PortalApiKeysRoute
   PortalBillingRoute: typeof PortalBillingRoute
+  PortalCommissionRoute: typeof PortalCommissionRoute
   PortalOnboardingRoute: typeof PortalOnboardingRoute
   PortalSettingsRoute: typeof PortalSettingsRoute
   PortalWidgetRoute: typeof PortalWidgetRoute
@@ -1050,6 +1070,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalAnalyticsRoute: PortalAnalyticsRoute,
   PortalApiKeysRoute: PortalApiKeysRoute,
   PortalBillingRoute: PortalBillingRoute,
+  PortalCommissionRoute: PortalCommissionRoute,
   PortalOnboardingRoute: PortalOnboardingRoute,
   PortalSettingsRoute: PortalSettingsRoute,
   PortalWidgetRoute: PortalWidgetRoute,
