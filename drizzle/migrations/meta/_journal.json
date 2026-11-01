@@ -29,6 +29,13 @@
       "when": 1792871654207,
       "tag": "0003_tighten_storage_and_analytics_rules",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793496888223,
+      "tag": "0004_add_tryon_credits_and_affiliate_commissions",
+      "breakpoints": true
     }
   ]
 }

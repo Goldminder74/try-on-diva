@@ -14,6 +14,133 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_clicks: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          referrer: string | null
+          retailer_id: string
+          shopper_user_id: string | null
+          token: string
+          user_agent: string | null
+          wig_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          referrer?: string | null
+          retailer_id: string
+          shopper_user_id?: string | null
+          token: string
+          user_agent?: string | null
+          wig_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          referrer?: string | null
+          retailer_id?: string
+          shopper_user_id?: string | null
+          token?: string
+          user_agent?: string | null
+          wig_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_clicks_retailer_id_fkey"
+            columns: ["retailer_id"]
+            isOneToOne: false
+            referencedRelation: "retailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_clicks_wig_id_fkey"
+            columns: ["wig_id"]
+            isOneToOne: false
+            referencedRelation: "wigs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_sales: {
+        Row: {
+          click_id: string | null
+          commission_bps: number
+          commission_gbp: number
+          created_at: string
+          created_by: string
+          currency: string
+          id: string
+          notes: string | null
+          order_reference: string
+          retailer_id: string
+          sale_date: string
+          sale_gbp: number
+          status: string
+          updated_at: string
+          wig_id: string | null
+        }
+        Insert: {
+          click_id?: string | null
+          commission_bps: number
+          commission_gbp: number
+          created_at?: string
+          created_by: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          order_reference: string
+          retailer_id: string
+          sale_date?: string
+          sale_gbp: number
+          status?: string
+          updated_at?: string
+          wig_id?: string | null
+        }
+        Update: {
+          click_id?: string | null
+          commission_bps?: number
+          commission_gbp?: number
+          created_at?: string
+          created_by?: string
+          currency?: string
+          id?: string
+          notes?: string | null
+          order_reference?: string
+          retailer_id?: string
+          sale_date?: string
+          sale_gbp?: number
+          status?: string
+          updated_at?: string
+          wig_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_sales_click_id_fkey"
+            columns: ["click_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_clicks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_sales_retailer_id_fkey"
+            columns: ["retailer_id"]
+            isOneToOne: false
+            referencedRelation: "retailers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_sales_wig_id_fkey"
+            columns: ["wig_id"]
+            isOneToOne: false
+            referencedRelation: "wigs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -363,6 +490,9 @@ export type Database = {
         Row: {
           brand_primary: string | null
           business_name: string
+          commission_enabled: boolean
+          commission_rate_bps: number
+          commission_terms_accepted_at: string | null
           contact_name: string | null
           country: string | null
           created_at: string
@@ -388,6 +518,9 @@ export type Database = {
         Insert: {
           brand_primary?: string | null
           business_name: string
+          commission_enabled?: boolean
+          commission_rate_bps?: number
+          commission_terms_accepted_at?: string | null
           contact_name?: string | null
           country?: string | null
           created_at?: string
@@ -413,6 +546,9 @@ export type Database = {
         Update: {
           brand_primary?: string | null
           business_name?: string
+          commission_enabled?: boolean
+          commission_rate_bps?: number
+          commission_terms_accepted_at?: string | null
           contact_name?: string | null
           country?: string | null
           created_at?: string
@@ -542,6 +678,54 @@ export type Database = {
           id?: string
           metadata?: Json | null
           reason?: string
+        }
+        Relationships: []
+      }
+      try_on_credits: {
+        Row: {
+          amount_gbp: number | null
+          created_at: string
+          credits_purchased: number
+          credits_used: number
+          currency: string
+          expires_at: string
+          id: string
+          price_id: string | null
+          source: string
+          status: string
+          stripe_checkout_session_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_gbp?: number | null
+          created_at?: string
+          credits_purchased: number
+          credits_used?: number
+          currency?: string
+          expires_at: string
+          id?: string
+          price_id?: string | null
+          source?: string
+          status?: string
+          stripe_checkout_session_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_gbp?: number | null
+          created_at?: string
+          credits_purchased?: number
+          credits_used?: number
+          currency?: string
+          expires_at?: string
+          id?: string
+          price_id?: string | null
+          source?: string
+          status?: string
+          stripe_checkout_session_id?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -848,7 +1032,9 @@ export type Database = {
         Args: { _limit: number }
         Returns: {
           allowed: boolean
+          credit_id: string
           remaining: number
+          source: string
         }[]
       }
       get_retailers_public: {
@@ -862,6 +1048,7 @@ export type Database = {
           website: string
         }[]
       }
+      get_try_on_credit_balance: { Args: never; Returns: number }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
@@ -873,7 +1060,10 @@ export type Database = {
         }
         Returns: boolean
       }
-      refund_try_on: { Args: never; Returns: undefined }
+      refund_try_on: {
+        Args: { _credit_id?: string; _source?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "consumer" | "retailer" | "admin"
