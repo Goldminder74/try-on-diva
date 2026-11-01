@@ -12,7 +12,6 @@ import {
 
 // A "try-on" is one set of three angles (front, side, back) generated together
 // and charged as a single unit against the free monthly allowance.
-const FREE_QUOTA = 5;
 const ALL_VIEWS = ["front", "side", "back"] as const;
 
 /** Resolve the consumer's current tier from their latest consumer subscription. */
@@ -547,15 +546,18 @@ export const generateTryOn = createServerFn({ method: "POST" })
     //    limit, so parallel tabs cannot both slip past the last free try-on.
     const tier = await getConsumerTier(supabase, userId);
     const features = planFeatures(tier);
-    const isPaid = features.unlimitedTryOns;
     const { data: reservation, error: reserveErr } = await (supabase as any).rpc("consume_try_on", {
-      _limit: isPaid ? null : FREE_QUOTA,
+      _limit: features.monthlyTryOns,
     });
 
     if (reserveErr) throw reserveErr;
     const reserved = Array.isArray(reservation) ? reservation[0] : reservation;
     if (!reserved?.allowed) {
-      throw new Error("Free try-on limit reached this month.");
+      throw new Error(
+        tier === "free"
+          ? "Free try-on limit reached this month."
+          : `Monthly try-on limit reached (${features.monthlyTryOns} on your plan). It resets on the 1st.`,
+      );
     }
 
     // Any failure past this point refunds the reserved try-on.
@@ -681,9 +683,9 @@ export const recordTryOn = createServerFn({ method: "POST" })
         : 0;
     }
 
-    const isPaid = planFeatures(await getConsumerTier(supabase, userId)).unlimitedTryOns;
+    const cap = planFeatures(await getConsumerTier(supabase, userId)).monthlyTryOns;
 
-    if (!isPaid && count >= FREE_QUOTA) {
+    if (count >= cap) {
       return { allowed: false as const, reason: "quota", remaining: 0 };
     }
 
@@ -692,7 +694,7 @@ export const recordTryOn = createServerFn({ method: "POST" })
     // generation neither inflates retailer analytics nor burns a free try-on.
     return {
       allowed: true as const,
-      remaining: isPaid ? null : Math.max(0, FREE_QUOTA - (count + 1)),
+      remaining: Math.max(0, cap - (count + 1)),
     };
 
   });
@@ -727,11 +729,11 @@ export const getTryOnQuota = createServerFn({ method: "GET" })
     const { data: subRows } = await subQuery;
     const tier = consumerTier(subRows?.[0]);
     const features = planFeatures(tier);
-    const isPaid = features.unlimitedTryOns;
+    const isPaid = tier !== "free";
     return {
       count,
-      remaining: isPaid ? null : Math.max(0, FREE_QUOTA - count),
-      limit: FREE_QUOTA,
+      remaining: Math.max(0, features.monthlyTryOns - count),
+      limit: features.monthlyTryOns,
       isPaid,
       tier,
       features,
