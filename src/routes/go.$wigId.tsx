@@ -85,10 +85,7 @@ export const Route = createFileRoute("/go/$wigId")({
             user_agent: request.headers.get("user-agent")?.slice(0, 300) ?? null,
             expires_at: new Date(Date.now() + CLICK_TTL_DAYS * 86400000).toISOString(),
           });
-          await supabaseAdmin
-            .from("wigs")
-            .update({ click_count: (row as any).click_count ?? 1 })
-            .eq("id", wigId);
+          await supabaseAdmin.rpc("increment_wig_click", { _wig_id: wigId });
 
           return Response.redirect(withClickRef(destination, token), 302);
         } catch (err) {

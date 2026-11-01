@@ -43,6 +43,13 @@
       "when": 1793496985770,
       "tag": "0005_add_wig_checkout_target_lookup",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793496997606,
+      "tag": "0006_add_wig_click_increment",
+      "breakpoints": true
     }
   ]
 }

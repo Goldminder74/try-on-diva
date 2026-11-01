@@ -1072,6 +1072,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_wig_click: { Args: { _wig_id: string }; Returns: undefined }
       refund_try_on: {
         Args: { _credit_id?: string; _source?: string }
         Returns: undefined

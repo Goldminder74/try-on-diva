@@ -32,6 +32,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as GoWigIdRouteImport } from './routes/go.$wigId'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PortalAnalyticsRouteImport } from './routes/portal.analytics'
 import { Route as PortalApiKeysRouteImport } from './routes/portal.api-keys'
@@ -170,6 +171,11 @@ const AuthSignupRoute = AuthSignupRouteImport.update({
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   id: '/checkout/success',
   path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GoWigIdRoute = GoWigIdRouteImport.update({
+  id: '/go/$wigId',
+  path: '/go/$wigId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalIndexRoute = PortalIndexRouteImport.update({
@@ -327,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/go/$wigId': typeof GoWigIdRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
@@ -374,6 +381,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/go/$wigId': typeof GoWigIdRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
@@ -425,6 +433,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
+  '/go/$wigId': typeof GoWigIdRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
@@ -476,6 +485,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/go/$wigId'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
@@ -523,6 +533,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/go/$wigId'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
@@ -573,6 +584,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/signup'
     | '/checkout/success'
+    | '/go/$wigId'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
@@ -620,6 +632,7 @@ export interface RootRouteChildren {
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+  GoWigIdRoute: typeof GoWigIdRoute
   RetailerLoginRoute: typeof RetailerLoginRoute
   RetailerSignupRoute: typeof RetailerSignupRoute
   WigIdRoute: typeof WigIdRoute
@@ -792,6 +805,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout/success'
       fullPath: '/checkout/success'
       preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/go/$wigId': {
+      id: '/go/$wigId'
+      path: '/go/$wigId'
+      fullPath: '/go/$wigId'
+      preLoaderRoute: typeof GoWigIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal/': {
@@ -1060,6 +1080,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
+  GoWigIdRoute: GoWigIdRoute,
   RetailerLoginRoute: RetailerLoginRoute,
   RetailerSignupRoute: RetailerSignupRoute,
   WigIdRoute: WigIdRoute,
