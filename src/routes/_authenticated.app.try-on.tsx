@@ -36,6 +36,21 @@ function AppTryOn() {
   const [error, setError] = useState<string | null>(null);
   const [quota, setQuota] = useState<{ remaining: number | null; isPaid: boolean } | null>(null);
   const { features: planFeats } = usePlanFeatures();
+  const { openCheckout } = useCheckout();
+  const [packBusy, setPackBusy] = useState(false);
+
+  // One-off top-up: adds try-ons on top of this month's allowance.
+  const onBuyPack = async () => {
+    setPackBusy(true);
+    try {
+      await openCheckout({
+        priceId: TRYON_PACKS[0].priceId,
+        successUrl: `${window.location.origin}/checkout/success?type=topup`,
+      });
+    } finally {
+      setPackBusy(false);
+    }
+  };
 
   // Apply-wig flow (gate + selfie conversion + generateTryOn) lives in the hook.
   const {
