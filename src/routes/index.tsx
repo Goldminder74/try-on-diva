@@ -158,8 +158,8 @@ function Landing() {
           <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-4 text-left md:grid-cols-3">
             {[
               { name: "Free", price: "£0", desc: "5 try-ons / month. Browse the full catalog." },
-              { name: "Plus", price: "£4.99", desc: "Unlimited try-ons. Save your photo. Style quiz." , badge: true },
-              { name: "Pro", price: "£9.99", desc: "Everything in Plus, plus early access to new drops." },
+              { name: "Plus", price: "£4.99", desc: "35 try-ons / month. Save your photo. Style quiz." , badge: true },
+              { name: "Pro", price: "£9.99", desc: "100 try-ons / month, no watermark, priority quality." },
             ].map((p) => (
               <div key={p.name} className={`rounded-xl border p-6 ${p.badge ? "border-gold bg-cream/5" : "border-cream/15"}`}>
                 {p.badge && <span className="font-mono text-[10px] uppercase tracking-wider text-gold">Most popular</span>}

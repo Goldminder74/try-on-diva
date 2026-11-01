@@ -43,8 +43,8 @@ export function consumerTier(sub?: SubscriptionLike | null): ConsumerTier {
 
 export interface PlanFeatures {
   tier: ConsumerTier;
-  /** Unlimited try-on sets per month. */
-  unlimitedTryOns: boolean;
+  /** Fair-use try-on sets allowed per calendar month. */
+  monthlyTryOns: number;
   /** Downloads and shares come without the Wigsmi watermark. */
   watermarkFree: boolean;
   /** How long saved looks stay retrievable; null = forever. */
@@ -58,7 +58,7 @@ export function planFeatures(tier: ConsumerTier): PlanFeatures {
     case "pro":
       return {
         tier,
-        unlimitedTryOns: true,
+        monthlyTryOns: 100,
         watermarkFree: true,
         historyDays: null,
         priorityGeneration: true,
@@ -66,7 +66,7 @@ export function planFeatures(tier: ConsumerTier): PlanFeatures {
     case "plus":
       return {
         tier,
-        unlimitedTryOns: true,
+        monthlyTryOns: 35,
         watermarkFree: false,
         historyDays: 30,
         priorityGeneration: false,
@@ -74,7 +74,7 @@ export function planFeatures(tier: ConsumerTier): PlanFeatures {
     default:
       return {
         tier: "free",
-        unlimitedTryOns: false,
+        monthlyTryOns: 5,
         watermarkFree: false,
         historyDays: 30,
         priorityGeneration: false,
