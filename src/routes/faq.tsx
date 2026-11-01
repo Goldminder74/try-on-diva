@@ -87,6 +87,10 @@ const RETAILER_QA: QA[] = [
     a: "We add a virtual try-on widget to your product pages so customers can see your exact wigs on their own face and skin tone before buying, built specifically for darker skin tones and natural Black hairstyles.",
   },
   {
+    q: "Do I have to pay Wigsmi commission on sales?",
+    a: "Only if you turn it on. When it's on, a shopper who leaves a Wigsmi listing for your shop arrives with a reference code, and you log any order that came from one. You choose the rate between 8% and 15%, and nothing is charged automatically - you record each order in your portal.",
+  },
+  {
     q: "How long does setup take?",
     a: "Most retailers are live within 15 minutes: sign up, upload your wigs, configure the widget, and paste one snippet into your store.",
   },
