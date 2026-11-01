@@ -89,6 +89,7 @@ function TermsPage() {
               <p>Payments are processed securely using Stripe. The payment terms shown at checkout identify the applicable payment arrangement and any transaction-level tax, refund and support handling. SHERWOOD CONSULTING SERVICES LTD, trading as Wigsmi, provides the Wigsmi service. Applicable taxes and the final amount payable are shown at checkout.</p>
               <p>Retailer subscriptions are billed monthly or yearly in advance and auto-renew until cancelled. You may cancel at any time from your billing portal; access continues until the end of the paid period.</p>
               <p>Consumer paid plans are billed monthly or yearly and auto-renew until cancelled. You may cancel at any time from your account settings.</p>
+              <p>One-off purchases, such as a pack of extra try-ons, are charged once and never renew automatically. Unused try-ons from a pack stay usable for 12 months from the day you buy it.</p>
               <p>Refunds: you may request a full refund within 30 days of any purchase by emailing support@wigsmi.com. After 30 days, fees are non-refundable except where required by law.</p>
             </div>
           </section>
