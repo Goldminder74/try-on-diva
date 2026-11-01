@@ -8,6 +8,9 @@ import { createPortalSession } from "@/lib/subscription.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { toast } from "sonner";
 import { planFeatures } from "@/lib/entitlements";
+import { useCheckout } from "@/hooks/useCheckout";
+import { getMyTryOnCredits } from "@/lib/topup.functions";
+import { TRYON_PACKS, formatPackPrice } from "@/lib/topup";
 
 
 export const Route = createFileRoute("/_authenticated/app/subscription")({
@@ -36,6 +39,41 @@ function SubscriptionPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [portalBusy, setPortalBusy] = useState(false);
+  const creditsFn = useServerFn(getMyTryOnCredits);
+  const { openCheckout } = useCheckout();
+  const [creditCount, setCreditCount] = useState(0);
+  const [packBusy, setPackBusy] = useState(false);
+
+  // Purchased top-up packs sit on top of the monthly allowance.
+  useEffect(() => {
+    let on = true;
+    creditsFn()
+      .then((r) => on && setCreditCount(r.remaining))
+      .catch(() => {});
+    return () => {
+      on = false;
+    };
+  }, [creditsFn]);
+
+  const onBuyPack = async () => {
+    setPackBusy(true);
+    try {
+      await openCheckout({
+        priceId: TRYON_PACKS[0].priceId,
+        successUrl: `${window.location.origin}/checkout/success?type=topup`,
+      });
+      // The provider's notification lands a moment later; re-read the balance.
+      setTimeout(() => {
+        creditsFn()
+          .then((r) => on && setCreditCount(r.remaining))
+          .catch(() => {});
+      }, 4000);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't start checkout");
+    } finally {
+      setPackBusy(false);
+    }
+  };
 
   useEffect(() => {
     let on = true;
