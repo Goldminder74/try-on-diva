@@ -120,16 +120,28 @@ function CheckoutSuccess() {
           )}
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <Link
-            to={destination}
-            className="rounded-md bg-mahogany px-5 py-2.5 text-sm font-medium text-cream hover:bg-mahogany-soft"
-          >
-            {kind === "retailer"
-              ? "Go to billing"
-              : kind === "topup"
-                ? "Start a try-on"
-                : "Go to my app"}
-          </Link>
+          {kind === "retailer" ? (
+            <Link
+              to="/portal/billing"
+              className="rounded-md bg-mahogany px-5 py-2.5 text-sm font-medium text-cream hover:bg-mahogany-soft"
+            >
+              Go to billing
+            </Link>
+          ) : kind === "topup" ? (
+            <Link
+              to="/app/try-on"
+              className="rounded-md bg-mahogany px-5 py-2.5 text-sm font-medium text-cream hover:bg-mahogany-soft"
+            >
+              Start a try-on
+            </Link>
+          ) : (
+            <Link
+              to="/app"
+              className="rounded-md bg-mahogany px-5 py-2.5 text-sm font-medium text-cream hover:bg-mahogany-soft"
+            >
+              Go to my app
+            </Link>
+          )}
         </div>
       </div>
     </div>
