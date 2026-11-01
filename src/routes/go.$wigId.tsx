@@ -29,6 +29,24 @@ function publicClient() {
 }
 
 /**
+ * A listing's own product page, if it is a plain web address.
+ *
+ * The retailer wrote this link themselves and the shopper sees it labelled
+ * with the shop's name, so we follow it as long as it is a real page - never
+ * a `javascript:` or other trick address.
+ */
+function plainHttpsTarget(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return null;
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Tracked hand-off to a shop's own product page.
  *
  * A shopper clicking "Buy from ..." leaves Wigsmi for the retailer's store.
@@ -64,14 +82,16 @@ export const Route = createFileRoute("/go/$wigId")({
             return backToCatalog;
           }
 
-          // Only ever send the shopper to the retailer's own site; anything
-          // else (missing, off-domain, unsafe) falls back to the Wigsmi page.
-          const destination = safeRetailerTarget(row.product_url, row.retailer_website);
+          // Where the shopper is going: the listing's own product page. A
+          // reference code is only ever attached when the address is on the
+          // shop's own site, which is what the commission agreement covers.
+          const tracked = safeRetailerTarget(row.product_url, row.retailer_website);
+          const destination = tracked ?? plainHttpsTarget(row.product_url);
           if (!destination) {
             return Response.redirect(new URL(`/wig/${wigId}`, request.url), 302);
           }
 
-          if (row.commission_enabled !== true) {
+          if (row.commission_enabled !== true || !tracked) {
             return Response.redirect(destination, 302);
           }
 
