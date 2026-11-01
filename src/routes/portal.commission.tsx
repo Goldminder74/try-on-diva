@@ -32,7 +32,7 @@ import {
   type CommissionOverview,
 } from "@/lib/commission.functions";
 import { listMyWigs } from "@/lib/retailer.functions";
-import { MAX_RATE_BPS, MIN_RATE_BPS, commissionFor } from "@/lib/commission";
+import { COMMISSION_MAX_BPS, COMMISSION_MIN_BPS, commissionFor } from "@/lib/commission";
 
 export const Route = createFileRoute("/portal/commission")({
   staticData: { sitemap: false },
@@ -253,8 +253,8 @@ function PortalCommission() {
           <Slider
             id="rate"
             className="mt-3"
-            min={MIN_RATE_BPS}
-            max={MAX_RATE_BPS}
+            min={COMMISSION_MIN_BPS}
+            max={COMMISSION_MAX_BPS}
             step={50}
             value={[rateBps]}
             onValueChange={([v]) => setRateBps(v)}

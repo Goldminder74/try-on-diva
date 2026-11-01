@@ -102,11 +102,11 @@ export const syncMyTopUps = createServerFn({ method: "POST" })
           sessionId: session.id,
           amountGbp: session.amount_total ? session.amount_total / 100 : null,
           currency: session.currency?.toUpperCase() ?? "GBP",
-          purchasedAt: session.current_period_end
-            ? new Date(session.current_period_end * 1000)
+          purchasedAt: session.created
+            ? new Date(session.created * 1000)
             : new Date(),
         });
-        if (result.ok && result.granted) synced += 1;
+        if ("ok" in result && result.ok && result.granted) synced += 1;
       }
 
       return { synced };

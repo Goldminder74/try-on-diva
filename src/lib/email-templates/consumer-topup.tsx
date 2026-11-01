@@ -14,7 +14,7 @@ interface Props {
 const ConsumerTopUpEmail = ({ name, credits, priceGbp, expiresOn, appUrl }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>{credits ?? 10} extra try-ons are on your account.</Preview>
+    <Preview>{`${credits ?? 10} extra try-ons are on your account.`}</Preview>
     <Body style={main}>
       <Section style={outer}>
         <Container style={container}>

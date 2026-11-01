@@ -568,7 +568,7 @@ export const generateTryOn = createServerFn({ method: "POST" })
     // Any failure past this point refunds the reserved try-on.
     const refund = async () => {
       try {
-        await supabase.rpc("refund_try_on", { _source: paidFrom, _credit_id: creditId });
+        await supabase.rpc("refund_try_on", { _source: paidFrom, _credit_id: creditId ?? undefined });
       } catch {
         /* best effort */
       }
