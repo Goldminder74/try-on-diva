@@ -1,26 +1,26 @@
-# Monitoring billing findings
+# Roadmap
 
-- [x] Verify Stripe upsert conflict target against the current database: the non-partial unique index already exists; finding is stale.
-- [x] Preserve selected-plan and protected-page query strings after retailer login; six retailer redirect tests and eleven callback tests passed. Signed-in preview opened the selected Growth yearly checkout; preview validation passed.
+## In progress — build both money suggestions (user approved 2026-11-01)
 
-# Billing audit fixes
+### A. One-off try-on top-up pack (10 try-ons for £2.99)
+- [ ] Database: `try_on_credits` table + RLS/grants; `consume_try_on` falls back to credits; `refund_try_on` credits-aware
+- [ ] Stripe: one-time product/price `tryon_pack_10` (299 pence GBP)
+- [ ] Checkout: allow the pack price id, webhook grants credits (idempotent), success-page recovery
+- [ ] UI: pricing page pack card, account page balance + top-up button, try-on limit CTA, quota shows credits
+- [ ] Copy: pricing/FAQ/brochure mention the pack
+- [ ] Tests: pack price validation + credit math
 
-- [x] Recover subscription state from checkout and paid-invoice webhooks; surface database failures for retry.
-- [x] Enforce retailer plan caps on downgrades and publication.
-- [x] Configure and verify product tax codes in test and live Stripe.
-- [x] Correct payment/legal wording and add private optional retailer VAT number.
-- [x] Secure scheduled hooks and update their callers.
-- [x] Tighten paid-subscription checks in trial expiry handling.
-- [x] Deprecate unused Paddle columns safely without breaking the published app.
-- [x] Run 22 focused tests; verify authenticated settings, billing and Stripe checkout opening.
-- [x] Complete a payment and confirm recovery sync, tax calculation and invoice: sandbox Starter purchase completed; found and fixed a silent upsert failure (partial unique index broke ON CONFLICT); subscription row written, billing page shows active plan, paid invoice £59.29 with tax. Webhook delivery itself is untestable from localhost (Stripe delivers to the preview/published URL).
-- [ ] Confirm publication: requested during Google Search Console setup; the single live check still served the previous deployment.
+### B. Commission on tracked wig sales (retailer pays Wigsmi a % )
+- [ ] Database: retailer commission columns, `affiliate_clicks`, `affiliate_sales` + RLS/grants
+- [ ] Tracked outbound link route `/go/$wigId` (records click, safe redirect)
+- [ ] Product page buy button routes through `/go` when the retailer runs commission
+- [ ] Server functions: settings, log sale, list sales/clicks, settle (admin)
+- [ ] Portal page `/portal/commission` + sidebar link
+- [ ] Admin settlement view
+- [ ] Legal copy on /terms and /privacy
+- [ ] Tests: commission math + rate bounds + click token rule
 
-# SEO corrections
-
-- [x] Remove duplicate titles and add self-referencing page metadata.
-- [x] Label catalogue/FAQ search, gallery buttons and the Instagram link.
-- [x] Add Organization/WebSite and product structured data; stale composite finding remains unresolved because FAQPage is not an appropriate SEO addition.
-- [x] Install a public router-derived sitemap and crawler rules.
-- [ ] Verify Google Search Console and submit sitemap: account connected and verification tag added; awaiting deployment because live HTML still lacks the tag and sitemap returns 404.
-- [x] Verify 56 rendered pages, sitemap exclusions and 22 tests; record six completed findings. Structured-data composite remains failing because its FAQPage recommendation was intentionally not implemented.
+### Shared
+- [ ] Typecheck/build clean, tests pass
+- [ ] Browser check: pack checkout opens, commission page loads
+- [ ] Publish reminder to user
