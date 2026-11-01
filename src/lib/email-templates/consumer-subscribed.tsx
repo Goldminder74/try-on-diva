@@ -23,7 +23,7 @@ const ConsumerSubscribedEmail = ({ name, plan, appUrl }: Props) => (
           <Heading style={h1}>You're on {planLabel(plan)}.</Heading>
           <Text style={text}>
             Hi{name ? ` ${name}` : ""}, your Wigsmi subscription is active.
-            Unlimited try-ons are unlocked, so upload a selfie and see yourself
+            Your monthly try-ons are unlocked, so upload a selfie and see yourself
             in as many styles as you like.
           </Text>
           {plan === "pro" ? (

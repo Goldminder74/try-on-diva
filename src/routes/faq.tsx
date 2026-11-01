@@ -53,11 +53,11 @@ const BUYER_QA: QA[] = [
   },
   {
     q: "What happens when I run out of free try-ons?",
-    a: "You can upgrade to Plus (£4.99/month) for unlimited try-ons, or wait until your free try-ons reset next month.",
+    a: "You can upgrade to Plus (£4.99/month) for 35 try-ons a month, or wait until your free try-ons reset next month.",
   },
   {
     q: "What's the difference between Plus and Pro?",
-    a: "Plus gives you unlimited try-ons, the ability to save your selfie for faster future try-ons, and the style quiz. Pro includes everything in Plus plus early access to new wig drops.",
+    a: "Plus gives you 35 try-ons a month, the ability to save your selfie for faster future try-ons, and the style quiz. Pro gives you 100 try-ons a month plus everything in Plus, watermark-free downloads, full history and early access to new wig drops.",
   },
   {
     q: "Can I cancel anytime?",

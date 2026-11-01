@@ -7,8 +7,8 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { createPortalSession } from "@/lib/subscription.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { toast } from "sonner";
+import { planFeatures } from "@/lib/entitlements";
 
-const FREE_TRY_ON_LIMIT = 5;
 
 export const Route = createFileRoute("/_authenticated/app/subscription")({
   staticData: { sitemap: false },
@@ -72,7 +72,9 @@ function SubscriptionPage() {
 
   const isFree = !isActive || subscription?.customer_type !== "consumer";
   const used = consumer?.try_on_count_this_month ?? 0;
-  const quotaCap = isFree ? FREE_TRY_ON_LIMIT : null;
+  const quotaCap = planFeatures(
+    isFree ? "free" : subscription?.plan === "pro" ? "pro" : "plus",
+  ).monthlyTryOns;
   const pct = quotaCap ? Math.min(100, Math.round((used / quotaCap) * 100)) : 0;
 
   // Next reset = 1st of next month
@@ -147,7 +149,7 @@ function SubscriptionPage() {
             {loading ? "…" : used} <span className="text-base text-foreground/70">try-ons</span>
           </p>
           <p className="text-sm text-muted-foreground">
-            {quotaCap ? `of ${quotaCap}` : "Unlimited"}
+            {`of ${quotaCap}`}
           </p>
         </div>
         {quotaCap !== null && (
@@ -160,7 +162,7 @@ function SubscriptionPage() {
             </div>
             {pct >= 100 && (
               <p className="mt-3 text-xs text-error">
-                You've hit your free limit. Upgrade for unlimited try-ons.
+                {isFree ? "You've hit your free limit. Upgrade to Plus for 35 try-ons a month." : "You've reached this month's fair-use allowance. It resets on the date below."}
               </p>
             )}
           </>
