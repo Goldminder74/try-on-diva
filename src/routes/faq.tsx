@@ -53,7 +53,11 @@ const BUYER_QA: QA[] = [
   },
   {
     q: "What happens when I run out of free try-ons?",
-    a: "You can upgrade to Plus (£4.99/month) for 35 try-ons a month, or wait until your free try-ons reset next month.",
+    a: "You can upgrade to Plus (£4.99/month) for 35 try-ons a month, add a one-off pack of 10 extra try-ons for £2.99, or wait until your free try-ons reset next month.",
+  },
+  {
+    q: "How does the £2.99 pack of 10 try-ons work?",
+    a: "It's a one-off purchase on any plan - no subscription, no renewal, no card charged again. The 10 try-ons are added to your account and stay usable for 12 months. Your monthly allowance is always used first, so the pack only kicks in once that runs out.",
   },
   {
     q: "What's the difference between Plus and Pro?",

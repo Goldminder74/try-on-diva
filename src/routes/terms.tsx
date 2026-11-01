@@ -125,6 +125,11 @@ function TermsPage() {
               the quality, delivery, or returns of products bought from third-party
               retailers.
             </p>
+            <p>
+              Some retailers pay Wigsmi a commission on orders that come from a
+              tracked Wigsmi visit. That agreement is between us and the retailer:
+              it does not change what you pay, and we never add it to your bill.
+            </p>
           </section>
 
           <section>

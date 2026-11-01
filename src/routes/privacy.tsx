@@ -59,6 +59,7 @@ function PrivacyPage() {
               <li><strong>Profile data:</strong> optional preferences, style quiz answers, wishlist.</li>
               <li><strong>Photos:</strong> selfies you upload for try-on. Stored only as long as needed to render the result and any photos you choose to save.</li>
               <li><strong>Usage data:</strong> try-on counts, pages visited, device and browser info, IP address.</li>
+              <li><strong>Tracked shop visits:</strong> if you tap "Buy from ..." on a listing at a shop that pays us commission, we record a one-time reference code with the wig, the time and the page you came from, so that shop can match the visit to an order later. We do not send the shop your name or email.</li>
               <li><strong>Retailer data:</strong> business name, optional VAT number, contact details, catalog content, payment metadata (handled by our payment processor - we do not store card numbers).</li>
             </ul>
           </section>
