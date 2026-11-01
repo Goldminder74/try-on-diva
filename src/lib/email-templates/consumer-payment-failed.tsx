@@ -22,7 +22,7 @@ const ConsumerPaymentFailedEmail = ({ name, billingUrl }: Props) => (
             Wigsmi subscription and it was declined.
           </Text>
           <Text style={text}>
-            We'll retry over the next few days. To avoid losing unlimited
+            We'll retry over the next few days. To avoid losing your plan's
             try-ons, please update your billing details now.
           </Text>
           <Button style={button} href={billingUrl ?? "https://wigsmi.com/pricing"}>
