@@ -41,6 +41,7 @@ export async function grantPackCredits(
   const { error } = await client.from("try_on_credits").insert({
     user_id: args.userId,
     credits_purchased: pack.credits,
+    credits_used: 0,
     source: "topup",
     price_id: pack.priceId,
     amount_gbp: args.amountGbp ?? pack.amountGbp,
