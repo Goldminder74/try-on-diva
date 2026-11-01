@@ -130,6 +130,7 @@ function CheckoutSuccess() {
           ) : kind === "topup" ? (
             <Link
               to="/app/try-on"
+              search={{ wig: undefined }}
               className="rounded-md bg-mahogany px-5 py-2.5 text-sm font-medium text-cream hover:bg-mahogany-soft"
             >
               Start a try-on
