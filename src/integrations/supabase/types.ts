@@ -1049,6 +1049,18 @@ export type Database = {
         }[]
       }
       get_try_on_credit_balance: { Args: never; Returns: number }
+      get_wig_checkout_target: {
+        Args: { _wig_id: string }
+        Returns: {
+          commission_enabled: boolean
+          deleted_at: string
+          is_published: boolean
+          product_url: string
+          retailer_id: string
+          retailer_website: string
+          wig_id: string
+        }[]
+      }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean
