@@ -23,6 +23,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TryOnRouteImport } from './routes/try-on'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
+import { Route as AdminCommissionRouteImport } from './routes/admin.commission'
 import { Route as AdminConsumersRouteImport } from './routes/admin.consumers'
 import { Route as AdminFeaturedRouteImport } from './routes/admin.featured'
 import { Route as AdminRetailersRouteImport } from './routes/admin.retailers'
@@ -127,6 +128,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCommissionRoute = AdminCommissionRouteImport.update({
+  id: '/commission',
+  path: '/commission',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminConsumersRoute = AdminConsumersRouteImport.update({
@@ -330,6 +336,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/commission': typeof AdminCommissionRoute
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
   '/admin/retailers': typeof AdminRetailersRoute
@@ -379,6 +386,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/commission': typeof AdminCommissionRoute
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
   '/admin/retailers': typeof AdminRetailersRoute
@@ -432,6 +440,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/try-on': typeof TryOnRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/commission': typeof AdminCommissionRoute
   '/admin/consumers': typeof AdminConsumersRoute
   '/admin/featured': typeof AdminFeaturedRoute
   '/admin/retailers': typeof AdminRetailersRoute
@@ -485,6 +494,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/try-on'
     | '/admin/catalog'
+    | '/admin/commission'
     | '/admin/consumers'
     | '/admin/featured'
     | '/admin/retailers'
@@ -534,6 +544,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/try-on'
     | '/admin/catalog'
+    | '/admin/commission'
     | '/admin/consumers'
     | '/admin/featured'
     | '/admin/retailers'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/try-on'
     | '/admin/catalog'
+    | '/admin/commission'
     | '/admin/consumers'
     | '/admin/featured'
     | '/admin/retailers'
@@ -754,6 +766,13 @@ declare module '@tanstack/react-router' {
       path: '/catalog'
       fullPath: '/admin/catalog'
       preLoaderRoute: typeof AdminCatalogRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/commission': {
+      id: '/admin/commission'
+      path: '/commission'
+      fullPath: '/admin/commission'
+      preLoaderRoute: typeof AdminCommissionRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/consumers': {
@@ -1037,6 +1056,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminCatalogRoute: typeof AdminCatalogRoute
+  AdminCommissionRoute: typeof AdminCommissionRoute
   AdminConsumersRoute: typeof AdminConsumersRoute
   AdminFeaturedRoute: typeof AdminFeaturedRoute
   AdminRetailersRoute: typeof AdminRetailersRoute
@@ -1045,6 +1065,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogRoute: AdminCatalogRoute,
+  AdminCommissionRoute: AdminCommissionRoute,
   AdminConsumersRoute: AdminConsumersRoute,
   AdminFeaturedRoute: AdminFeaturedRoute,
   AdminRetailersRoute: AdminRetailersRoute,
