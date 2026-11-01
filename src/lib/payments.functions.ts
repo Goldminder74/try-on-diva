@@ -7,6 +7,7 @@ import {
   createStripeClient,
   getStripeErrorMessage,
 } from "@/lib/stripe.server";
+import { isCheckoutPriceId, isPackPriceId } from "@/lib/topup";
 
 type CheckoutSessionResult = { clientSecret: string } | { error: string };
 
@@ -54,7 +55,10 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       environment: StripeEnv;
     }) => {
       return z.object({
-        priceId: z.string().regex(/^(consumer_(plus|pro)|retailer_(starter|growth|scale))_(monthly|yearly)$/),
+        priceId: z
+          .string()
+          .max(120)
+          .refine(isCheckoutPriceId, () => ({ message: "Unknown plan or pack." })),
         customerEmail: z.string().email().max(254).optional(), userId: z.string().uuid().optional(),
         returnUrl: z.string().url().max(2048), environment: z.enum(["sandbox", "live"]),
       }).parse(data);
@@ -98,7 +102,13 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         ...(customerId && { customer: customerId }),
         ...(!isRecurring && { payment_intent_data: { description: productDescription } }),
         ...(data.userId && {
-          metadata: { userId: data.userId, managed_payments: "true" },
+          metadata: {
+            userId: data.userId,
+            managed_payments: "true",
+            // Marks a one-off pack so the notification handler and the
+            // success-page recovery both know which pack was bought.
+            ...(isPackPriceId(data.priceId) && { packPriceId: data.priceId }),
+          },
           ...(isRecurring && {
             subscription_data: { metadata: { userId: data.userId } },
           }),
