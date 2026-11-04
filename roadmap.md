@@ -27,3 +27,5 @@
 - [ ] Pay the pack with a real test card — Stripe form fills correctly but stalls on "Processing"; needs a manual card entry in the preview
 - [ ] Consumer account page credits row not seen (the preview session is a retailer account)
 - [ ] Publish so the pack and commission go live
+- [x] Company name written as "Sherwood Consulting Services Ltd" (not all caps) everywhere
+- [ ] Brochure PDF: add £2.99 pack + retailer commission
