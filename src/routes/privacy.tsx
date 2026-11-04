@@ -34,7 +34,7 @@ function PrivacyPage() {
           <section>
             <p>
               This policy explains how{" "}
-              <strong>SHERWOOD CONSULTING SERVICES LTD</strong>, trading as Wigsmi
+              <strong>Sherwood Consulting Services Ltd</strong>, trading as Wigsmi
               ("we", "us", "our"), collects and uses your personal data when you use
               our website, mobile app, or virtual try-on service (the "Service"). We
               act as a data controller under the UK General Data Protection Regulation
@@ -45,7 +45,7 @@ function PrivacyPage() {
           <section>
             <h2 className="font-display text-2xl text-mahogany">1. Who we are</h2>
             <p>
-              Wigsmi is operated by <strong>SHERWOOD CONSULTING SERVICES LTD</strong>{" "}
+              Wigsmi is operated by <strong>Sherwood Consulting Services Ltd</strong>{" "}
               from the United Kingdom. If you have any questions about this policy or
               your data, contact us at{" "}
               <a className="underline" href="mailto:privacy@wigsmi.com">privacy@wigsmi.com</a>.
