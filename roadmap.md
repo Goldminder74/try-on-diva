@@ -8,7 +8,7 @@
 - [x] Checkout: pack price id allowed, `packPriceId` metadata on session, webhook grants credits (idempotent), success-page recovery
 - [x] UI: pricing page pack card, account page balance + top-up button, try-on limit CTA, quota includes credits
 - [x] Copy: pricing + FAQ + terms + privacy mention the pack
-- [ ] Brochure PDF still says nothing about the pack — needs a rebuild (source not in the repo)
+- [x] Brochure PDF updated with pack + commission
 - [x] Tests: pack config, price-id validation, expiry math, idempotent grant (11 tests)
 
 ### B. Commission on tracked wig sales (retailer pays Wigsmi a %)
