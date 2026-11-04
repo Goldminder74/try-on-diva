@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
     scripts: [{ type: "application/ld+json", children: JSON.stringify({
       "@context": "https://schema.org",
       "@graph": [
-        { "@type": "Organization", "@id": "https://wigsmi.com/#organization", name: "Wigsmi", legalName: "SHERWOOD CONSULTING SERVICES LTD", url: "https://wigsmi.com/" },
+        { "@type": "Organization", "@id": "https://wigsmi.com/#organization", name: "Wigsmi", legalName: "Sherwood Consulting Services Ltd", url: "https://wigsmi.com/" },
         { "@type": "WebSite", "@id": "https://wigsmi.com/#website", name: "Wigsmi", url: "https://wigsmi.com/", publisher: { "@id": "https://wigsmi.com/#organization" } },
       ],
     }) }],
