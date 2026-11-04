@@ -28,4 +28,4 @@
 - [ ] Consumer account page credits row not seen (the preview session is a retailer account)
 - [ ] Publish so the pack and commission go live
 - [x] Company name written as "Sherwood Consulting Services Ltd" (not all caps) everywhere
-- [ ] Brochure PDF: add £2.99 pack + retailer commission
+- [x] Brochure PDF: add £2.99 pack + retailer commission
