@@ -1,7 +1,8 @@
 # Roadmap
 
 ## Luxury-beauty acquisition and onboarding kit (2026-11-05)
-- [ ] Confirm generated-film format and approve reference pack
+- [x] Confirm generated creator format; center adult Black women
+- [ ] Approve first shopper film script/start frames — waiting for the user's creative approval
 - [ ] Approve shopper/retailer campaign video plans and sound direction
 - [ ] Produce and review campaign images and generated product films
 - [ ] Produce shopper and retailer onboarding videos grounded in real screens
