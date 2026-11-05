@@ -7,6 +7,7 @@ import { WigCard } from "@/components/wigsmi/WigCard";
 import { WigCardSkeleton } from "@/components/wigsmi/WigCardSkeleton";
 import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig } from "@/lib/wigs";
 import { useAsync } from "@/lib/use-async";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/catalog")({
   staticData: { sitemap: true },
@@ -17,9 +18,9 @@ export const Route = createFileRoute("/catalog")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://wigsmi.com/catalog" },
       { title: "Wig Catalog - Wigsmi" },
-      { name: "description", content: "Browse hundreds of wigs from trusted Black-owned and Black-focused retailers. Filter by style, texture, length and price." },
+      { name: "description", content: "Explore Wigsmi’s retailer wig catalogue and virtual try-on. New retailer collections are coming soon." },
       { property: "og:title", content: "Wig Catalog - Wigsmi" },
-      { property: "og:description", content: "Browse and try on hundreds of wigs." },
+      { property: "og:description", content: "Explore Wigsmi’s retailer wig catalogue. New collections are coming soon." },
     ],
   }),
   component: Catalog,
@@ -133,9 +134,9 @@ function Catalog() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-sand/40 px-6 py-20 text-center">
-                <p className="font-display text-2xl text-mahogany">No wigs match those filters.</p>
-                <p className="mt-2 text-sm text-muted-foreground">Try clearing a filter or two.</p>
-                <button onClick={() => { setStyles([]); setTextures([]); setQuery(""); }} className="mt-5 rounded-md bg-mahogany px-5 py-2 text-sm text-cream">Clear filters</button>
+                <p className="font-display text-2xl text-mahogany">{wigs?.length ? "No wigs match those filters." : "New retailer collections coming soon."}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{wigs?.length ? "Try clearing a filter or two." : "There are no styles available to try on right now."}</p>
+                {wigs?.length ? <Button onClick={() => { setStyles([]); setTextures([]); setQuery(""); }} className="mt-5">Clear filters</Button> : <Button asChild className="mt-5"><Link to="/retailer">Become a retailer partner</Link></Button>}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3">

@@ -152,6 +152,8 @@ export async function fetchWigById(id: string): Promise<Wig | null> {
     .from("wigs")
     .select(SELECT)
     .eq("id", id)
+    .eq("is_published", true)
+    .is("deleted_at", null)
     .maybeSingle();
   if (error) throw error;
   if (!data) return null;

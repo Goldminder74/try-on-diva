@@ -1,5 +1,15 @@
 # Roadmap
 
+## Catalogue cleanup and recruitment (2026-11-05)
+- [x] Remove all 48 current unauthorised wigs; live catalogue/try-on empty, old product 404, sitemap zero wig URLs
+- [x] Find two retailer pilots plus reserves with verified public websites/contact routes
+- [x] Find ten publicly contactable wig-user/creator prospects; UK is creator-declared, exact age/current wig use/consent require confirmation
+- [x] Prepare invitations, feedback questions and a gated paid-promotion test plan; no sending or spending
+- [ ] Publish truthful empty-catalogue/offer copy — requires publication; stock removal is already live
+- [ ] Retailer permission-cleared stock, tester consent and successful generation — await participating retailers/shoppers
+- [ ] Confirm photo-provider retention/deletion claims before tester consent — provider terms/settings not verified in recruitment research
+- [ ] Paid promotion — waits for the preceding checks and approved budget/platform
+
 ## Luxury-beauty acquisition and onboarding kit (2026-11-05)
 - [x] Revise invitation take for human micro-expressions and explicit “wigs-me” pronunciation; versioned clip, revised film and ZIP checked
 - [ ] Human watch-with-sound approval for revised invitation pronunciation and realism — awaits user review; cannot establish from stills alone
