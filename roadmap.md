@@ -5,8 +5,8 @@
 - [x] Approve first shopper film script/start frames
 - [x] Produce shopper creator film (14s); inspect frames, caption placement and audio levels
 - [ ] Approve retailer creator film script/start frame — waits on user's approval before generation
-- [ ] Produce shopper/retailer instructional onboarding videos and review returned exports
-- [x] Create six social concepts in feed/story formats, sales/welcome/quick-start PDFs, intake CSV and outreach/follow-up guide
+- [x] Produce shopper 26s and retailer 42s instructional onboarding overviews; inspect key exported frames (agent completion review pending)
+- [x] Create eight social concepts in feed/story formats (16 images), sales/welcome/quick-start PDFs, intake CSV and outreach/follow-up guide
 - [x] Inspect all nine PDF pages; organize initial Files collection
 - [ ] Release authentic result/portal walkthrough footage — needs permission-cleared successful try-on and retailer session; orientation videos must not imply these were recorded
 
