@@ -1,10 +1,11 @@
 # Roadmap
 
 ## Catalogue cleanup and recruitment (2026-11-05)
-- [ ] Remove all current unauthorised wigs from public catalogue and verify live disappearance
-- [ ] Find two retailer pilots plus reserves with verified public websites/contact routes
+- [x] Remove all 48 current unauthorised wigs; live catalogue/try-on empty, old product 404, sitemap zero wig URLs
+- [x] Find two retailer pilots plus reserves with verified public websites/contact routes
 - [ ] Find ten publicly contactable adult wig-user/creator tester prospects; preserve fit uncertainties
-- [ ] Prepare invitations, feedback questions and a gated paid-promotion test plan; no sending or spending
+- [x] Prepare invitations, feedback questions and a gated paid-promotion test plan; no sending or spending
+- [ ] Publish truthful empty-catalogue/offer copy — requires publication; stock removal is already live
 - [ ] Retailer permission-cleared stock, tester consent and successful generation — await participating retailers/shoppers
 - [ ] Paid promotion — waits for the preceding checks and approved budget/platform
 
