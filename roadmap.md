@@ -7,6 +7,7 @@
 - [x] Prepare invitations, feedback questions and a gated paid-promotion test plan; no sending or spending
 - [ ] Publish truthful empty-catalogue/offer copy — requires publication; stock removal is already live
 - [ ] Retailer permission-cleared stock, tester consent and successful generation — await participating retailers/shoppers
+- [ ] Confirm photo-provider retention/deletion claims before tester consent — provider terms/settings not verified in recruitment research
 - [ ] Paid promotion — waits for the preceding checks and approved budget/platform
 
 ## Luxury-beauty acquisition and onboarding kit (2026-11-05)
