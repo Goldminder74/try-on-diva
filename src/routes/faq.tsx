@@ -37,11 +37,11 @@ interface QA {
 const BUYER_QA: QA[] = [
   {
     q: "How does the try-on actually work?",
-    a: "Upload a clear, front-facing selfie, pick a wig from the catalog, and our AI generates a realistic image of you wearing that exact style. It takes a few seconds.",
+    a: "When retailer styles are available, upload a clear, front-facing selfie and choose a wig. Our AI generates an illustrative preview of the style on your photo. Results and generation times can vary.",
   },
   {
     q: "Will it actually look like me, or a generic model?",
-    a: "It's built specifically to preserve your real skin tone and face, validated across Fitzpatrick I to VI. The result shows the wig on your actual photo, not a stand-in model.",
+    a: "The preview uses your own photo rather than a stand-in model. AI can still alter details or misrepresent colour, hairline and texture, so compare it with the retailer's real product photos.",
   },
   {
     q: "Is my photo safe?",
@@ -84,7 +84,7 @@ const BUYER_QA: QA[] = [
 const RETAILER_QA: QA[] = [
   {
     q: "What does Wigsmi do for my store?",
-    a: "We add a virtual try-on widget to your product pages so customers can see your exact wigs on their own face and skin tone before buying, built specifically for darker skin tones and natural Black hairstyles.",
+    a: "We add a virtual try-on widget so shoppers can preview your permission-cleared wig styles on their own selfie, then visit your shop to buy. The preview is illustrative, not a guarantee of fit or colour.",
   },
   {
     q: "Do I have to pay Wigsmi commission on sales?",
@@ -92,7 +92,7 @@ const RETAILER_QA: QA[] = [
   },
   {
     q: "How long does setup take?",
-    a: "Most retailers are live within 15 minutes: sign up, upload your wigs, configure the widget, and paste one snippet into your store.",
+    a: "Setup includes creating an account, adding permission-cleared wigs and exact product links, configuring your widget and testing it on your store. The time depends on your catalogue and website; we can help with your pilot setup.",
   },
   {
     q: "What platforms does the widget work on?",
