@@ -2,12 +2,13 @@
 
 ## Luxury-beauty acquisition and onboarding kit (2026-11-05)
 - [x] Confirm generated creator format; center adult Black women
-- [ ] Approve first shopper film script/start frames — waiting for the user's creative approval
-- [ ] Approve shopper/retailer campaign video plans and sound direction
-- [ ] Produce and review campaign images and generated product films
-- [ ] Produce shopper and retailer onboarding videos grounded in real screens
-- [ ] Create social variants, sales materials, intake checklist and welcome/follow-up copy
-- [ ] Review final exports and organize the delivery collection
+- [x] Approve first shopper film script/start frames
+- [x] Produce shopper creator film (14s); inspect frames, caption placement and audio levels
+- [ ] Approve retailer creator film script/start frame — waits on user's approval before generation
+- [x] Produce shopper 26s and retailer 42s instructional onboarding overviews; inspect key exported frames (agent completion review pending)
+- [x] Create eight social concepts in feed/story formats (16 images), sales/welcome/quick-start PDFs, intake CSV and outreach/follow-up guide
+- [x] Inspect all nine PDF pages; organize initial Files collection
+- [ ] Release authentic result/portal walkthrough footage — needs permission-cleared successful try-on and retailer session; orientation videos must not imply these were recorded
 
 ## Both money suggestions — built (user approved 2026-11-01)
 
