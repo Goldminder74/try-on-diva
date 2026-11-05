@@ -3,7 +3,7 @@
 ## Catalogue cleanup and recruitment (2026-11-05)
 - [x] Remove all 48 current unauthorised wigs; live catalogue/try-on empty, old product 404, sitemap zero wig URLs
 - [x] Find two retailer pilots plus reserves with verified public websites/contact routes
-- [ ] Find ten publicly contactable adult wig-user/creator tester prospects; preserve fit uncertainties
+- [x] Find ten publicly contactable wig-user/creator prospects; UK is creator-declared, exact age/current wig use/consent require confirmation
 - [x] Prepare invitations, feedback questions and a gated paid-promotion test plan; no sending or spending
 - [ ] Publish truthful empty-catalogue/offer copy — requires publication; stock removal is already live
 - [ ] Retailer permission-cleared stock, tester consent and successful generation — await participating retailers/shoppers
