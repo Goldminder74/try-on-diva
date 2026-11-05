@@ -1,7 +1,8 @@
 # Roadmap
 
 ## Luxury-beauty acquisition and onboarding kit (2026-11-05)
-- [ ] Revise invitation take for human micro-expressions and correct “wigs-me” pronunciation; deliver versioned clip and revised film/kit
+- [x] Revise invitation take for human micro-expressions and explicit “wigs-me” pronunciation; versioned clip, revised film and ZIP checked
+- [ ] Human watch-with-sound approval for revised invitation pronunciation and realism — awaits user review; cannot establish from stills alone
 - [x] Confirm generated creator format; center adult Black women
 - [x] Approve first shopper film script/start frames
 - [x] Produce shopper creator film (14s); inspect frames, caption placement and audio levels
