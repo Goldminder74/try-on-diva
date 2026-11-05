@@ -1,11 +1,13 @@
 # Roadmap
 
 ## Luxury-beauty acquisition and onboarding kit (2026-11-05)
+- [x] Revise invitation take for human micro-expressions and explicit “wigs-me” pronunciation; versioned clip, revised film and ZIP checked
+- [ ] Human watch-with-sound approval for revised invitation pronunciation and realism — awaits user review; cannot establish from stills alone
 - [x] Confirm generated creator format; center adult Black women
 - [x] Approve first shopper film script/start frames
 - [x] Produce shopper creator film (14s); inspect frames, caption placement and audio levels
 - [ ] Approve retailer creator film script/start frame — waits on user's approval before generation
-- [x] Produce shopper 26s and retailer 42s instructional onboarding overviews; inspect key exported frames (agent completion review pending)
+- [x] Produce shopper 26s and retailer 42s instructional onboarding overviews; agents completed visual/motion reviews, parent inspected key frames
 - [x] Create eight social concepts in feed/story formats (16 images), sales/welcome/quick-start PDFs, intake CSV and outreach/follow-up guide
 - [x] Inspect all nine PDF pages; organize initial Files collection
 - [ ] Release authentic result/portal walkthrough footage — needs permission-cleared successful try-on and retailer session; orientation videos must not imply these were recorded
