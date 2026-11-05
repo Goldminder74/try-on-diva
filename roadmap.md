@@ -1,5 +1,13 @@
 # Roadmap
 
+## Luxury-beauty acquisition and onboarding kit (2026-11-05)
+- [ ] Confirm generated-film format and approve reference pack
+- [ ] Approve shopper/retailer campaign video plans and sound direction
+- [ ] Produce and review campaign images and generated product films
+- [ ] Produce shopper and retailer onboarding videos grounded in real screens
+- [ ] Create social variants, sales materials, intake checklist and welcome/follow-up copy
+- [ ] Review final exports and organize the delivery collection
+
 ## Both money suggestions — built (user approved 2026-11-01)
 
 ### A. One-off try-on top-up pack (10 try-ons for £2.99)
