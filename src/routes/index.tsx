@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
       { property: "og:url", content: "https://wigsmi.com/" },
       { property: "og:type", content: "website" },
       { title: "Wigsmi - Try every wig before you buy it" },
-      { name: "description", content: "Virtual wig try-on built for Black women. Browse hundreds of styles, see them on your skin in seconds, then buy from the retailer you trust." },
+      { name: "description", content: "Virtual wig try-on built for Black women. Explore Wigsmi and discover our upcoming retailer collections." },
       { property: "og:title", content: "Wigsmi - Try every wig before you buy it" },
       { property: "og:description", content: "Virtual wig try-on built for Black women." },
       { name: "twitter:card", content: "summary_large_image" },
@@ -56,7 +56,7 @@ function Landing() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link to="/try-on" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm transition-all hover:bg-mahogany-soft hover:shadow-md">
-                Upload a selfie. See yourself in 5 wigs free.
+                Explore virtual try-on
               </Link>
               <Link to="/retailer" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">
                 I'm a retailer →
@@ -85,7 +85,7 @@ function Landing() {
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
               { icon: Upload, title: "Upload your selfie", body: "A clear, well-lit photo is all we need." },
-              { icon: Palette, title: "Browse hundreds of styles", body: "Lace fronts, glueless, braids, bobs - filtered by your texture and budget." },
+              { icon: Palette, title: "Explore retailer styles", body: "Lace fronts, glueless, braids and bobs, as new collections arrive." },
               { icon: Heart, title: "Find your perfect wig", body: "See it on you, save your favourites, buy from a retailer you trust." },
             ].map((s, i) => (
               <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
@@ -106,7 +106,7 @@ function Landing() {
         <h2 className="font-display text-3xl text-mahogany md:text-4xl">Why Wigsmi</h2>
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
           {[
-            { icon: ShieldCheck, title: "Built for dark skin", body: "Trained on tones from Fitzpatrick I to VI. No washed-out previews, no off colour matching." },
+            { icon: ShieldCheck, title: "Beauty that reflects you", body: "Created with Black women’s wig-shopping experience in mind. AI previews are a guide, not a guarantee of fit or colour." },
             { icon: Sparkles, title: "Afrocentric styles", body: "From kinky coily afros to knotless braids to body wave - the catalog reflects you." },
             { icon: Heart, title: "Try before you buy", body: "Save the styles that work. Skip the styles that don't. Reduce returns and regret." },
           ].map((c, i) => (
@@ -189,6 +189,7 @@ function FeaturedRow() {
       </div>
     );
   }
+  if (!data?.length) return <p className="mt-8 text-sm text-muted-foreground">New retailer collections coming soon. No styles are available to try on right now.</p>;
   return (
     <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
       {(data ?? []).map((w) => <WigCard key={w.id} wig={w} />)}

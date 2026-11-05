@@ -12,5 +12,7 @@
 - Stripe tax codes are assigned upfront per offering and environment, never patched during checkout; eligible consumer AI service and retailer SaaS remain distinct classifications.
 # SEO
 
+- Public single-wig lookups enforce published and undeleted status, like catalogue lists, so archived stock cannot reappear through deep links.
+
 - Keep page-specific metadata and canonical URLs on leaf routes; the root supplies sitewide defaults only to prevent duplicate titles and shared previews.
 - Every route declares staticData.sitemap; private layouts exclude their subtrees, and published, undeleted products are read with public credentials and full pagination, never admin access or generation-time lastmod.

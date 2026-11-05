@@ -13,7 +13,7 @@ export const Route = createFileRoute("/retailer")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://wigsmi.com/retailer" },
       { title: "For Retailers - Wigsmi" },
-      { name: "description", content: "Add the virtual try-on built for Black wig buyers to your store. Reduce returns, lift conversion. Free 1-month trial." },
+      { name: "description", content: "Add Wigsmi virtual wig try-on to your store. Help shoppers explore your collection with a free 1-month retailer trial." },
       { property: "og:title", content: "Wigsmi for Retailers" },
       { property: "og:description", content: "Virtual try-on for wig retailers. Free 1-month trial." },
     ],
@@ -33,10 +33,10 @@ function RetailerLanding() {
             For wig retailers
           </span>
           <h1 className="mt-5 max-w-3xl font-display text-5xl leading-[1.05] text-mahogany md:text-6xl">
-            Fewer returns. More confident buyers. More sales.
+            Your collection. A more personal shopping experience.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-foreground/75">
-            When customers can see exactly how a wig looks on their own skin tone before buying, they buy with confidence, and they keep what they buy.
+            Help shoppers preview your wigs on their own selfie before visiting your shop to buy. AI previews are illustrative, not a guarantee of fit or colour.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link to="/retailer/signup" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft">
@@ -56,16 +56,16 @@ function RetailerLanding() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {[
             {
-              title: "Fewer returns",
-              body: "Customers who try on before buying are far less likely to return a wig that did not meet their expectations.",
+              title: "Preview before purchase",
+              body: "Give customers another way to explore a style before ordering.",
             },
             {
-              title: "Higher conversion",
-              body: "Reduce the hesitation that stops a browser becoming a buyer.",
+              title: "Learn from your shoppers",
+              body: "Use your pilot to understand which styles attract interest and what questions shoppers still have.",
             },
             {
               title: "Built for your exact customer",
-              body: "The only try-on technology designed and validated for darker skin tones and natural Black hairstyles.",
+              body: "A wig-shopping experience created with Black women in mind.",
             },
           ].map((item, i) => (
             <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
@@ -80,9 +80,9 @@ function RetailerLanding() {
       <section className="border-y border-border bg-mahogany text-cream">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-5 py-14 md:grid-cols-3">
           {[
-            ["Up to 300%", "more conversion"],
-            ["12 try-ons", "average per visitor"],
-            ["Up to 60%", "fewer returns"],
+            ["1 month", "free retailer trial"],
+            ["Your wigs", "your verified product links"],
+            ["Your shop", "where customers buy"],
           ].map(([n, l]) => (
             <div key={l}>
               <p className="font-display text-4xl text-gold md:text-5xl">{n}</p>
@@ -90,7 +90,6 @@ function RetailerLanding() {
             </div>
           ))}
         </div>
-        <p className="border-t border-cream/10 px-5 py-3 text-center font-mono text-[11px] text-cream/50">Typical results from early retailers</p>
       </section>
 
       {/* How it works */}
@@ -99,7 +98,7 @@ function RetailerLanding() {
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
           {[
             { icon: Sparkles, title: "Sign up", body: "Create a retailer account in 60 seconds." },
-            { icon: TrendingUp, title: "Upload your wigs", body: "Bulk import or add them one by one. Our team adds the AR assets." },
+            { icon: TrendingUp, title: "Upload your wigs", body: "Add permission-cleared product photos, descriptions, prices and exact buying links." },
             { icon: Code2, title: "Paste one line of code", body: "Drop the embed snippet into Shopify, WooCommerce or any HTML. Done." },
           ].map((s, i) => (
             <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
