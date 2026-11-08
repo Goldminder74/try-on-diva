@@ -35,7 +35,7 @@ describe("USD amounts match the approved list", () => {
     expect(formatPackPrice(TRYON_PACKS[0])).toBe("£2.99");
   });
   it("GBP amounts are unchanged", () => {
-    expect(formatPlanPrice("retailer_starter_monthly", "GBP")).toBe("£49.00");
+    expect(formatPlanPrice("retailer_starter_monthly", "GBP")).toBe("£49");
     expect(formatPlanPrice("retailer_scale_yearly", "GBP")).toBe("£3,112.20");
     expect(formatPlanPrice("consumer_plus_monthly", "GBP")).toBe("£4.99");
   });

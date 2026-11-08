@@ -32,6 +32,7 @@ export function formatMinor(amountMinor: number, currency: string): string {
   return new Intl.NumberFormat(c === "USD" ? "en-US" : "en-GB", {
     style: "currency",
     currency: c,
+    ...(amountMinor % 100 === 0 && { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
   }).format(amountMinor / 100);
 }
 
