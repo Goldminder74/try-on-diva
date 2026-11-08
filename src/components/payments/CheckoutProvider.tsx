@@ -11,6 +11,8 @@ import {
 
 export interface CheckoutOptions {
   priceId: string;
+  /** Currency the customer pays in (defaults to GBP). */
+  currency?: "GBP" | "USD";
   customerEmail?: string;
   userId?: string;
   /** Where to send the shopper once the payment is complete. */
@@ -33,6 +35,7 @@ function CheckoutFrame({ options }: { options: CheckoutOptions }) {
     const result = await createCheckoutSession({
       data: {
         priceId: options.priceId,
+        currency: options.currency ?? "GBP",
         customerEmail: options.customerEmail,
         userId: options.userId ?? options.customData?.userId,
         returnUrl,
@@ -43,7 +46,7 @@ function CheckoutFrame({ options }: { options: CheckoutOptions }) {
     if (!result.clientSecret) throw new Error("Checkout could not be started.");
     return result.clientSecret;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.priceId, options.customerEmail, options.userId, options.successUrl]);
+  }, [options.priceId, options.currency, options.customerEmail, options.userId, options.successUrl]);
 
   const checkoutOptions = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
 
@@ -79,7 +82,7 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
           <DialogHeader>
             <DialogTitle className="sr-only">Checkout</DialogTitle>
           </DialogHeader>
-          {options ? <CheckoutFrame key={options.priceId} options={options} /> : null}
+          {options ? <CheckoutFrame key={`${options.priceId}-${options.currency ?? "GBP"}`} options={options} /> : null}
         </DialogContent>
       </Dialog>
     </CheckoutContext.Provider>

@@ -45,9 +45,6 @@ function formatMoney(amountMinor: number, currency: string) {
   return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(amountMinor / 100);
 }
 
-function formatGBP(amountMinor: number) {
-  return formatMoney(amountMinor, "GBP");
-}
 
 export const Route = createFileRoute("/portal/billing")({
   staticData: { sitemap: false },
@@ -339,7 +336,7 @@ function BillingPage() {
                   <p>
                     You'll be charged{" "}
                     <span className="font-medium text-foreground">
-                      {formatGBP(switchPreview.immediateAmount)}
+                      {formatMoney(switchPreview.immediateAmount, switchPreview.currency)}
                     </span>{" "}
                     today (prorated).
                   </p>
@@ -348,7 +345,7 @@ function BillingPage() {
                   <p>
                     You'll receive a credit of{" "}
                     <span className="font-medium text-foreground">
-                      {formatGBP(Math.abs(switchPreview.immediateAmount))}
+                      {formatMoney(Math.abs(switchPreview.immediateAmount), switchPreview.currency)}
                     </span>{" "}
                     toward your next invoice.
                   </p>
@@ -358,7 +355,7 @@ function BillingPage() {
                 )}
                 {switchPreview?.nextBilledAt && (
                   <p className="text-muted-foreground">
-                    Next renewal: {formatGBP(switchPreview.nextAmount)} on{" "}
+                    Next renewal: {formatMoney(switchPreview.nextAmount, switchPreview.currency)} on{" "}
                     {new Date(switchPreview.nextBilledAt).toLocaleDateString("en-GB", {
                       day: "numeric", month: "long", year: "numeric",
                     })}.

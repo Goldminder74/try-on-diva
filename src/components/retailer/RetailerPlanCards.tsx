@@ -5,10 +5,12 @@ import { useAuth } from "@/contexts/auth-context";
 import { useCheckout } from "@/hooks/useCheckout";
 import {
   RETAILER_PLANS,
+  formatRetailerPlanPrice,
   type BillingInterval,
   type RetailerPlanId,
 } from "@/lib/retailer-plans";
 import { toast } from "sonner";
+import { CurrencySwitch, usePlanCurrency } from "@/hooks/usePlanCurrency";
 
 interface RetailerPlanCardsProps {
   /** Currently active paid plan, if any - used to render a "Current plan" pill. */
@@ -45,6 +47,7 @@ export function RetailerPlanCards({
   const { openCheckout, loading: checkoutLoading } = useCheckout();
   const [interval, setInterval] = useState<BillingInterval>("monthly");
   const [busy, setBusy] = useState<string | null>(null);
+  const { currency } = usePlanCurrency();
 
   const onChoose = async (planId: RetailerPlanId, priceId: string, planName: string) => {
     if (requireSignup || !user) {
@@ -62,6 +65,7 @@ export function RetailerPlanCards({
     try {
       await openCheckout({
         priceId,
+        currency,
         customerEmail: user.email ?? undefined,
         customData: { userId: user.id, plan: planId },
         successUrl:
@@ -77,7 +81,8 @@ export function RetailerPlanCards({
 
   return (
     <div>
-      <div className="mb-6 inline-flex rounded-full border border-border bg-card p-1">
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+      <div className="inline-flex rounded-full border border-border bg-card p-1">
         <button
           type="button"
           onClick={() => setInterval("monthly")}
@@ -101,6 +106,8 @@ export function RetailerPlanCards({
           Yearly <span className="ml-1 text-gold">-35%</span>
         </button>
       </div>
+      <CurrencySwitch />
+      </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {RETAILER_PLANS.map((p) => {
@@ -121,7 +128,7 @@ export function RetailerPlanCards({
                 </span>
               )}
               <p className="font-display text-xl text-mahogany">{p.name}</p>
-              <p className="mt-3 font-mono text-3xl">{p.prices[interval]}</p>
+              <p className="mt-3 font-mono text-3xl">{formatRetailerPlanPrice(p, interval, currency)}</p>
               <p className="text-xs text-muted-foreground">{periodLabel}</p>
               <p className="mt-2 text-sm text-muted-foreground">{p.tagline}</p>
               <ul className="mt-4 space-y-2">
