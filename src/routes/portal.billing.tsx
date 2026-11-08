@@ -15,6 +15,8 @@ import { useCheckout } from "@/hooks/useCheckout";
 import { Loader2, ExternalLink, FileText, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { RetailerPlanCards } from "@/components/retailer/RetailerPlanCards";
+import { formatMinor } from "@/lib/plan-prices";
+import { usePlanCurrency } from "@/hooks/usePlanCurrency";
 import {
   type RetailerPlanId,
   getPlanDisplayName,
@@ -42,7 +44,7 @@ interface Invoice {
 }
 
 function formatMoney(amountMinor: number, currency: string) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(amountMinor / 100);
+  return formatMinor(amountMinor, currency);
 }
 
 
@@ -75,6 +77,7 @@ const PAID_PLAN_IDS: RetailerPlanId[] = ["starter", "growth", "scale"];
 function BillingPage() {
   const { user } = useAuth();
   const portal = useServerFn(createPortalSession);
+  const { currency } = usePlanCurrency();
   const invoicesFn = useServerFn(listInvoices);
   const preview = useServerFn(previewPlanChange);
   const changePlan = useServerFn(changeSubscriptionPlan);
@@ -150,6 +153,7 @@ function BillingPage() {
     window.history.replaceState(null, "", cleanUrl);
     openCheckout({
       priceId,
+      currency,
       customerEmail: user.email ?? undefined,
       customData: { userId: user.id, plan: planId },
       successUrl: `${window.location.origin}/checkout/success?type=retailer`,
