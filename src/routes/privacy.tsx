@@ -80,7 +80,7 @@ function PrivacyPage() {
               Photos you upload are processed by our AI try-on engine to generate a
               preview. They are stored in encrypted cloud storage. You can delete any
               saved photo from your account at any time. We do not use your photos to
-              train third-party AI models, and we do not sell them. Try-on photos are sent to Google LLC's Gemini image API for processing and are not retained by Google after the result is generated.
+              train third-party AI models, and we do not sell them. Try-on photos are sent to Google LLC's Gemini image API for processing and are not used by Google to train its models; Google keeps them only for a limited period to detect misuse of its service, under its Gemini API terms.
             </p>
           </section>
 
@@ -90,7 +90,7 @@ function PrivacyPage() {
             <ul className="list-disc space-y-2 pl-6">
               <li>Cloud hosting and database providers.</li>
               <li>Stripe (stripe.com) processes payment information and supports billing for retailer and consumer subscriptions. Its role and applicable transaction terms are shown at checkout. See stripe.com/privacy.</li>
-              <li>Google LLC (Gemini image API) - processes selfie photos you upload solely to generate your virtual try-on result. Google is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See policies.google.com/privacy. Photos are not retained by Google beyond the processing request.</li>
+              <li>Google LLC (Gemini image API) - processes selfie photos you upload solely to generate your virtual try-on result. Google is incorporated in the USA; transfers are covered by Standard Contractual Clauses. See policies.google.com/privacy. Google does not use these photos to improve its products and keeps them only for a limited period to detect misuse.</li>
               <li>Email delivery providers.</li>
               <li>Analytics providers (aggregated, where possible).</li>
             </ul>

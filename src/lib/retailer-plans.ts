@@ -1,3 +1,4 @@
+import { formatPlanPrice, type PlanCurrency } from "@/lib/plan-prices";
 // Shared plan config for the retailer pricing page, /portal/billing,
 // and the trial-expired paywall. Keep monthly/yearly priceIds in sync with
 // the payment provider products created via create_product / create_price.
@@ -5,11 +6,19 @@
 export type RetailerPlanId = "starter" | "growth" | "scale";
 export type BillingInterval = "monthly" | "yearly";
 
+/** Display price for a plan, read from the shared Stripe-matching config. */
+export function formatRetailerPlanPrice(
+  plan: RetailerPlan,
+  interval: BillingInterval,
+  currency: PlanCurrency,
+): string {
+  return formatPlanPrice(plan.priceIds[interval], currency);
+}
+
 export interface RetailerPlan {
   id: RetailerPlanId;
   name: string;
   tagline: string;
-  prices: { monthly: string; yearly: string };
   priceIds: { monthly: string; yearly: string };
   features: string[];
   badge?: string;
@@ -20,7 +29,6 @@ export const RETAILER_PLANS: RetailerPlan[] = [
     id: "starter",
     name: "Starter",
     tagline: "Solo founders.",
-    prices: { monthly: "£49", yearly: "£382.20" },
     priceIds: {
       monthly: "retailer_starter_monthly",
       yearly: "retailer_starter_yearly",
@@ -31,7 +39,6 @@ export const RETAILER_PLANS: RetailerPlan[] = [
     id: "growth",
     name: "Growth",
     tagline: "Growing brands.",
-    prices: { monthly: "£149", yearly: "£1,162.20" },
     priceIds: {
       monthly: "retailer_growth_monthly",
       yearly: "retailer_growth_yearly",
@@ -43,7 +50,6 @@ export const RETAILER_PLANS: RetailerPlan[] = [
     id: "scale",
     name: "Pro",
     tagline: "Multi-store retailers.",
-    prices: { monthly: "£399", yearly: "£3,112.20" },
     priceIds: {
       monthly: "retailer_scale_monthly",
       yearly: "retailer_scale_yearly",

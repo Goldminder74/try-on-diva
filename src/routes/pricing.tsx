@@ -27,8 +27,23 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-function formatGBP(pence: number) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(pence / 100);
+import { formatMinor, formatPlanPrice, formatZero, priceMinor, type PlanCurrency } from "@/lib/plan-prices";
+import { CurrencySwitch, usePlanCurrency } from "@/hooks/usePlanCurrency";
+
+/** Price lines for a paid plan, read from the shared Stripe-matching config. */
+function planDisplay(ids: PriceMap, currency: PlanCurrency) {
+  if (!ids.monthly || !ids.yearly) {
+    const z = formatZero(currency);
+    return { monthly: z, yearly: z, monthlyEquivYearly: undefined, yearlySavings: undefined };
+  }
+  const m = priceMinor(ids.monthly, currency);
+  const y = priceMinor(ids.yearly, currency);
+  return {
+    monthly: formatPlanPrice(ids.monthly, currency),
+    yearly: formatPlanPrice(ids.yearly, currency),
+    monthlyEquivYearly: formatMinor(Math.round(y / 12), currency),
+    yearlySavings: formatMinor(m * 12 - y, currency),
+  };
 }
 
 export const Route = createFileRoute("/pricing")({
@@ -54,9 +69,6 @@ const PLANS: {
   name: string;
   desc: string;
   badge?: string;
-  prices: { monthly: string; yearly: string };
-  monthlyEquivYearly?: string;
-  yearlySavings?: string;
   priceIds: PriceMap;
   features: readonly (readonly [boolean, string])[];
   planKey: "free" | "plus" | "pro";
@@ -64,7 +76,6 @@ const PLANS: {
   {
     name: "Free",
     desc: "Browse the full catalog and try out the AI.",
-    prices: { monthly: "£0", yearly: "£0" },
     priceIds: { monthly: null, yearly: null },
     planKey: "free",
     features: [
@@ -80,9 +91,6 @@ const PLANS: {
     name: "Plus",
     desc: "35 try-ons a month and personalised picks.",
     badge: "Most popular",
-    prices: { monthly: "£4.99", yearly: "£38.92" },
-    monthlyEquivYearly: "£3.24",
-    yearlySavings: "£20.96",
     priceIds: { monthly: "consumer_plus_monthly", yearly: "consumer_plus_yearly" },
     planKey: "plus",
     features: [
@@ -98,9 +106,6 @@ const PLANS: {
   {
     name: "Pro",
     desc: "Watermark-free downloads, full history and priority quality.",
-    prices: { monthly: "£9.99", yearly: "£77.92" },
-    monthlyEquivYearly: "£6.49",
-    yearlySavings: "£41.96",
     priceIds: { monthly: "consumer_pro_monthly", yearly: "consumer_pro_yearly" },
     planKey: "pro",
     features: [
@@ -135,6 +140,7 @@ function Pricing() {
   const preview = useServerFn(previewPlanChange);
   const cancelSub = useServerFn(cancelSubscription);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const { currency } = usePlanCurrency();
   const [interval, setInterval] = useState<"monthly" | "yearly">("monthly");
   const [previewState, setPreviewState] = useState<PreviewState | null>(null);
   const [confirmingSwitch, setConfirmingSwitch] = useState(false);
@@ -177,6 +183,7 @@ function Pricing() {
       }
       await openCheckout({
         priceId,
+        currency,
         customerEmail: user.email ?? undefined,
         customData: { userId: user.id, plan: planName },
         successUrl: `${window.location.origin}/checkout/success?type=consumer`,
@@ -198,6 +205,7 @@ function Pricing() {
     try {
       await openCheckout({
         priceId: pack.priceId,
+        currency,
         customerEmail: user.email ?? undefined,
         customData: { userId: user.id },
         successUrl: `${window.location.origin}/checkout/success?type=topup`,
@@ -294,6 +302,9 @@ function Pricing() {
               Yearly <span className="ml-1 text-gold">-35%</span>
             </button>
           </div>
+          <div className="mt-3">
+            <CurrencySwitch />
+          </div>
 
           {isActive && subscription?.customer_type === "consumer" && (
             <p className="mt-4 text-xs text-muted-foreground">
@@ -323,6 +334,7 @@ function Pricing() {
             const priceId = p.priceIds[interval];
             const isCurrent = currentPlanKey === p.planKey;
             const busy = busyId === p.planKey || (busyId === null && checkoutLoading);
+            const d = planDisplay(p.priceIds, currency);
             const showYearly = interval === "yearly" && p.planKey !== "free";
             return (
               <div
@@ -337,17 +349,17 @@ function Pricing() {
                   </span>
                 )}
                 <p className="font-display text-2xl text-mahogany">{p.name}</p>
-                {showYearly && p.monthlyEquivYearly ? (
+                {showYearly && d.monthlyEquivYearly ? (
                   <>
-                    <p className="mt-3 font-mono text-4xl text-foreground">{p.monthlyEquivYearly}</p>
-                    <p className="text-xs text-muted-foreground">per month, billed annually ({p.prices.yearly}/yr)</p>
-                    {p.yearlySavings && (
-                      <p className="mt-1 text-xs font-medium text-gold-dark">Save {p.yearlySavings}/yr</p>
+                    <p className="mt-3 font-mono text-4xl text-foreground">{d.monthlyEquivYearly}</p>
+                    <p className="text-xs text-muted-foreground">per month, billed annually ({d.yearly}/yr)</p>
+                    {d.yearlySavings && (
+                      <p className="mt-1 text-xs font-medium text-gold-dark">Save {d.yearlySavings}/yr</p>
                     )}
                   </>
                 ) : (
                   <>
-                    <p className="mt-3 font-mono text-4xl text-foreground">{p.prices[interval]}</p>
+                    <p className="mt-3 font-mono text-4xl text-foreground">{d[interval]}</p>
                     <p className="text-xs text-muted-foreground">
                       {p.planKey === "free" ? "forever" : "per month"}
                     </p>
@@ -397,7 +409,7 @@ function Pricing() {
               Need more this month?
             </p>
             <p className="mt-1 text-sm text-foreground/80">
-              {TRYON_PACKS[0].label} for {formatPackPrice(TRYON_PACKS[0])} - a one-off
+              {TRYON_PACKS[0].label} for {formatPackPrice(TRYON_PACKS[0], currency)} - a one-off
               top-up on any plan, yours to use for {TRYON_PACKS[0].validMonths} months.
               Your monthly allowance is always used first.
             </p>
@@ -434,7 +446,7 @@ function Pricing() {
                   <p>
                     You'll be charged{" "}
                     <span className="font-medium text-foreground">
-                      {formatGBP(previewState.immediateAmount)}
+                      {formatMinor(previewState.immediateAmount, previewState.currency)}
                     </span>{" "}
                     today (prorated).
                   </p>
@@ -443,7 +455,7 @@ function Pricing() {
                   <p>
                     You'll receive a credit of{" "}
                     <span className="font-medium text-foreground">
-                      {formatGBP(Math.abs(previewState.immediateAmount))}
+                      {formatMinor(Math.abs(previewState.immediateAmount), previewState.currency)}
                     </span>{" "}
                     toward your next invoice.
                   </p>
@@ -453,7 +465,7 @@ function Pricing() {
                 )}
                 {previewState?.nextBilledAt && (
                   <p className="text-muted-foreground">
-                    Next renewal: {formatGBP(previewState.nextAmount)} on{" "}
+                    Next renewal: {formatMinor(previewState.nextAmount, previewState.currency)} on{" "}
                     {new Date(previewState.nextBilledAt).toLocaleDateString("en-GB", {
                       day: "numeric", month: "long", year: "numeric",
                     })}.

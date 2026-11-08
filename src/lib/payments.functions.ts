@@ -49,6 +49,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   .inputValidator(
     (data: {
       priceId: string;
+      currency?: "GBP" | "USD";
       customerEmail?: string;
       userId?: string;
       returnUrl: string;
@@ -59,6 +60,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           .string()
           .max(120)
           .refine(isCheckoutPriceId, () => ({ message: "Unknown plan or pack." })),
+        currency: z.enum(["GBP", "USD"]).default("GBP"),
         customerEmail: z.string().email().max(254).optional(), userId: z.string().uuid().optional(),
         returnUrl: z.string().url().max(2048), environment: z.enum(["sandbox", "live"]),
       }).parse(data);
@@ -97,6 +99,8 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         line_items: [{ price: stripePrice.id, quantity: 1 }],
         mode: isRecurring ? "subscription" : "payment",
         ui_mode: "embedded_page",
+        // Picks the price's matching currency option (GBP default, USD option).
+        currency: (data.currency ?? "GBP").toLowerCase(),
         return_url: data.returnUrl,
         managed_payments: { enabled: true },
         ...(customerId && { customer: customerId }),

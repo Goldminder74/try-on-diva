@@ -8,6 +8,8 @@
  *
  * `priceId` must match the payment-provider price id created for the pack.
  */
+import { formatPlanPrice, type PlanCurrency } from "@/lib/plan-prices";
+
 export interface TryOnPack {
   /** Payment-provider price id (also the checkout lookup key). */
   priceId: string;
@@ -64,10 +66,7 @@ export function packExpiresAt(purchasedAt: Date, validMonths: number): Date {
   return d;
 }
 
-/** £-formatted pack price, e.g. "£2.99". */
-export function formatPackPrice(pack: TryOnPack): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: pack.currency,
-  }).format(pack.amountGbp);
+/** Pack price in the chosen currency, e.g. "£2.99" or "$3.99". */
+export function formatPackPrice(pack: TryOnPack, currency: PlanCurrency = "GBP"): string {
+  return formatPlanPrice(pack.priceId, currency);
 }
