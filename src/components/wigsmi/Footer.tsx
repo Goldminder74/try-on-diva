@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 import { Wordmark } from "./Wordmark";
 
 export function Footer() {
@@ -35,7 +35,10 @@ export function Footer() {
       <div className="border-t border-border">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5 text-xs text-muted-foreground">
           <span>© {new Date().getFullYear()} Wigsmi</span>
-          <a href="#" aria-label="Wigsmi on Instagram" className="hover:text-mahogany"><Instagram className="h-4 w-4" /></a>
+          <div className="flex items-center gap-2">
+            <a href="https://www.facebook.com/profile.php?id=61590950803900" target="_blank" rel="noopener noreferrer" aria-label="Wigsmi on Facebook (opens in a new tab)" title="Wigsmi on Facebook" className="inline-flex h-10 w-10 items-center justify-center rounded-md hover:text-mahogany focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><Facebook className="h-5 w-5" aria-hidden="true" /></a>
+            <a href="https://www.instagram.com/wigsmi/" target="_blank" rel="noopener noreferrer" aria-label="Wigsmi on Instagram (opens in a new tab)" title="Wigsmi on Instagram" className="inline-flex h-10 w-10 items-center justify-center rounded-md hover:text-mahogany focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><Instagram className="h-5 w-5" aria-hidden="true" /></a>
+          </div>
         </div>
       </div>
     </footer>
