@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Official social links (2026-11-08)
-- [ ] Add the supplied Facebook and Instagram pages to the website footer and verify both destinations
+- [x] Add the supplied Facebook and Instagram pages to the website footer and verify both destinations; desktop and phone checked
 
 ## Catalogue cleanup and recruitment (2026-11-05)
 - [x] Remove all 48 current unauthorised wigs; live catalogue/try-on empty, old product 404, sitemap zero wig URLs
