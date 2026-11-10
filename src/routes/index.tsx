@@ -20,6 +20,7 @@ export const Route = createFileRoute("/")({
       ],
     }) }],
     meta: [
+      { name: "fo-verify", content: "83a758b2-98d4-496d-804d-d390f7045221" },
       { property: "og:url", content: "https://wigsmi.com/" },
       { property: "og:type", content: "website" },
       { title: "Wigsmi - Try every wig before you buy it" },
