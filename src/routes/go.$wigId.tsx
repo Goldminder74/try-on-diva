@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { CLICK_TTL_DAYS, safeRetailerTarget, withClickRef } from "@/lib/commission";
+import { utmFromCookieHeader } from "@/lib/utm";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -35,6 +36,30 @@ function publicClient() {
  * with the shop's name, so we follow it as long as it is a real page - never
  * a `javascript:` or other trick address.
  */
+/**
+ * Counts every Buy click (wig click total + a buy_click event with the
+ * shopper's first-visit campaign tags). Never throws: logging must not block
+ * the redirect.
+ */
+async function logBuyClick(request: Request, wigId: string, retailerId: string | null) {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.rpc("increment_wig_click", { _wig_id: wigId });
+    await supabaseAdmin.from("analytics_events").insert({
+      event_type: "buy_click",
+      retailer_id: retailerId,
+      payload: {
+        wig_id: wigId,
+        retailer_id: retailerId,
+        referrer: request.headers.get("referer")?.slice(0, 500) ?? null,
+        ...utmFromCookieHeader(request.headers.get("cookie")),
+      },
+    });
+  } catch (err) {
+    console.error("buy click logging failed:", err);
+  }
+}
+
 function plainHttpsTarget(url: string | null | undefined): string | null {
   if (!url) return null;
   try {
@@ -52,8 +77,8 @@ function plainHttpsTarget(url: string | null | undefined): string | null {
  * A shopper clicking "Buy from ..." leaves Wigsmi for the retailer's store.
  * When that retailer runs commission, the visit is recorded with a reference
  * code that rides along on the shop URL, so the retailer can tell us later
- * which order came from us. Nothing here is stored for shops that do not run
- * commission - they simply get a straight redirect.
+ * which order came from us. Every click is also counted, for all
+ * shops, before the redirect.
  */
 export const Route = createFileRoute("/go/$wigId")({
   staticData: { sitemap: false },
@@ -92,6 +117,7 @@ export const Route = createFileRoute("/go/$wigId")({
           }
 
           if (row.commission_enabled !== true || !tracked) {
+            await logBuyClick(request, wigId, row.retailer_id ?? null);
             return Response.redirect(destination, 302);
           }
 
@@ -106,6 +132,20 @@ export const Route = createFileRoute("/go/$wigId")({
             expires_at: new Date(Date.now() + CLICK_TTL_DAYS * 86400000).toISOString(),
           });
           await supabaseAdmin.rpc("increment_wig_click", { _wig_id: wigId });
+          try {
+            await supabaseAdmin.from("analytics_events").insert({
+              event_type: "buy_click",
+              retailer_id: row.retailer_id,
+              payload: {
+                wig_id: wigId,
+                retailer_id: row.retailer_id,
+                referrer: request.headers.get("referer")?.slice(0, 500) ?? null,
+                ...utmFromCookieHeader(request.headers.get("cookie")),
+              },
+            });
+          } catch (err) {
+            console.error("buy click event failed:", err);
+          }
 
           return Response.redirect(withClickRef(destination, token), 302);
         } catch (err) {

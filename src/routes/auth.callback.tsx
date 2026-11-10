@@ -1,3 +1,4 @@
+import { storedUtm } from "@/lib/utm";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +21,17 @@ export const Route = createFileRoute("/auth/callback")({
   }),
 });
 
+/** Google sign-ups carry no sign-up metadata: copy first-visit tags onto a brand-new profile. */
+async function saveSignupUtm(userId: string) {
+  try {
+    const utm = storedUtm();
+    if (!utm.utm_source && !utm.utm_medium && !utm.utm_campaign) return;
+    const since = new Date(Date.now() - 86400000).toISOString();
+    await supabase.from("profiles").update(utm).eq("id", userId)
+      .is("utm_source", null).is("utm_medium", null).is("utm_campaign", null).gte("created_at", since);
+  } catch { /* never block sign-in */ }
+}
+
 function Callback() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -27,6 +39,7 @@ function Callback() {
       void resolveCallback(window.location.search, {
         getSession: async () => (await supabase.auth.getSession()).data.session,
         getRoles: async (userId) => {
+          void saveSignupUtm(userId);
           const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
           return (data ?? []).map((r) => r.role as string);
         },

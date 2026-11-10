@@ -188,3 +188,17 @@
     border-left-color: var(--color-gold);
   }
 }
+
+/* Long-form guide articles */
+.guide-prose { font-size: 1.0625rem; line-height: 1.8; color: var(--color-foreground); }
+.guide-prose > * + * { margin-top: 1.25em; }
+.guide-prose h2 { font-family: var(--font-display); color: var(--color-mahogany); font-size: 1.75rem; line-height: 1.25; margin-top: 2.25em; }
+.guide-prose h3 { font-family: var(--font-display); color: var(--color-mahogany); font-size: 1.35rem; margin-top: 1.75em; }
+.guide-prose ul, .guide-prose ol { padding-left: 1.4em; }
+.guide-prose ul { list-style: disc; }
+.guide-prose ol { list-style: decimal; }
+.guide-prose li + li { margin-top: 0.5em; }
+.guide-prose li::marker { color: var(--color-gold-dark); }
+.guide-prose strong { color: var(--color-mahogany); font-weight: 600; }
+.guide-prose a { color: var(--color-mahogany); text-decoration: underline; text-decoration-color: var(--color-gold); text-underline-offset: 3px; overflow-wrap: anywhere; }
+.guide-prose a:hover { text-decoration-color: var(--color-mahogany); }

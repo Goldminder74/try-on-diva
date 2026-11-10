@@ -187,6 +187,9 @@ export type Database = {
           result_path: string
           seq: number
           user_agent: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
           wig_id: string | null
         }
         Insert: {
@@ -199,6 +202,9 @@ export type Database = {
           result_path: string
           seq?: number
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
           wig_id?: string | null
         }
         Update: {
@@ -211,6 +217,9 @@ export type Database = {
           result_path?: string
           seq?: number
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
           wig_id?: string | null
         }
         Relationships: []
@@ -418,6 +427,9 @@ export type Database = {
           email: string | null
           id: string
           updated_at: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -427,6 +439,9 @@ export type Database = {
           email?: string | null
           id: string
           updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -436,6 +451,9 @@ export type Database = {
           email?: string | null
           id?: string
           updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Relationships: []
       }

@@ -1,3 +1,4 @@
+import { storedUtm } from "@/lib/utm";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +44,7 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
             data: {
               display_name: business || email.split("@")[0],
               role: "retailer",
+              ...storedUtm(),
             },
           },
         });

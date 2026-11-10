@@ -54,3 +54,9 @@
 - [ ] Publish so the pack and commission go live
 - [x] Company name written as "Sherwood Consulting Services Ltd" (not all caps) everywhere
 - [x] Brochure PDF: add £2.99 pack + retailer commission
+
+### Guides, buy-click logging, canonicals, UTM (10 Nov)
+- [x] /guides index + /guides/$slug from markdown, nav links, sitemap, first guide
+- [x] /go records every Buy click (wig click count + buy_click event)
+- [x] /retailer "first" claim removed
+- [x] Canonicals on remaining public pages; UTM capture on visit, anonymous session, profile, events

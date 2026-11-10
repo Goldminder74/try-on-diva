@@ -158,7 +158,7 @@ function RetailerLanding() {
         <div className="mx-auto w-full max-w-4xl px-5 py-20 text-center">
           <ShieldCheck className="mx-auto h-8 w-8 text-gold" />
           <h2 className="mt-4 font-display text-4xl md:text-5xl">
-            Join the first virtual try-on built for Black wig buyers.
+            Join the virtual try-on built for Black wig buyers.
           </h2>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link to="/retailer/signup" className="inline-flex rounded-md bg-gold px-7 py-3 text-sm font-medium text-mahogany hover:bg-cream">

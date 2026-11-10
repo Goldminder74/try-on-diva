@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getRouterInstance } from "@tanstack/react-start";
 import { isSitemapRouteIncluded, sitemapPathForLocation, sitemapStaticPaths, sitemapXML, type SitemapEntry } from "@/lib/sitemap";
 import { collectPublishedWigIds } from "@/lib/sitemap-content";
+import { listGuides } from "@/lib/guides";
 
 const BASE_URL = "https://wigsmi.com";
 
@@ -13,6 +14,14 @@ export const Route = createFileRoute("/sitemap.xml")({
         try {
           const router = await getRouterInstance();
           const entries: SitemapEntry[] = sitemapStaticPaths(router).map((path) => ({ path }));
+          const guideRouteId = "/guides/$slug";
+          if (isSitemapRouteIncluded(router.routesById[guideRouteId])) {
+            for (const g of listGuides()) {
+              const location = router.buildLocation({ to: "/guides/$slug", params: { slug: g.slug }, search: () => ({}), hash: "" });
+              const path = sitemapPathForLocation(router, location, guideRouteId);
+              if (path) entries.push({ path });
+            }
+          }
           const routeId = "/wig/$id";
           if (isSitemapRouteIncluded(router.routesById[routeId])) {
             const { createClient } = await import("@supabase/supabase-js");

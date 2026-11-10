@@ -1,3 +1,4 @@
+import { utmFromCookieHeader } from "@/lib/utm";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
@@ -960,6 +961,7 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
       result_path: path,
       user_agent: userAgent,
       seq: usedCount + 1,
+      ...utmFromCookieHeader(getRequest()?.headers?.get("cookie")),
     });
     if (insErr) {
       // Race lost - treat as already used.

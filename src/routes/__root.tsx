@@ -10,6 +10,8 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { useEffect } from "react";
+import { captureUtmOnFirstVisit } from "@/lib/utm";
 import { AuthProvider } from "@/contexts/auth-context";
 import { CheckoutProvider } from "@/components/payments/CheckoutProvider";
 
@@ -116,6 +118,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => captureUtmOnFirstVisit(), []);
 
   return (
     <QueryClientProvider client={queryClient}>

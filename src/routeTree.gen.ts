@@ -34,6 +34,8 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as GoWigIdRouteImport } from './routes/go.$wigId'
+import { Route as GuidesIndexRouteImport } from './routes/guides.index'
+import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PortalAnalyticsRouteImport } from './routes/portal.analytics'
 import { Route as PortalApiKeysRouteImport } from './routes/portal.api-keys'
@@ -183,6 +185,16 @@ const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
 const GoWigIdRoute = GoWigIdRouteImport.update({
   id: '/go/$wigId',
   path: '/go/$wigId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesIndexRoute = GuidesIndexRouteImport.update({
+  id: '/guides/',
+  path: '/guides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidesSlugRoute = GuidesSlugRouteImport.update({
+  id: '/guides/$slug',
+  path: '/guides/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalIndexRoute = PortalIndexRouteImport.update({
@@ -347,6 +359,7 @@ export interface FileRoutesByFullPath {
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/go/$wigId': typeof GoWigIdRoute
+  '/guides/$slug': typeof GuidesSlugRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
@@ -358,6 +371,7 @@ export interface FileRoutesByFullPath {
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/guides/': typeof GuidesIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
@@ -397,6 +411,7 @@ export interface FileRoutesByTo {
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/go/$wigId': typeof GoWigIdRoute
+  '/guides/$slug': typeof GuidesSlugRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
@@ -408,6 +423,7 @@ export interface FileRoutesByTo {
   '/retailer/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
   '/admin': typeof AdminIndexRoute
+  '/guides': typeof GuidesIndexRoute
   '/portal': typeof PortalIndexRoute
   '/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
@@ -451,6 +467,7 @@ export interface FileRoutesById {
   '/auth/signup': typeof AuthSignupRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/go/$wigId': typeof GoWigIdRoute
+  '/guides/$slug': typeof GuidesSlugRoute
   '/portal/analytics': typeof PortalAnalyticsRoute
   '/portal/api-keys': typeof PortalApiKeysRoute
   '/portal/billing': typeof PortalBillingRoute
@@ -462,6 +479,7 @@ export interface FileRoutesById {
   '/retailer_/signup': typeof RetailerSignupRoute
   '/wig/$id': typeof WigIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/guides/': typeof GuidesIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/_authenticated/app/catalog': typeof AuthenticatedAppCatalogRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
@@ -505,6 +523,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/checkout/success'
     | '/go/$wigId'
+    | '/guides/$slug'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
@@ -516,6 +535,7 @@ export interface FileRouteTypes {
     | '/retailer/signup'
     | '/wig/$id'
     | '/admin/'
+    | '/guides/'
     | '/portal/'
     | '/app/catalog'
     | '/app/profile'
@@ -555,6 +575,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/checkout/success'
     | '/go/$wigId'
+    | '/guides/$slug'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
@@ -566,6 +587,7 @@ export interface FileRouteTypes {
     | '/retailer/signup'
     | '/wig/$id'
     | '/admin'
+    | '/guides'
     | '/portal'
     | '/app/catalog'
     | '/app/profile'
@@ -608,6 +630,7 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/checkout/success'
     | '/go/$wigId'
+    | '/guides/$slug'
     | '/portal/analytics'
     | '/portal/api-keys'
     | '/portal/billing'
@@ -619,6 +642,7 @@ export interface FileRouteTypes {
     | '/retailer_/signup'
     | '/wig/$id'
     | '/admin/'
+    | '/guides/'
     | '/portal/'
     | '/_authenticated/app/catalog'
     | '/_authenticated/app/profile'
@@ -657,9 +681,11 @@ export interface RootRouteChildren {
   AuthSignupRoute: typeof AuthSignupRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   GoWigIdRoute: typeof GoWigIdRoute
+  GuidesSlugRoute: typeof GuidesSlugRoute
   RetailerLoginRoute: typeof RetailerLoginRoute
   RetailerSignupRoute: typeof RetailerSignupRoute
   WigIdRoute: typeof WigIdRoute
+  GuidesIndexRoute: typeof GuidesIndexRoute
   EmbedWidgetTokenRoute: typeof EmbedWidgetTokenRoute
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
   ApiPublicHooksQuotaResetRoute: typeof ApiPublicHooksQuotaResetRoute
@@ -843,6 +869,20 @@ declare module '@tanstack/react-router' {
       path: '/go/$wigId'
       fullPath: '/go/$wigId'
       preLoaderRoute: typeof GoWigIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/': {
+      id: '/guides/'
+      path: '/guides'
+      fullPath: '/guides/'
+      preLoaderRoute: typeof GuidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guides/$slug': {
+      id: '/guides/$slug'
+      path: '/guides/$slug'
+      fullPath: '/guides/$slug'
+      preLoaderRoute: typeof GuidesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal/': {
@@ -1123,9 +1163,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignupRoute: AuthSignupRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
   GoWigIdRoute: GoWigIdRoute,
+  GuidesSlugRoute: GuidesSlugRoute,
   RetailerLoginRoute: RetailerLoginRoute,
   RetailerSignupRoute: RetailerSignupRoute,
   WigIdRoute: WigIdRoute,
+  GuidesIndexRoute: GuidesIndexRoute,
   EmbedWidgetTokenRoute: EmbedWidgetTokenRoute,
   LovableEmailEventsRoute: LovableEmailEventsRoute,
   ApiPublicHooksQuotaResetRoute: ApiPublicHooksQuotaResetRoute,

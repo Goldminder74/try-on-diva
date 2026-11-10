@@ -1,3 +1,4 @@
+import { storedUtm } from "@/lib/utm";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,7 +36,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
-            data: { display_name: name || email.split("@")[0], role: "consumer" },
+            data: { display_name: name || email.split("@")[0], role: "consumer", ...storedUtm() },
           },
         });
         if (error) throw error;
