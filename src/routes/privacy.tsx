@@ -79,8 +79,8 @@ function PrivacyPage() {
             <h2 className="font-display text-2xl text-mahogany">4. Try-on photos and AI processing</h2>
             <p>
               Photos you upload are processed by our AI try-on engine to generate a
-              preview. They are stored in encrypted cloud storage. You can delete any
-              saved photo from your account at any time. We do not use your photos to
+              preview. They are stored in encrypted cloud storage. To delete a saved try-on or
+              photo, email privacy@wigsmi.com and we will delete it. We do not use your photos to
               train third-party AI models, and we do not sell them. Try-on photos are sent to Google LLC's Gemini image API for processing and are not used by Google to train its models; Google keeps them only for a limited period to detect misuse of its service, under its Gemini API terms.
             </p>
           </section>

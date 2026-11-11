@@ -45,7 +45,7 @@ const BUYER_QA: QA[] = [
   },
   {
     q: "Is my photo safe?",
-    a: "Yes. Your photos are stored privately and securely, never made public, and never sold or used to train any third-party AI model. You can delete any saved photo at any time from your account.",
+    a: "Yes. Your photos are stored privately and securely, never made public, and never sold or used to train any third-party AI model. To delete a saved try-on or photo, email privacy@wigsmi.com and we will delete it.",
   },
   {
     q: "How many try-ons do I get for free?",
