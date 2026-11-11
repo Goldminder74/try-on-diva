@@ -80,20 +80,6 @@ Many glueless wigs have a closure or a frontal. Many also come with pre-cut lace
 - An elastic band that is too tight can cause tension or headaches, so adjust it to snug, not tight.
 - Very sleek, high styles can take practice without adhesive.
 
-## A word on your edges
-
-Many women choose glueless wigs to rest their own hairline.
-
-The American Academy of Dermatology (AAD) says hairstyles that constantly pull on the hair can lead to traction alopecia over time. It suggests "temporarily protecting your hair with wigs or scarfs" as a way to give hair a break. It also advises choosing sewn-in weaves "rather than ones that use bonding glue".
-
-The AAD suggests checking each month for broken hairs around the forehead, a receding hairline or patches where hair is pulled tightly. If you notice any of these, a board-certified dermatologist is the right person to see. This guide is not medical advice.
-
-Practical habits that help:
-
-- Keep wig bands and grips snug, not tight.
-- Take your wig off at night when you can.
-- If you do use adhesive for an occasion, remove it gently with the remover made for it.
-
 ## Choosing lace for deeper skin tones
 
 Lace colour matters as much as lace size, and it matters most on a frontal, where there is more of it on show.
@@ -127,5 +113,4 @@ New retailer collections are arriving in the [Wigsmi catalogue](/catalog). Treat
 - Un-ruly, "Glueless Wigs, Everything to Know": https://un-ruly.com/glueless-wig-guide/
 - Un-ruly, "How to Wear a Wig Without Pulling Out Your Edges": https://un-ruly.com/how-to-wear-a-wig-without-pulling-out-your-edges/
 - Luvme Hair, "HD Lace vs Transparent Lace": https://shop.luvmehair.com/blogs/wigs-101/hd-lace-wigs-vs-transparent
-- American Academy of Dermatology, "Hairstyles that pull can lead to hair loss": https://www.aad.org/public/diseases/hair-loss/causes/hairstyles
 - American Academy of Dermatology, "Hair loss in Black women: Here's how dermatologists help": https://www.aad.org/public/diseases/hair-loss/insider/hair-loss-black-women

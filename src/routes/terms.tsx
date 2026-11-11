@@ -86,7 +86,7 @@ function TermsPage() {
           <section>
             <h2 className="font-display text-2xl text-mahogany">5. Payments, refunds, and cancellation</h2>
             <div className="mt-3 space-y-3">
-              <p>Payments are processed securely using Stripe. The payment terms shown at checkout identify the applicable payment arrangement and any transaction-level tax, refund and support handling. Sherwood Consulting Services Ltd, trading as Wigsmi, provides the Wigsmi service. Applicable taxes and the final amount payable are shown at checkout.</p>
+              <p>Payments are processed securely using Stripe. The payment terms shown at checkout identify the applicable payment arrangement and any transaction-level tax, refund and support handling. Sherwood Consulting Services Ltd, trading as Wigsmi, provides the Wigsmi service. Wigsmi is not VAT registered, so no VAT is added to our prices. The amount shown at checkout is the amount you pay.</p>
               <p>Retailer subscriptions are billed monthly or yearly in advance and auto-renew until cancelled. You may cancel at any time from your billing portal; access continues until the end of the paid period.</p>
               <p>Consumer paid plans are billed monthly or yearly and auto-renew until cancelled. You may cancel at any time from your account settings.</p>
               <p>One-off purchases, such as a pack of extra try-ons, are charged once and never renew automatically. Unused try-ons from a pack stay usable for 12 months from the day you buy it.</p>

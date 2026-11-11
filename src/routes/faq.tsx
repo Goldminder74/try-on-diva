@@ -124,7 +124,7 @@ const RETAILER_QA: QA[] = [
   },
   {
     q: "Who handles payments and is it secure?",
-    a: "Payments are processed securely using Stripe. Applicable taxes, the final price and payment terms are shown at checkout. Contact support@wigsmi.com for help with your Wigsmi service.",
+    a: "Payments are processed securely using Stripe. Wigsmi is not VAT registered, so no VAT is added to plan prices. The final price and payment terms are shown at checkout. Contact support@wigsmi.com for help with your Wigsmi service.",
   },
   {
     q: "How do I get help if I'm stuck?",

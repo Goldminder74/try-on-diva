@@ -19,7 +19,7 @@ export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
 });
 
-const UPDATED = "24 October 2026";
+const UPDATED = "11 November 2026";
 
 function PrivacyPage() {
   return (
@@ -57,8 +57,9 @@ function PrivacyPage() {
             <ul className="list-disc space-y-2 pl-6">
               <li><strong>Account data:</strong> name, email, password (hashed), account type.</li>
               <li><strong>Profile data:</strong> optional preferences, style quiz answers, wishlist.</li>
-              <li><strong>Photos:</strong> selfies you upload for try-on. Stored only as long as needed to render the result and any photos you choose to save.</li>
-              <li><strong>Usage data:</strong> try-on counts, pages visited, device and browser info, IP address.</li>
+              <li><strong>Photos:</strong> the selfie you upload is used to create your try-on; we do not save the selfie itself. If you are signed in, each try-on result is saved to your account history. There is currently no button to delete individual results or your history, so to remove them email privacy@wigsmi.com and we will delete them. If you do not have an account, the try-on result is stored with the record of your no-account try-on. These results have no automatic expiry and are kept until deleted on request. A profile photo you add to your account is stored until you replace it or ask us to delete it.</li>
+              <li><strong>Usage data:</strong> try-on counts, pages visited, device and browser info. To apply the free try-on limit for visitors without an account, Wigsmi stores a random device identifier in your browser's local storage and keeps a one-way hashed (scrambled) version of your browser's characteristics and of your IP address, not the raw IP address.</li>
+              <li><strong>How you found us:</strong> when you arrive from a link carrying campaign tags (utm_source, utm_medium, utm_campaign and similar), Wigsmi records those tags with your account or no-account try-on, to measure which channels bring visitors.</li>
               <li><strong>Tracked shop visits:</strong> if you tap "Buy from ..." on a listing at a shop that pays us commission, we record a one-time reference code with the wig, the time and the page you came from, so that shop can match the visit to an order later. We do not send the shop your name or email.</li>
               <li><strong>Retailer data:</strong> business name, optional VAT number, contact details, catalog content, payment metadata (handled by our payment processor - we do not store card numbers).</li>
             </ul>
@@ -105,9 +106,13 @@ function PrivacyPage() {
             <h2 className="font-display text-2xl text-mahogany">6. How long we keep it</h2>
             <p>
               We keep personal data only as long as needed for the purposes set out
-              above, or as required by law. When you delete your account, we delete or
-              anonymise your personal data within 30 days, except where we are legally
-              required to retain it (e.g. financial records).
+              above, or as required by law. There is currently no self-service option to
+              close your account. To close it, email privacy@wigsmi.com and we will
+              delete or anonymise your personal data, except where we are legally
+              required to retain it (for example financial records). Saved try-on
+              history is kept until you delete it or close your account. No-account
+              try-on records and results have no automatic expiry and are kept until
+              deleted on request.
             </p>
           </section>
 
@@ -132,12 +137,14 @@ function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="font-display text-2xl text-mahogany">8. Cookies</h2>
+            <h2 className="font-display text-2xl text-mahogany">8. Cookies and similar technologies</h2>
             <p>
               We use strictly necessary cookies to keep you signed in and the Service
               working. With your consent, we may use analytics cookies to understand
-              how the Service is used. You can manage cookies in your browser at any
-              time.
+              how the Service is used. For visitors without an account, we also store a
+              random device identifier in your browser's local storage; this is strictly
+              necessary for applying the free try-on limit. You can manage cookies and
+              local storage in your browser at any time.
             </p>
           </section>
 
