@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getMyConsumerProfile, updateProfile } from "@/lib/consumer-profile.functions";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import { SavedTryOns, DeleteAccountSection } from "@/components/account/ShopperDeleteControls";
 
 export const Route = createFileRoute("/_authenticated/app/profile")({
   staticData: { sitemap: false },
@@ -24,6 +25,14 @@ function Profile() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isShopper, setIsShopper] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("user_roles").select("role").eq("user_id", user.id).then(({ data }) => {
+      setIsShopper(!(data ?? []).some((r) => r.role === "retailer" || r.role === "admin"));
+    });
+  }, [user]);
 
   useEffect(() => {
     get().then((r) => {
@@ -134,6 +143,9 @@ function Profile() {
             View subscription & usage →
           </Link>
         </div>
+
+        {isShopper && <SavedTryOns />}
+        {isShopper && <DeleteAccountSection />}
       </div>
     </div>
   );

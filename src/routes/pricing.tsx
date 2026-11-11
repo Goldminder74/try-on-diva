@@ -425,7 +425,7 @@ function Pricing() {
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Wigsmi is not VAT registered, so no VAT is added to our prices. Payments processed securely by Stripe.
+          All prices include any applicable taxes. Payments processed securely by Stripe.
         </p>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">

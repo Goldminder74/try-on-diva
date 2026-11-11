@@ -18,3 +18,4 @@
 - Every route declares staticData.sitemap; private layouts exclude their subtrees, and published, undeleted products are read with public credentials and full pagination, never admin access or generation-time lastmod.
 - Guides are markdown files in src/content/guides (frontmatter: title, metaTitle, metaDescription, slug, datePublished, faq), loaded by src/lib/guides.ts; adding a guide means adding one file, so pages and sitemap stay in sync.
 - First-visit UTM tags live in the first-party `wigsmi_utm` cookie (src/lib/utm.ts) so server handlers can read them without client plumbing.
+- Shopper self-service deletion runs only in server functions (src/lib/account.functions.ts); account deletion uses the service role after a typed confirmation and keeps payment records unlinked rather than deleted, because financial records must be retained by law.

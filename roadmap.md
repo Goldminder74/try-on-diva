@@ -60,3 +60,5 @@
 - [x] /go records every Buy click (wig click count + buy_click event)
 - [x] /retailer "first" claim removed
 - [x] Canonicals on remaining public pages; UTM capture on visit, anonymous session, profile, events
+- [x] Shopper delete controls (try-on, all try-ons, account) and tax-inclusive wording (11 Nov 2026)
+- [ ] Live Stripe: replace 11 live prices with tax-inclusive copies (waiting for owner confirmation)

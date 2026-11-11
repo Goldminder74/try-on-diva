@@ -45,7 +45,7 @@ const BUYER_QA: QA[] = [
   },
   {
     q: "Is my photo safe?",
-    a: "Yes. Your photos are stored privately and securely, never made public, and never sold or used to train any third-party AI model. To delete a saved try-on or photo, email privacy@wigsmi.com and we will delete it.",
+    a: "Yes. Your photos are stored privately and securely, never made public, and never sold or used to train any third-party AI model. You can delete any saved try-on, or your whole history, from your account at any time, and you can delete your account from Account settings. Deleting removes the images from our storage.",
   },
   {
     q: "How many try-ons do I get for free?",
@@ -124,7 +124,7 @@ const RETAILER_QA: QA[] = [
   },
   {
     q: "Who handles payments and is it secure?",
-    a: "Payments are processed securely using Stripe. Wigsmi is not VAT registered, so no VAT is added to plan prices. The final price and payment terms are shown at checkout. Contact support@wigsmi.com for help with your Wigsmi service.",
+    a: "Payments are processed securely using Stripe. All prices include any applicable taxes. The final price and payment terms are shown at checkout. Contact support@wigsmi.com for help with your Wigsmi service.",
   },
   {
     q: "How do I get help if I'm stuck?",

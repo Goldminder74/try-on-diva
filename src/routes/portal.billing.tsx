@@ -315,7 +315,7 @@ function BillingPage() {
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">Applicable taxes are shown on your Stripe invoice.</p>
+          <p className="mt-2 text-xs text-muted-foreground">All prices include any applicable taxes.</p>
         </div>
       )}
 

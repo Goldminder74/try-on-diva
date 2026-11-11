@@ -57,6 +57,13 @@
       "when": 1794324760186,
       "tag": "0007_utm_capture",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794425208308,
+      "tag": "0008_shopper_self_service_delete",
+      "breakpoints": true
     }
   ]
 }

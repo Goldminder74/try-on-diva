@@ -57,7 +57,7 @@ function PrivacyPage() {
             <ul className="list-disc space-y-2 pl-6">
               <li><strong>Account data:</strong> name, email, password (hashed), account type.</li>
               <li><strong>Profile data:</strong> optional preferences, style quiz answers, wishlist.</li>
-              <li><strong>Photos:</strong> the selfie you upload is used to create your try-on; we do not save the selfie itself. If you are signed in, each try-on result is saved to your account history. There is currently no button to delete individual results or your history, so to remove them email privacy@wigsmi.com and we will delete them. If you do not have an account, the try-on result is stored with the record of your no-account try-on. These results have no automatic expiry and are kept until deleted on request. A profile photo you add to your account is stored until you replace it or ask us to delete it.</li>
+              <li><strong>Photos:</strong> the selfie you upload is used to create your try-on; we do not save the selfie itself. If you are signed in, each try-on result is saved to your account history. You can delete any saved try-on, or your whole history, from your account at any time. If you do not have an account, the try-on result is stored with the record of your no-account try-on. These results have no automatic expiry and are kept until deleted on request. A profile photo you add to your account is stored until you replace it or ask us to delete it.</li>
               <li><strong>Usage data:</strong> try-on counts, pages visited, device and browser info. To apply the free try-on limit for visitors without an account, Wigsmi stores a random device identifier in your browser's local storage and keeps a one-way hashed (scrambled) version of your browser's characteristics and of your IP address, not the raw IP address.</li>
               <li><strong>How you found us:</strong> when you arrive from a link carrying campaign tags (utm_source, utm_medium, utm_campaign and similar), Wigsmi records those tags with your account or no-account try-on, to measure which channels bring visitors.</li>
               <li><strong>Tracked shop visits:</strong> if you tap "Buy from ..." on a listing at a shop that pays us commission, we record a one-time reference code with the wig, the time and the page you came from, so that shop can match the visit to an order later. We do not send the shop your name or email.</li>
@@ -79,8 +79,7 @@ function PrivacyPage() {
             <h2 className="font-display text-2xl text-mahogany">4. Try-on photos and AI processing</h2>
             <p>
               Photos you upload are processed by our AI try-on engine to generate a
-              preview. They are stored in encrypted cloud storage. To delete a saved try-on or
-              photo, email privacy@wigsmi.com and we will delete it. We do not use your photos to
+              preview. They are stored in encrypted cloud storage. You can delete any saved try-on, or your whole history, from your account at any time, and you can delete your account from Account settings. Deleting removes the images from our storage. We do not use your photos to
               train third-party AI models, and we do not sell them. Try-on photos are sent to Google LLC's Gemini image API for processing and are not used by Google to train its models; Google keeps them only for a limited period to detect misuse of its service, under its Gemini API terms.
             </p>
           </section>
@@ -106,11 +105,8 @@ function PrivacyPage() {
             <h2 className="font-display text-2xl text-mahogany">6. How long we keep it</h2>
             <p>
               We keep personal data only as long as needed for the purposes set out
-              above, or as required by law. There is currently no self-service option to
-              close your account. To close it, email privacy@wigsmi.com and we will
-              delete or anonymise your personal data, except where we are legally
-              required to retain it (for example financial records). Saved try-on
-              history is kept until you delete it or close your account. No-account
+              above, or as required by law. You can delete your account at any time from Account settings. We then delete your personal data straight away, except payment records we must keep by law, which are anonymised. Saved try-on
+              history is kept until you delete it or delete your account. No-account
               try-on records and results have no automatic expiry and are kept until
               deleted on request.
             </p>

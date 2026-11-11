@@ -621,7 +621,7 @@ export type Database = {
           plan: string
           price_id: string | null
           product_id: string | null
-          profile_id: string
+          profile_id: string | null
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -643,7 +643,7 @@ export type Database = {
           plan: string
           price_id?: string | null
           product_id?: string | null
-          profile_id: string
+          profile_id?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -665,7 +665,7 @@ export type Database = {
           plan?: string
           price_id?: string | null
           product_id?: string | null
-          profile_id?: string
+          profile_id?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -713,7 +713,7 @@ export type Database = {
           status: string
           stripe_checkout_session_id: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           amount_gbp?: number | null
@@ -728,7 +728,7 @@ export type Database = {
           status?: string
           stripe_checkout_session_id?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           amount_gbp?: number | null
@@ -743,7 +743,7 @@ export type Database = {
           status?: string
           stripe_checkout_session_id?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }

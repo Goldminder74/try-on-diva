@@ -1,3 +1,4 @@
+import { AccountDeletedNotice } from "@/components/account/ShopperDeleteControls";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Upload, Heart, ShieldCheck, Palette } from "lucide-react";
 import heroModel from "@/assets/hero-model.jpg";
@@ -41,6 +42,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-cream">
       <Header />
+      <AccountDeletedNotice />
 
       {/* Hero */}
       <section className="relative overflow-hidden">
