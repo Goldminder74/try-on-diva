@@ -25,7 +25,7 @@ export const Route = createFileRoute("/")({
       { property: "og:url", content: "https://wigsmi.com/" },
       { property: "og:type", content: "website" },
       { title: "Wigsmi - Try every wig before you buy it" },
-      { name: "description", content: "Virtual wig try-on built for Black women. Explore Wigsmi and discover our upcoming retailer collections." },
+      { name: "description", content: "Virtual wig try-on built for Black women. Browse wigs from Wigsmi retail partners and try them on before you buy." },
       { property: "og:title", content: "Wigsmi - Try every wig before you buy it" },
       { property: "og:description", content: "Virtual wig try-on built for Black women." },
       { name: "twitter:card", content: "summary_large_image" },
@@ -88,7 +88,7 @@ function Landing() {
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
               { icon: Upload, title: "Upload your selfie", body: "A clear, well-lit photo is all we need." },
-              { icon: Palette, title: "Explore retailer styles", body: "Lace fronts, glueless, braids and bobs, as new collections arrive." },
+              { icon: Palette, title: "Explore retailer styles", body: "Lace fronts, glueless, braids and bobs from Wigsmi retail partners." },
               { icon: Heart, title: "Find your perfect wig", body: "See it on you, save your favourites, buy from a retailer you trust." },
             ].map((s, i) => (
               <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">

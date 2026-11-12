@@ -105,7 +105,7 @@ For a first wig bought online, a glueless closure wig is a gentle, lower-effort 
 
 Lace type tells you how a wig is built, not how the style, length and colour will look on your face. Upload one selfie on the [try-on page](/try-on) and see a wig on your own face and skin tone before you spend anything. Your first 2 try-ons are free with no account, and a free account gives you 5 a month with no card needed. See [pricing](/pricing) for more.
 
-New retailer collections are arriving in the [Wigsmi catalogue](/catalog). Treat the preview as a guide to style and colour, not a guarantee of fit, and check the retailer's cap size and lace details before you order.
+Browse wigs from retail partners in the [Wigsmi catalogue](/catalog) and try them on your own photo. Treat the preview as a guide to style and colour, not a guarantee of fit, and check the retailer's cap size and lace details before you order.
 
 ## Sources
 
