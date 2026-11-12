@@ -88,7 +88,7 @@ function Landing() {
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
               { icon: Upload, title: "Upload your selfie", body: "A clear, well-lit photo is all we need." },
-              { icon: Palette, title: "Explore retailer styles", body: "Lace fronts, glueless, braids and bobs from Wigsmi retail partners." },
+              { icon: Palette, title: "Explore retailer styles", body: "Lace fronts, glueless wigs and bobs from Wigsmi retail partners." },
               { icon: Heart, title: "Find your perfect wig", body: "See it on you, save your favourites, buy from a retailer you trust." },
             ].map((s, i) => (
               <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
