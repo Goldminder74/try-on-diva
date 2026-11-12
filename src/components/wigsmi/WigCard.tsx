@@ -37,6 +37,9 @@ export function WigCard({ wig, savedInitial = false }: { wig: Wig; savedInitial?
           src={wig.images[0]}
           alt={wig.name}
           loading="lazy"
+          decoding="async"
+          width={600}
+          height={600}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
         <button

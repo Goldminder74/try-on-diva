@@ -6,6 +6,7 @@ import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
 import { WigCardSkeleton } from "@/components/wigsmi/WigCardSkeleton";
 import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig, catalogueDisclosure } from "@/lib/wigs";
+import { ShowMore, useVisibleCount } from "@/components/wigsmi/ShowMore";
 import { useAsync } from "@/lib/use-async";
 import { Button } from "@/components/ui/button";
 
@@ -54,6 +55,7 @@ function Catalog() {
     }
     return out;
   }, [query, styles, textures, sort, wigs]);
+  const { count, more } = useVisibleCount(JSON.stringify([query, styles, textures, sort]));
 
   return (
     <div className="min-h-screen bg-cream">
@@ -142,9 +144,12 @@ function Catalog() {
                 {wigs?.length ? <Button onClick={() => { setStyles([]); setTextures([]); setQuery(""); }} className="mt-5">Clear filters</Button> : <Button asChild className="mt-5"><Link to="/retailer">Become a retailer partner</Link></Button>}
               </div>
             ) : (
+              <>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {filtered.map(w => <WigCard key={w.id} wig={w} />)}
+                {filtered.slice(0, count).map(w => <WigCard key={w.id} wig={w} />)}
               </div>
+              <ShowMore shown={count} total={filtered.length} onMore={more} />
+              </>
             )}
             <p className="mt-8 text-center text-xs text-muted-foreground">
               Want personalised picks? <Link to="/try-on" className="text-mahogany underline">Take the style quiz</Link>.

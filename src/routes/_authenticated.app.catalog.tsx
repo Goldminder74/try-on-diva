@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { WigCard } from "@/components/wigsmi/WigCard";
 import { WigCardSkeleton } from "@/components/wigsmi/WigCardSkeleton";
 import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig, catalogueDisclosure } from "@/lib/wigs";
+import { ShowMore, useVisibleCount } from "@/components/wigsmi/ShowMore";
 import { useAsync } from "@/lib/use-async";
 
 export const Route = createFileRoute("/_authenticated/app/catalog")({
@@ -28,6 +29,7 @@ function AppCatalog() {
       return true;
     });
   }, [wigs, query, styles, textures]);
+  const { count, more } = useVisibleCount(JSON.stringify([query, styles, textures]));
 
   return (
     <div className="mx-auto w-full max-w-7xl px-5 py-10">
@@ -77,9 +79,12 @@ function AppCatalog() {
               <Link to="/app/catalog" onClick={() => { setStyles([]); setTextures([]); setQuery(""); }} className="mt-4 inline-flex text-sm text-mahogany underline">Clear filters</Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              {filtered.map((w) => <WigCard key={w.id} wig={w} />)}
-            </div>
+            <>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                {filtered.slice(0, count).map((w) => <WigCard key={w.id} wig={w} />)}
+              </div>
+              <ShowMore shown={count} total={filtered.length} onMore={more} />
+            </>
           )}
         </div>
       </div>

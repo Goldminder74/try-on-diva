@@ -122,16 +122,25 @@ async function mapWigsWithRetailers(rows: unknown[] | null): Promise<Wig[]> {
   return wigRows.map((row) => mapWig(row, retailerNames));
 }
 
+const FETCH_BLOCK = 1000;
+
 export async function fetchWigs(): Promise<Wig[]> {
-  const { data, error } = await supabase
-    .from("wigs")
-    .select(SELECT)
-    .eq("is_published", true)
-    .is("deleted_at", null)
-    .order("is_featured", { ascending: false })
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return mapWigsWithRetailers(data);
+  const rows: unknown[] = [];
+  for (let from = 0; ; from += FETCH_BLOCK) {
+    const { data, error } = await supabase
+      .from("wigs")
+      .select(SELECT)
+      .eq("is_published", true)
+      .is("deleted_at", null)
+      .order("is_featured", { ascending: false })
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: true })
+      .range(from, from + FETCH_BLOCK - 1);
+    if (error) throw error;
+    rows.push(...(data ?? []));
+    if (!data || data.length < FETCH_BLOCK) break;
+  }
+  return mapWigsWithRetailers(rows as Parameters<typeof mapWigsWithRetailers>[0]);
 }
 
 export async function fetchFeaturedWigs(limit = 6): Promise<Wig[]> {

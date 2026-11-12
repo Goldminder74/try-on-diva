@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listWishlist, toggleWishlist } from "@/lib/wishlist.functions";
 import { formatPrice } from "@/lib/wigs";
 import { Heart } from "lucide-react";
+import { ShowMore, useVisibleCount } from "@/components/wigsmi/ShowMore";
 
 export const Route = createFileRoute("/_authenticated/app/wishlist")({
   staticData: { sitemap: false },
@@ -28,6 +29,7 @@ function Wishlist() {
   const list = useServerFn(listWishlist);
   const toggle = useServerFn(toggleWishlist);
   const [items, setItems] = useState<Item[] | null>(null);
+  const { count, more } = useVisibleCount("wishlist");
 
   const refresh = () => list().then((r) => setItems(r.items as unknown as Item[]));
   useEffect(() => { refresh(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -54,7 +56,7 @@ function Wishlist() {
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-          {items.filter((i) => i.wigs).map((i) => {
+          {items.filter((i) => i.wigs).slice(0, count).map((i) => {
             const w = i.wigs!;
             const ret = Array.isArray(w.retailers) ? w.retailers[0] : w.retailers;
             return (
@@ -79,6 +81,7 @@ function Wishlist() {
           })}
         </div>
       )}
+      {items.length > 0 && <ShowMore shown={count} total={items.filter((i) => i.wigs).length} onMore={more} />}
     </div>
   );
 }
