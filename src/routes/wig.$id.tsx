@@ -4,7 +4,7 @@ import { Heart, ExternalLink, ArrowLeft } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
-import { fetchWigById, fetchRelatedWigs, formatPrice, type Wig } from "@/lib/wigs";
+import { fetchWigById, fetchRelatedWigs, formatPrice, type Wig, isAffiliateLink } from "@/lib/wigs";
 import { absoluteImage, pageUrl, productShareImage } from "@/lib/seo";
 import { Button } from "@/components/ui/button";
 
@@ -150,6 +150,9 @@ function WigDetail() {
               >
                 <ExternalLink className="h-4 w-4" /> Buy from {wig.retailer}
               </a>
+              {isAffiliateLink(wig.product_url) && (
+                <p className="text-center text-xs text-muted-foreground">Wigsmi earns a commission if you buy from {wig.retailer}.</p>
+              )}
             </div>
           </div>
         </div>

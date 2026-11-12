@@ -32,3 +32,15 @@ describe("public catalogue removal", () => {
     expect((await fetchWigById("authorised"))?.id).toBe("authorised");
   });
 });
+import { isAffiliateLink, affiliateDisclosure } from "./wigs";
+describe("isAffiliateLink", () => {
+  it("is true for an awin1.com link", () => expect(isAffiliateLink("https://www.awin1.com/cread.php?a=1")).toBe(true));
+  it("is false for a unice.com link", () => expect(isAffiliateLink("https://www.unice.com/p/1")).toBe(false));
+  it("is false for an empty value", () => { expect(isAffiliateLink("")).toBe(false); expect(isAffiliateLink(null)).toBe(false); });
+  it("is false for a malformed value", () => expect(isAffiliateLink("not a url")).toBe(false));
+  it("does not match lookalike hosts", () => expect(isAffiliateLink("https://evilawin1.com/x")).toBe(false));
+});
+describe("affiliateDisclosure", () => {
+  it("names one retailer", () => expect(affiliateDisclosure(["UNice", "UNice"])).toBe("Wigsmi earns a commission if you buy from UNice."));
+  it("joins several with or", () => expect(affiliateDisclosure(["UNice", "Luvme Hair"])).toBe("Wigsmi earns a commission if you buy from UNice or Luvme Hair."));
+});

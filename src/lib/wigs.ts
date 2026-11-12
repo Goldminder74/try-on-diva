@@ -206,3 +206,33 @@ export async function fetchWigsByRetailerId(retailerId: string, limit = 24): Pro
   if (error) throw error;
   return mapWigsWithRetailers(data);
 }
+
+const AFFILIATE_HOSTS = [
+  "awin1.com", "anrdoezrs.net", "dpbolvw.net", "jdoqocy.com", "kqzyfj.com",
+  "tkqlhce.com", "impact.com", "sjv.io", "pxf.io",
+];
+
+/** True when the product URL goes through a known affiliate network. */
+export function isAffiliateLink(productUrl: string | null | undefined): boolean {
+  if (!productUrl) return false;
+  let host: string;
+  try {
+    host = new URL(productUrl).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  return AFFILIATE_HOSTS.some((h) => host === h || host.endsWith(`.${h}`));
+}
+
+export function affiliateDisclosure(retailers: string[]): string | null {
+  const names = Array.from(new Set(retailers.filter(Boolean)));
+  if (names.length === 0) return null;
+  const list = names.length === 1
+    ? names[0]
+    : `${names.slice(0, -1).join(", ")} or ${names[names.length - 1]}`;
+  return `Wigsmi earns a commission if you buy from ${list}.`;
+}
+
+export function catalogueDisclosure(wigs: Pick<Wig, "retailer" | "product_url">[] | null | undefined): string | null {
+  return affiliateDisclosure((wigs ?? []).filter((w) => isAffiliateLink(w.product_url)).map((w) => w.retailer));
+}

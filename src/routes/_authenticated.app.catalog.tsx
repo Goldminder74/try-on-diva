@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { WigCard } from "@/components/wigsmi/WigCard";
 import { WigCardSkeleton } from "@/components/wigsmi/WigCardSkeleton";
-import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig } from "@/lib/wigs";
+import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig, catalogueDisclosure } from "@/lib/wigs";
 import { useAsync } from "@/lib/use-async";
 
 export const Route = createFileRoute("/_authenticated/app/catalog")({
@@ -64,6 +64,9 @@ function AppCatalog() {
         </aside>
 
         <div>
+          {!loading && catalogueDisclosure(wigs) && (
+            <p className="mb-4 text-xs text-muted-foreground">{catalogueDisclosure(wigs)}</p>
+          )}
           {loading ? (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => <WigCardSkeleton key={i} />)}

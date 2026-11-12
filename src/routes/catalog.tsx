@@ -5,7 +5,7 @@ import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
 import { WigCardSkeleton } from "@/components/wigsmi/WigCardSkeleton";
-import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig } from "@/lib/wigs";
+import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig, catalogueDisclosure } from "@/lib/wigs";
 import { useAsync } from "@/lib/use-async";
 import { Button } from "@/components/ui/button";
 
@@ -123,6 +123,9 @@ function Catalog() {
 
           {/* Grid */}
           <div>
+            {!loading && catalogueDisclosure(wigs) && (
+              <p className="mb-4 text-xs text-muted-foreground">{catalogueDisclosure(wigs)}</p>
+            )}
             {loading ? (
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                 {Array.from({ length: 9 }).map((_, i) => <WigCardSkeleton key={i} />)}
