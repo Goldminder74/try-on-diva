@@ -272,17 +272,34 @@ function AppTryOn() {
 
         <aside>
           <p className="mb-3 font-mono text-xs uppercase tracking-wider text-gold-dark">Choose a wig</p>
-          <div className="grid grid-cols-3 gap-3">
-            {list.map((w) => (
-              <button
-                key={w.id}
-                onClick={() => onSelectWig(w)}
-                className={`group overflow-hidden rounded-md border-2 text-left transition-all ${wig?.id === w.id ? "border-gold" : "border-transparent hover:border-mahogany/40"}`}
-              >
-                <img src={w.images[0]} alt={w.name} className="aspect-square w-full object-cover" />
-                <p className="px-1 py-1.5 text-[11px] leading-tight break-words">{w.name}</p>
-              </button>
-            ))}
+          {list.length === 0 ? (
+            <p className="rounded-md border border-border bg-card p-4 text-xs text-muted-foreground">
+              No published styles yet.
+            </p>
+          ) : (
+            <div className="grid grid-cols-3 gap-3">
+              {list.map((w) => (
+                <button
+                  key={w.id}
+                  onClick={() => onSelectWig(w)}
+                  className={`group overflow-hidden rounded-md border-2 text-left transition-all ${wig?.id === w.id ? "border-gold" : "border-transparent hover:border-mahogany/40"}`}
+                >
+                  <img src={w.images[0]} alt={w.name} className="aspect-square w-full object-cover" />
+                  <p className="px-1 py-1.5 text-[11px] leading-tight break-words">{w.name}</p>
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="mt-3">
+            <Link
+              to="/app/catalog"
+              className="text-xs text-mahogany underline-offset-4 hover:underline"
+            >
+              Browse all styles
+            </Link>
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+              Pick any style in the catalogue and press Try this wig on.
+            </p>
           </div>
         </aside>
       </div>

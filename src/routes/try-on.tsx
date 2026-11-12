@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Upload, RefreshCw, Sparkles } from "lucide-react";
@@ -547,6 +547,19 @@ function TryOn() {
                     </div>
                   </button>
                 ))}
+              </div>
+            )}
+            {(!scoped || list.length === 0) && (
+              <div className="mt-3">
+                <Link
+                  to="/catalog"
+                  className="text-xs text-mahogany underline-offset-4 hover:underline"
+                >
+                  Browse all styles
+                </Link>
+                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                  Pick any style in the catalogue and press Try this wig on.
+                </p>
               </div>
             )}
             <p className="mt-5 rounded-md border border-gold/30 bg-gold/10 p-3 font-mono text-[11px] leading-relaxed text-gold-dark">
