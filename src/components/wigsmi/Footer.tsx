@@ -27,7 +27,6 @@ export function Footer() {
           <ul className="space-y-2 text-sm">
             <li><Link to="/retailer" className="hover:text-mahogany">For retailers</Link></li>
             <li><a href="/wigsmi-brochure.pdf" download className="hover:text-mahogany">Download brochure (PDF)</a></li>
-            <li><a href="/downloads/wigsmi-retailer-embed-guide.pdf" download className="hover:text-mahogany">Retailer embed guide (PDF)</a></li>
             <li><Link to="/faq" className="hover:text-mahogany">FAQ</Link></li>
             <li><Link to="/privacy" className="hover:text-mahogany">Privacy</Link></li>
             <li><Link to="/terms" className="hover:text-mahogany">Terms</Link></li>

@@ -171,13 +171,6 @@ function RetailerLanding() {
             >
               Download the brochure (PDF)
             </a>
-            <a
-              href="/downloads/wigsmi-retailer-embed-guide.pdf"
-              download
-              className="inline-flex rounded-md border border-cream/50 px-7 py-3 text-sm font-medium text-cream hover:bg-cream hover:text-mahogany"
-            >
-              Download the embed guide (PDF)
-            </a>
           </div>
         </div>
       </section>
