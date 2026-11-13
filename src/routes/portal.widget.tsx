@@ -436,6 +436,9 @@ function Header() {
           Embed Wigsmi on your store.
         </h1>
       </div>
+      <a href="/downloads/wigsmi-retailer-embed-guide.pdf" download className="text-sm text-mahogany underline-offset-4 hover:underline">
+        Download the embed guide (PDF)
+      </a>
     </div>
   );
 }
