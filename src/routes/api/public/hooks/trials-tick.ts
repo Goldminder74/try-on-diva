@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { serverSendTransactionalEmail } from "@/lib/email/server-send";
 import { cronAuthorized } from "@/lib/cron-auth";
+import { purgeAnonymousTryOns } from "@/lib/retention";
 import { subscriptionIsValid } from "@/lib/entitlements";
 
 let _supabase: ReturnType<typeof createClient> | null = null;
@@ -177,10 +178,14 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
           lockedCount++;
         }
 
+        // Daily privacy clean-up of anonymous try-on images and records.
+        const retention = await purgeAnonymousTryOns(sb);
+
         return Response.json({
           ok: true,
           ending_soon_sent: endingSoonSent,
           locked: lockedCount,
+          retention,
         });
       },
     },

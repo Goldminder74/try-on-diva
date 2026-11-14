@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /go/
+Disallow: /api/
+Disallow: /embed/
 
 Sitemap: https://wigsmi.com/sitemap.xml

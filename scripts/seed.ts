@@ -27,11 +27,25 @@ const admin = createClient(SUPABASE_URL, SERVICE_KEY, {
 
 const WITH_ANALYTICS = process.argv.includes("--with-analytics");
 
-const ADMIN = { email: "ayo@wigsmi.com", password: "Wigsmi!Admin2026", name: "Ayo" };
+// Passwords are never kept in the repository. Set SEED_PASSWORD (at least 16
+// characters) when running the seed; every seeded account gets that password.
+// This script is for a local or throwaway database only: it refuses to run
+// against the live project unless SEED_ALLOW_REMOTE=yes is set on purpose.
+const SEED_PASSWORD = process.env.SEED_PASSWORD ?? "";
+if (SEED_PASSWORD.length < 16) {
+  console.error("Set SEED_PASSWORD (at least 16 characters) before running the seed.");
+  process.exit(1);
+}
+if (!/localhost|127\.0\.0\.1/.test(SUPABASE_URL) && process.env.SEED_ALLOW_REMOTE !== "yes") {
+  console.error("Refusing to seed a remote database. Set SEED_ALLOW_REMOTE=yes if you really mean it.");
+  process.exit(1);
+}
+
+const ADMIN = { email: "ayo@wigsmi.com", password: SEED_PASSWORD, name: "Ayo" };
 const RETAILERS = [
   {
     email: "owner@crownandcoils.com",
-    password: "Wigsmi!Retailer1",
+    password: SEED_PASSWORD,
     business: "Crown & Coils",
     slug: "crown-and-coils",
     country: "United Kingdom",
@@ -42,7 +56,7 @@ const RETAILERS = [
   },
   {
     email: "owner@silkscalp.co",
-    password: "Wigsmi!Retailer2",
+    password: SEED_PASSWORD,
     business: "Silk & Scalp",
     slug: "silk-and-scalp",
     country: "United States",
@@ -53,8 +67,8 @@ const RETAILERS = [
   },
 ];
 const CONSUMERS = [
-  { email: "maya@example.com", password: "Wigsmi!Consumer1", name: "Maya" },
-  { email: "zola@example.com", password: "Wigsmi!Consumer2", name: "Zola" },
+  { email: "maya@example.com", password: SEED_PASSWORD, name: "Maya" },
+  { email: "zola@example.com", password: SEED_PASSWORD, name: "Zola" },
 ];
 
 async function ensureUser(email: string, password: string, name: string, role: "admin" | "retailer" | "consumer") {
@@ -70,9 +84,8 @@ async function ensureUser(email: string, password: string, name: string, role: "
     });
     if (error) throw error;
     user = data.user!;
-  } else {
-    await admin.auth.admin.updateUserById(user.id, { password });
   }
+  // An account that already exists keeps its own password.
   // Ensure role row (trigger inserts consumer by default).
   await admin.from("user_roles").upsert(
     { user_id: user.id, role },

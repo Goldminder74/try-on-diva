@@ -17,12 +17,18 @@ export const listMyTryOns = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data: rows, error } = await supabase
+    // Same history window as opening a single saved look: Pro keeps
+    // everything, other plans a rolling number of days.
+    const { getMyPlanFeatures } = await import("@/lib/try-on.functions");
+    const { historyDays } = await getMyPlanFeatures();
+    let query = supabase
       .from("tryon_results")
       .select("id, wig_id, result_url, created_at")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(200);
+      .eq("user_id", userId);
+    if (historyDays) {
+      query = query.gte("created_at", new Date(Date.now() - historyDays * 86400000).toISOString());
+    }
+    const { data: rows, error } = await query.order("created_at", { ascending: false }).limit(200);
     if (error) throw error;
     const list = rows ?? [];
     const paths = list.map((r) => r.result_url).filter((p) => isOwnStoragePath(p, userId));

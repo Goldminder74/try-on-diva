@@ -25,11 +25,13 @@ export const getPublicWidgetData = createServerFn({ method: "GET" })
 
     const { data: retailer } = await supabaseAdmin
       .from("retailers")
-      .select("id, slug, display_name, brand_primary, widget_cta_text, logo_url, currency, plan, widget_calls_this_month, widget_calls_month_reset")
+      .select("id, slug, display_name, brand_primary, widget_cta_text, logo_url, currency, plan, is_active, widget_calls_this_month, widget_calls_month_reset")
       .eq("id", widget.retailer_id)
       .maybeSingle();
 
     if (!retailer) return { notFound: true as const };
+    // A retailer whose trial lapsed or who was deactivated has no live widget.
+    if ((retailer as any).is_active === false) return { paused: true as const };
 
     // Roll the monthly counter forward if the stored reset date is older
     // than the current month boundary.
@@ -68,6 +70,7 @@ export const getPublicWidgetData = createServerFn({ method: "GET" })
       .select("id, name, price, currency, images, product_url")
       .eq("retailer_id", widget.retailer_id)
       .eq("is_published", true)
+      .is("deleted_at", null)
       .eq("in_stock", true)
       .order("is_featured", { ascending: false })
       .order("created_at", { ascending: false })

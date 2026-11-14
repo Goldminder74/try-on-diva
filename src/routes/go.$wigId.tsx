@@ -41,7 +41,21 @@ function publicClient() {
  * shopper's first-visit campaign tags). Never throws: logging must not block
  * the redirect.
  */
+// Crawlers, link checkers and preview fetchers follow Buy links too. They are
+// sent on like anyone else, but they are not shoppers and are not counted.
+const BOT_AGENT =
+  /bot|crawl|spider|slurp|preview|fetch|monitor|scan|headless|lighthouse|python|curl|wget|httpclient|go-http|okhttp|axios|node|facebookexternalhit|whatsapp|telegram|discord|embedly|pinterest|bingpreview|gptbot|claude|perplexity|ccbot|bytespider|ahrefs|semrush/i;
+
+function isAutomatedVisit(request: Request): boolean {
+  const agent = request.headers.get("user-agent") ?? "";
+  if (!agent || BOT_AGENT.test(agent)) return true;
+  // Browsers mark a page fetched ahead of a click; that is not a click.
+  const purpose = `${request.headers.get("purpose") ?? ""} ${request.headers.get("sec-purpose") ?? ""}`;
+  return /prefetch|prerender|preview/i.test(purpose);
+}
+
 async function logBuyClick(request: Request, wigId: string, retailerId: string | null) {
+  if (isAutomatedVisit(request)) return;
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.rpc("increment_wig_click", { _wig_id: wigId });
@@ -116,36 +130,31 @@ export const Route = createFileRoute("/go/$wigId")({
             return Response.redirect(new URL(`/wig/${wigId}`, request.url), 302);
           }
 
-          if (row.commission_enabled !== true || !tracked) {
+          if (row.commission_enabled !== true || !tracked || isAutomatedVisit(request)) {
             await logBuyClick(request, wigId, row.retailer_id ?? null);
             return Response.redirect(destination, 302);
           }
 
+          // A tracking hiccup must never cost a retailer a sale: if the visit
+          // cannot be recorded, the shopper still goes to the shop, without a
+          // reference code.
           const token = crypto.randomUUID();
-          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          await supabaseAdmin.from("affiliate_clicks").insert({
-            retailer_id: row.retailer_id,
-            wig_id: wigId,
-            token,
-            referrer: request.headers.get("referer")?.slice(0, 500) ?? null,
-            user_agent: request.headers.get("user-agent")?.slice(0, 300) ?? null,
-            expires_at: new Date(Date.now() + CLICK_TTL_DAYS * 86400000).toISOString(),
-          });
-          await supabaseAdmin.rpc("increment_wig_click", { _wig_id: wigId });
           try {
-            await supabaseAdmin.from("analytics_events").insert({
-              event_type: "buy_click",
+            const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+            const { error: clickErr } = await supabaseAdmin.from("affiliate_clicks").insert({
               retailer_id: row.retailer_id,
-              payload: {
-                wig_id: wigId,
-                retailer_id: row.retailer_id,
-                referrer: request.headers.get("referer")?.slice(0, 500) ?? null,
-                ...utmFromCookieHeader(request.headers.get("cookie")),
-              },
+              wig_id: wigId,
+              token,
+              referrer: request.headers.get("referer")?.slice(0, 500) ?? null,
+              user_agent: request.headers.get("user-agent")?.slice(0, 300) ?? null,
+              expires_at: new Date(Date.now() + CLICK_TTL_DAYS * 86400000).toISOString(),
             });
+            if (clickErr) throw clickErr;
           } catch (err) {
-            console.error("buy click event failed:", err);
+            console.error("tracked click failed:", err);
+            return Response.redirect(destination, 302);
           }
+          await logBuyClick(request, wigId, row.retailer_id ?? null);
 
           return Response.redirect(withClickRef(destination, token), 302);
         } catch (err) {

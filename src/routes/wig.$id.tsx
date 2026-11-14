@@ -145,7 +145,7 @@ function WigDetail() {
               <a
                 href={`/go/${wig.id}`}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="nofollow sponsored noopener noreferrer"
                 className="flex w-full items-center justify-center gap-2 rounded-md bg-gold px-5 py-3 text-sm font-medium text-mahogany hover:bg-gold-dark hover:text-cream"
               >
                 <ExternalLink className="h-4 w-4" /> Buy from {wig.retailer}

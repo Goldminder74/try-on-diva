@@ -4,13 +4,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 /** Sends the signed-in user's welcome email (retailer or consumer). */
 export const sendWelcomeEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { origin: string }) => {
-    if (!d || typeof d.origin !== "string" || !/^https?:\/\//.test(d.origin)) {
-      throw new Error("Invalid origin");
-    }
-    return { origin: d.origin.replace(/\/+$/, "") };
-  })
-  .handler(async ({ data, context }) => {
+  .inputValidator((d: { origin?: string }) => d ?? {})
+  .handler(async ({ context }) => {
+    // The links in the email point at the site that handled this request,
+    // never at an address supplied by the browser.
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const data = { origin: new URL(getRequest().url).origin };
     const { supabase, userId, claims } = context as any;
     const email = (claims?.email as string | undefined) ?? null;
     if (!email) return { ok: false };

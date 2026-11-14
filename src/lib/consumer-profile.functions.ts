@@ -18,6 +18,14 @@ export const getMyConsumerProfile = createServerFn({ method: "GET" })
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("consumer_profiles").select("*").eq("user_id", userId).maybeSingle(),
     ]);
+    // A stored photo is a path in the shopper's own folder: hand back a link
+    // that lasts an hour. Older rows hold a full link and pass through.
+    if (profile?.avatar_url && !/^https?:\/\//.test(profile.avatar_url)) {
+      const { data: signed } = await supabase.storage
+        .from("user-photos")
+        .createSignedUrl(profile.avatar_url, 60 * 60);
+      profile.avatar_url = signed?.signedUrl ?? null;
+    }
     return { profile, consumer: cp };
   });
 
@@ -48,12 +56,21 @@ export const updateProfile = createServerFn({ method: "POST" })
       .object({
         display_name: z.string().min(1).max(80).optional(),
         country: z.string().min(2).max(60).nullable().optional(),
-        avatar_url: z.string().url().nullable().optional(),
+        // The storage path of a photo in the shopper's own folder. It is
+        // signed for an hour each time the profile is read, instead of storing
+        // a link that stays valid for a year.
+        avatar_url: z.string().max(300).nullable().optional(),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    if (data.avatar_url && !/^[A-Za-z0-9._-]+$/.test(data.avatar_url.slice(userId.length + 1))) {
+      throw new Error("Invalid photo.");
+    }
+    if (data.avatar_url && !data.avatar_url.startsWith(`${userId}/`)) {
+      throw new Error("Invalid photo.");
+    }
     const { error } = await supabase.from("profiles").update(data).eq("id", userId);
     if (error) throw error;
     return { ok: true };

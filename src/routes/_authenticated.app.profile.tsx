@@ -53,11 +53,12 @@ function Profile() {
       const { error: upErr } = await supabase.storage.from("user-photos").upload(path, f, { upsert: true });
       if (upErr) throw upErr;
       const { data } = supabase.storage.from("user-photos").createSignedUrl
-        ? await supabase.storage.from("user-photos").createSignedUrl(path, 60 * 60 * 24 * 365)
+        ? await supabase.storage.from("user-photos").createSignedUrl(path, 60 * 60)
         : { data: null };
       const url = data?.signedUrl ?? null;
       setAvatar(url);
-      if (url) await save({ data: { avatar_url: url } });
+      // Store the photo's path, not a long-lived link to it.
+      if (url) await save({ data: { avatar_url: path } });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
     } finally {

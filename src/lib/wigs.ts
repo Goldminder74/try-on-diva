@@ -150,6 +150,9 @@ export async function fetchFeaturedWigs(limit = 6): Promise<Wig[]> {
     .eq("is_published", true)
     .is("deleted_at", null)
     .eq("is_featured", true)
+    // The home shortlist is curated by Wigsmi: a retailer's own "featured"
+    // tick orders their shop and widget, but only a ranked wig appears here.
+    .not("featured_rank", "is", null)
     .order("featured_rank", { ascending: true })
     .limit(limit);
   if (error) throw error;
