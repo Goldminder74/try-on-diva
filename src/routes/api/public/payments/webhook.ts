@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
-import { type StripeEnv, verifyWebhook, createStripeClient } from "@/lib/stripe.server";
+import {
+  type StripeEnv,
+  verifyWebhook,
+  createStripeClient,
+  deploymentStripeEnv,
+} from "@/lib/stripe.server";
 import { serverSendTransactionalEmail } from "@/lib/email/server-send";
 import { PLAN_WIG_CAPS, paymentCanSync, subscriptionIdFromPayment } from "@/lib/billing-rules";
 import { getPackByPriceId, packExpiresAt } from "@/lib/topup";
@@ -188,7 +193,9 @@ async function handleSubscriptionCreated(sub: any, env: StripeEnv) {
     }
   }
 
-  if (ctype === "retailer") {
+  // A test-mode subscription never activates a retailer on the live site: the
+  // row above is kept for the record, but the plan and catalogue are untouched.
+  if (ctype === "retailer" && env === deploymentStripeEnv()) {
     const sb = getSupabase();
     await sb
       .from("retailers")
@@ -382,6 +389,7 @@ async function handleOneOffPurchase(session: any, env: StripeEnv) {
   const purchasedAt = full.created ? new Date(full.created * 1000) : new Date();
   const result = await grantPackCredits(getSupabase(), {
     userId,
+    environment: env,
     priceId: priceId ?? "",
     sessionId: full.id,
     amountGbp: full.amount_total ? full.amount_total / 100 : null,

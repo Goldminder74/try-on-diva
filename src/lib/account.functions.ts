@@ -94,7 +94,9 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     await assertShopper(supabase, userId);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { createStripeClient, getStripeErrorMessage } = await import("@/lib/stripe.server");
+    const { createStripeClient, deploymentStripeEnv, getStripeErrorMessage } = await import(
+      "@/lib/stripe.server"
+    );
     const admin: any = supabaseAdmin;
 
     // 1. Stripe: cancel subscriptions immediately and anonymise the customer.
@@ -113,9 +115,20 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
         }
         if (s.stripe_customer_id) customers.set(s.stripe_customer_id, s.environment);
       }
-      const stripe = createStripeClient(data.environment);
-      const found = await stripe.customers.search({ query: `metadata['userId']:'${userId}'`, limit: 20 });
-      for (const c of found.data) customers.set(c.id, data.environment);
+      // Look in both payment modes, so a customer record is never left behind
+      // because the browser named the wrong one. A mode with no key configured
+      // is skipped.
+      for (const env of ["live", "sandbox"] as const) {
+        try {
+          const found = await createStripeClient(env).customers.search({
+            query: `metadata['userId']:'${userId}'`,
+            limit: 20,
+          });
+          for (const c of found.data) customers.set(c.id, env);
+        } catch (error) {
+          if (env === deploymentStripeEnv()) throw error;
+        }
+      }
       for (const [id, env] of customers) {
         await createStripeClient(env).customers.update(id, {
           name: "", email: "", phone: "", description: "Deleted Wigsmi account",
@@ -123,7 +136,11 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
         });
       }
     } catch (error) {
-      return { error: getStripeErrorMessage(error) };
+      console.error("[account:delete] payment provider step failed:", getStripeErrorMessage(error));
+      return {
+        error:
+          "We could not close your billing record, so nothing was deleted. Please try again, or contact us if it keeps happening.",
+      };
     }
 
     // 2. Try-ons and their images.

@@ -10,6 +10,8 @@ import { getPackByPriceId, packExpiresAt } from "@/lib/topup";
  */
 export interface PackGrantArgs {
   userId: string;
+  /** Payment mode the pack was bought in; a test-mode pack never counts on the live site. */
+  environment: "sandbox" | "live";
   priceId: string;
   sessionId: string;
   amountGbp?: number | null;
@@ -47,6 +49,7 @@ export async function grantPackCredits(
     amount_gbp: args.amountGbp ?? pack.amountGbp,
     currency: args.currency ?? pack.currency,
     stripe_checkout_session_id: args.sessionId,
+    environment: args.environment,
     status: "active",
     expires_at: packExpiresAt(purchasedAt, pack.validMonths).toISOString(),
   });

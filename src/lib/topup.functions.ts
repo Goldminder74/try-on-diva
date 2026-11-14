@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib/stripe.server";
+import {
+  type StripeEnv,
+  createStripeClient,
+  deploymentStripeEnv,
+  getStripeErrorMessage,
+} from "@/lib/stripe.server";
 import { TRYON_PACKS, getPackByPriceId } from "@/lib/topup";
 import { grantPackCredits } from "@/lib/topup.grant";
 
@@ -28,20 +33,26 @@ export const getMyTryOnCredits = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<TryOnCreditsSummary> => {
     const { supabase, userId } = context;
+    const environment = deploymentStripeEnv();
 
-    const { data: balance } = await supabase.rpc("get_try_on_credit_balance");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: balance } = await (supabaseAdmin as any).rpc("try_on_credit_balance_as", {
+      _user_id: userId,
+      _environment: environment,
+    });
 
-    const { data: rows, error } = await supabase
+    const { data: rows, error } = await (supabase as any)
       .from("try_on_credits")
       .select(
         "id, credits_purchased, credits_used, price_id, amount_gbp, currency, status, expires_at, created_at",
       )
       .eq("user_id", userId)
+      .eq("environment", environment)
       .order("created_at", { ascending: false });
     if (error) throw error;
 
     const now = Date.now();
-    const packs = (rows ?? [])
+    const packs = ((rows ?? []) as TryOnCreditRow[])
       .map((r) => ({
         ...r,
         amount_gbp: r.amount_gbp === null ? null : Number(r.amount_gbp),
@@ -68,10 +79,11 @@ export const syncMyTopUps = createServerFn({ method: "POST" })
   .inputValidator((d: { environment: StripeEnv }) =>
     z.object({ environment: z.enum(["sandbox", "live"]) }).parse(d),
   )
-  .handler(async ({ data, context }): Promise<{ synced: number; error?: string }> => {
+  .handler(async ({ context }): Promise<{ synced: number; error?: string }> => {
     const { userId } = context;
+    const environment = deploymentStripeEnv();
     try {
-      const stripe = createStripeClient(data.environment);
+      const stripe = createStripeClient(environment);
       const customers = await stripe.customers.search({
         query: `metadata['userId']:'${userId}'`,
         limit: 1,
@@ -98,6 +110,7 @@ export const syncMyTopUps = createServerFn({ method: "POST" })
 
         const result = await grantPackCredits(supabaseAdmin, {
           userId,
+          environment,
           priceId: pack.priceId,
           sessionId: session.id,
           amountGbp: session.amount_total ? session.amount_total / 100 : null,

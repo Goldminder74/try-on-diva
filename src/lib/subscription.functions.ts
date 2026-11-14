@@ -5,7 +5,8 @@ import { planChangeError } from "@/lib/billing-rules";
 import {
   type StripeEnv,
   createStripeClient,
-  getStripeErrorMessage,
+  customerPaymentError,
+  deploymentStripeEnv,
 } from "@/lib/stripe.server";
 
 const envSchema = z.enum(["sandbox", "live"]);
@@ -44,6 +45,8 @@ export const createPortalSession = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
     const { supabase, userId } = context;
+    // The payment mode is the deployment's, whatever the browser sent.
+    data.environment = deploymentStripeEnv();
     const { data: sub } = await supabase
       .from("subscriptions")
       .select("stripe_customer_id")
@@ -62,7 +65,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
       });
       return { url: portal.url };
     } catch (error) {
-      return { error: getStripeErrorMessage(error) };
+      return { error: customerPaymentError(error, "subscription") };
     }
   });
 
@@ -85,6 +88,8 @@ export const changeSubscriptionPlan = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { supabase, userId } = context;
+    // The payment mode is the deployment's, whatever the browser sent.
+    data.environment = deploymentStripeEnv();
     const { data: sub } = await supabase
       .from("subscriptions")
       .select("stripe_subscription_id, status")
@@ -114,7 +119,7 @@ export const changeSubscriptionPlan = createServerFn({ method: "POST" })
       });
       return { ok: true };
     } catch (error) {
-      return { error: getStripeErrorMessage(error) };
+      return { error: customerPaymentError(error, "subscription") };
     }
   });
 
@@ -137,6 +142,8 @@ export const previewPlanChange = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    // The payment mode is the deployment's, whatever the browser sent.
+    data.environment = deploymentStripeEnv();
     const { data: sub } = await supabase
       .from("subscriptions")
       .select("stripe_subscription_id, stripe_customer_id")
@@ -177,7 +184,7 @@ export const previewPlanChange = createServerFn({ method: "POST" })
       nextAmount: Number(price.unit_amount ?? 0),
       nextBilledAt: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
     };
-    } catch (error) { return { error: getStripeErrorMessage(error) }; }
+    } catch (error) { return { error: customerPaymentError(error, "subscription") }; }
   });
 
 /** Cancel the user's subscription at period end (keeps access until then). */
@@ -189,6 +196,8 @@ export const cancelSubscription = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { supabase, userId } = context;
+    // The payment mode is the deployment's, whatever the browser sent.
+    data.environment = deploymentStripeEnv();
     const { data: sub } = await supabase
       .from("subscriptions")
       .select("stripe_subscription_id, status")
@@ -210,7 +219,7 @@ export const cancelSubscription = createServerFn({ method: "POST" })
       });
       return { ok: true };
     } catch (error) {
-      return { error: getStripeErrorMessage(error) };
+      return { error: customerPaymentError(error, "subscription") };
     }
   });
 
@@ -233,6 +242,8 @@ export const listInvoices = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }): Promise<InvoiceRow[] | { error: string }> => {
     const { supabase, userId } = context;
+    // The payment mode is the deployment's, whatever the browser sent.
+    data.environment = deploymentStripeEnv();
     const { data: sub } = await supabase
       .from("subscriptions")
       .select("stripe_customer_id")
@@ -260,5 +271,5 @@ export const listInvoices = createServerFn({ method: "GET" })
       billedAt: inv.created ? new Date(inv.created * 1000).toISOString() : null,
       invoiceUrl: inv.hosted_invoice_url ?? inv.invoice_pdf ?? null,
     }));
-    } catch (error) { return { error: getStripeErrorMessage(error) }; }
+    } catch (error) { return { error: customerPaymentError(error, "subscription") }; }
   });

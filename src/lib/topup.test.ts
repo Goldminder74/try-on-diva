@@ -78,7 +78,7 @@ describe("checkout price ids", () => {
 describe("grantPackCredits", () => {
   it("refuses an unknown pack", async () => {
     const client = fakeClient();
-    const result = await grantPackCredits(client, {
+    const result = await grantPackCredits(client, { environment: "live",
       userId: "u1",
       priceId: "tryon_pack_999",
       sessionId: "cs_1",
@@ -89,7 +89,7 @@ describe("grantPackCredits", () => {
 
   it("adds 10 try-ons with a 12-month expiry", async () => {
     const client = fakeClient();
-    const result = await grantPackCredits(client, {
+    const result = await grantPackCredits(client, { environment: "live",
       userId: "u1",
       priceId: "tryon_pack_10",
       sessionId: "cs_1",
@@ -109,7 +109,7 @@ describe("grantPackCredits", () => {
 
   it("never grants the same payment twice", async () => {
     const client = fakeClient({ existing: { id: "already" } });
-    const result = await grantPackCredits(client, {
+    const result = await grantPackCredits(client, { environment: "live",
       userId: "u1",
       priceId: "tryon_pack_10",
       sessionId: "cs_1",
@@ -120,7 +120,7 @@ describe("grantPackCredits", () => {
 
   it("treats a simultaneous duplicate delivery as already granted", async () => {
     const client = fakeClient({ insertError: { code: "23505", message: "duplicate" } });
-    const result = await grantPackCredits(client, {
+    const result = await grantPackCredits(client, { environment: "live",
       userId: "u1",
       priceId: "tryon_pack_10",
       sessionId: "cs_1",
@@ -130,7 +130,7 @@ describe("grantPackCredits", () => {
 
   it("reports a real database failure instead of pretending", async () => {
     const client = fakeClient({ insertError: { code: "42P10", message: "no index" } });
-    const result = await grantPackCredits(client, {
+    const result = await grantPackCredits(client, { environment: "live",
       userId: "u1",
       priceId: "tryon_pack_10",
       sessionId: "cs_1",

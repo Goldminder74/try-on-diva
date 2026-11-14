@@ -8,6 +8,16 @@ const getEnv = (key: string): string => {
 
 export type StripeEnv = "sandbox" | "live";
 
+/**
+ * Which payment mode this deployment runs in. It comes from the publishable
+ * key the build was made with, never from the browser, so a visitor cannot
+ * ask the live site to honour a test-mode purchase.
+ */
+export function deploymentStripeEnv(): StripeEnv {
+  const token = import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined;
+  return token?.startsWith("pk_live_") ? "live" : "sandbox";
+}
+
 const GATEWAY_STRIPE_BASE = "https://connector-gateway.lovable.dev/stripe";
 
 export function getConnectionApiKey(env: StripeEnv): string {
@@ -76,6 +86,21 @@ export function getStripeErrorMessage(error: unknown): string {
   return "Stripe request failed";
 }
 
+/**
+ * What a customer may be shown when a payment request fails. Card problems
+ * carry the provider's own customer-facing wording; anything else is logged in
+ * full on the server and replaced with a plain message, so request ids,
+ * parameter names and configuration details never reach the browser.
+ */
+export function customerPaymentError(error: unknown, context: string): string {
+  console.error(`[payments:${context}]`, getStripeErrorMessage(error));
+  const stripeError = (error ?? {}) as { type?: string; message?: string; raw?: { type?: string; message?: string } };
+  const type = stripeError.raw?.type ?? stripeError.type;
+  const message = stripeError.raw?.message ?? stripeError.message;
+  if (type === "card_error" && message) return message;
+  return "We could not complete that payment request. Please try again in a moment.";
+}
+
 export async function verifyWebhook(
   req: Request,
   env: StripeEnv,
@@ -115,7 +140,16 @@ export async function verifyWebhook(
   );
   const expected = Buffer.from(new Uint8Array(signed)).toString("hex");
 
-  if (!v1Signatures.includes(expected)) throw new Error("Invalid webhook signature");
+  // Compare without stopping at the first differing character.
+  const matches = v1Signatures.some((candidate) => {
+    if (candidate.length !== expected.length) return false;
+    let difference = 0;
+    for (let i = 0; i < expected.length; i++) {
+      difference |= candidate.charCodeAt(i) ^ expected.charCodeAt(i);
+    }
+    return difference === 0;
+  });
+  if (!matches) throw new Error("Invalid webhook signature");
 
   return JSON.parse(body);
 }

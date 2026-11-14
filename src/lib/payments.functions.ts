@@ -1,10 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import Stripe from "stripe";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   type StripeEnv,
   createStripeClient,
+  customerPaymentError,
+  deploymentStripeEnv,
   getStripeErrorMessage,
 } from "@/lib/stripe.server";
 import { isCheckoutPriceId, isPackPriceId } from "@/lib/topup";
@@ -69,6 +72,13 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<CheckoutSessionResult> => {
     data.userId = context.userId;
     data.customerEmail = context.claims.email as string | undefined;
+    // The payment mode is the deployment's, whatever the browser sent.
+    data.environment = deploymentStripeEnv();
+    // Send the customer back to this site only.
+    const requestOrigin = new URL(getRequest().url).origin;
+    if (new URL(data.returnUrl).origin !== requestOrigin) {
+      return { error: "Invalid return address." };
+    }
     try {
       const stripe = createStripeClient(data.environment);
 
@@ -121,7 +131,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {
-      return { error: getStripeErrorMessage(error) };
+      return { error: customerPaymentError(error, "checkout") };
     }
   });
 
@@ -140,10 +150,11 @@ export const syncMySubscription = createServerFn({ method: "POST" })
     }
     return d;
   })
-  .handler(async ({ data, context }): Promise<{ synced: boolean }> => {
+  .handler(async ({ context }): Promise<{ synced: boolean }> => {
     const { userId } = context;
+    const environment = deploymentStripeEnv();
     try {
-      const stripe = createStripeClient(data.environment);
+      const stripe = createStripeClient(environment);
       const customers = await stripe.customers.search({
         query: `metadata['userId']:'${userId}'`,
         limit: 1,
@@ -190,7 +201,7 @@ export const syncMySubscription = createServerFn({ method: "POST" })
             : null,
           current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
           cancel_at_period_end: sub.cancel_at_period_end ?? false,
-          environment: data.environment,
+          environment,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "stripe_subscription_id" },
