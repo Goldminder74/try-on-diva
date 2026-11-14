@@ -64,6 +64,13 @@
       "when": 1794425208308,
       "tag": "0008_shopper_self_service_delete",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794674177417,
+      "tag": "0009_signup_role_allowlist",
+      "breakpoints": true
     }
   ]
 }

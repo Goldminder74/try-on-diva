@@ -1,6 +1,7 @@
 # Authentication
 
 - Existing protected shopper, retailer and admin layouts are client-only (`ssr: false`), because their sign-in session lives in browser storage; retain server-side authorization on every private server function.
+- Sign-up metadata is browser-written, so the new-user trigger only accepts consumer or retailer; admin is never granted at sign-up.
 - Retailer login uses router navigation with `href` for the shared safe return-destination URL, so query strings and checkout selections are parsed without a full-page reload.
 
 # Billing
