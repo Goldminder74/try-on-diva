@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { normaliseAllowedDomain, widgetFrameAncestors, withSecurityHeaders } from "./security-headers";
+import {
+  normaliseAllowedDomain,
+  widgetFrameAncestors,
+  withSecurityHeaders,
+} from "./security-headers";
 
 describe("normaliseAllowedDomain", () => {
   it("reduces an address to its hostname", () => {

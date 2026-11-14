@@ -3,8 +3,12 @@ import { utmFromCookieHeader, utmFromSearch } from "./utm";
 
 describe("utm", () => {
   it("reads the three tags from a landing URL", () => {
-    expect(utmFromSearch("?utm_source=instagram&utm_medium=social&utm_campaign=launch&x=1")).toEqual({
-      utm_source: "instagram", utm_medium: "social", utm_campaign: "launch",
+    expect(
+      utmFromSearch("?utm_source=instagram&utm_medium=social&utm_campaign=launch&x=1"),
+    ).toEqual({
+      utm_source: "instagram",
+      utm_medium: "social",
+      utm_campaign: "launch",
     });
   });
   it("ignores URLs without tags", () => {

@@ -12,14 +12,28 @@ import {
   YAxis,
 } from "recharts";
 import { Download, Lock, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
-import {
-  getRetailerAnalytics,
-  exportRetailerAnalyticsCsv,
-} from "@/lib/analytics.functions";
+import { getRetailerAnalytics, exportRetailerAnalyticsCsv } from "@/lib/analytics.functions";
 
 export const Route = createFileRoute("/portal/analytics")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Track try-ons, product views and engagement across your Wigsmi retailer catalogue." }, { property: "og:title", content: "Analytics - Wigsmi Retailer" }, { property: "og:description", content: "Track try-ons, product views and engagement across your Wigsmi retailer catalogue." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Analytics - Wigsmi Retailer" }] }),
+  head: () => ({
+    meta: [
+      {
+        name: "description",
+        content:
+          "Track try-ons, product views and engagement across your Wigsmi retailer catalogue.",
+      },
+      { property: "og:title", content: "Analytics - Wigsmi Retailer" },
+      {
+        property: "og:description",
+        content:
+          "Track try-ons, product views and engagement across your Wigsmi retailer catalogue.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Analytics - Wigsmi Retailer" },
+    ],
+  }),
   component: AnalyticsPage,
 });
 
@@ -64,10 +78,10 @@ function AnalyticsPage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-wider text-gold-dark">
-            Analytics
-          </p>
-          <h1 className="mt-1 font-display text-4xl text-mahogany">How your widget is performing.</h1>
+          <p className="font-mono text-[11px] uppercase tracking-wider text-gold-dark">Analytics</p>
+          <h1 className="mt-1 font-display text-4xl text-mahogany">
+            How your widget is performing.
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Try-ons, clicks, and customer signals from your store.
           </p>
@@ -133,7 +147,11 @@ function AnalyticsPage() {
               value={data.kpis.uniqueVisitors.value}
               prev={data.kpis.uniqueVisitors.prev}
             />
-            <KpiCard label="Wig clicks" value={data.kpis.clicks.value} prev={data.kpis.clicks.prev} />
+            <KpiCard
+              label="Wig clicks"
+              value={data.kpis.clicks.value}
+              prev={data.kpis.clicks.prev}
+            />
             <KpiCard
               label="Click-through rate"
               value={data.kpis.ctr.value}
@@ -145,7 +163,10 @@ function AnalyticsPage() {
           <Card title="Try-ons over time">
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data.timeseries} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                <AreaChart
+                  data={data.timeseries}
+                  margin={{ top: 8, right: 8, left: -16, bottom: 0 }}
+                >
                   <defs>
                     <linearGradient id="tryOnFill" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="var(--mahogany)" stopOpacity={0.25} />
@@ -189,7 +210,9 @@ function AnalyticsPage() {
 
           <Card title="Top wigs">
             {data.topWigs.length === 0 ? (
-              <p className="py-6 text-center text-sm text-muted-foreground">No wig try-ons yet in this range.</p>
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                No wig try-ons yet in this range.
+              </p>
             ) : (
               <table className="w-full text-sm">
                 <thead>
@@ -206,7 +229,11 @@ function AnalyticsPage() {
                       <td className="py-2.5">
                         <div className="flex items-center gap-3">
                           {w.image ? (
-                            <img src={w.image} alt="" className="h-10 w-10 rounded-md object-cover" />
+                            <img
+                              src={w.image}
+                              alt=""
+                              className="h-10 w-10 rounded-md object-cover"
+                            />
                           ) : (
                             <div className="h-10 w-10 rounded-md bg-sand" />
                           )}
@@ -246,7 +273,10 @@ function AnalyticsPage() {
                   <p className="text-sm font-medium">Geography breakdown is a Pro feature.</p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     See where your customers are trying on wigs from.{" "}
-                    <Link to="/portal/billing" className="text-mahogany underline-offset-2 hover:underline">
+                    <Link
+                      to="/portal/billing"
+                      className="text-mahogany underline-offset-2 hover:underline"
+                    >
                       Upgrade to Pro
                     </Link>
                     .
@@ -272,8 +302,7 @@ function KpiCard({
   prev: number;
   format?: "percent";
 }) {
-  const display =
-    format === "percent" ? `${(value * 100).toFixed(1)}%` : value.toLocaleString();
+  const display = format === "percent" ? `${(value * 100).toFixed(1)}%` : value.toLocaleString();
   const delta = prev === 0 ? (value > 0 ? 1 : 0) : (value - prev) / prev;
   const Icon = delta > 0.001 ? ArrowUpRight : delta < -0.001 ? ArrowDownRight : Minus;
   const tone =
@@ -286,9 +315,7 @@ function KpiCard({
       <p className="mt-2 font-display text-3xl tabular-nums text-mahogany">{display}</p>
       <p className={`mt-1 inline-flex items-center gap-1 text-xs ${tone}`}>
         <Icon className="h-3.5 w-3.5" />
-        {prev === 0 && value === 0
-          ? "no change"
-          : `${Math.abs(delta * 100).toFixed(0)}% vs prev.`}
+        {prev === 0 && value === 0 ? "no change" : `${Math.abs(delta * 100).toFixed(0)}% vs prev.`}
       </p>
     </div>
   );
@@ -319,10 +346,7 @@ function Breakdown({ rows }: { rows: { label: string; value: number }[] }) {
             <span className="font-mono tabular-nums text-muted-foreground">{r.value}</span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-sand">
-            <div
-              className="h-full bg-mahogany"
-              style={{ width: `${(r.value / max) * 100}%` }}
-            />
+            <div className="h-full bg-mahogany" style={{ width: `${(r.value / max) * 100}%` }} />
           </div>
         </li>
       ))}
@@ -349,7 +373,8 @@ function EmptyState() {
     <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center">
       <p className="font-display text-2xl text-mahogany">No data yet.</p>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-        Paste your widget snippet on a product page to start collecting try-ons, clicks, and customer signals.
+        Paste your widget snippet on a product page to start collecting try-ons, clicks, and
+        customer signals.
       </p>
       <Link
         to="/portal/widget"

@@ -4,7 +4,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { listConsumers } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin/consumers")({
-  head: () => ({ meta: [{ title: "Shoppers - Wigsmi Admin" }, { name: "description", content: "Review and manage shopper accounts on Wigsmi." }, { property: "og:title", content: "Shoppers - Wigsmi Admin" }, { property: "og:description", content: "Review and manage shopper accounts on Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Shoppers - Wigsmi Admin" },
+      { name: "description", content: "Review and manage shopper accounts on Wigsmi." },
+      { property: "og:title", content: "Shoppers - Wigsmi Admin" },
+      { property: "og:description", content: "Review and manage shopper accounts on Wigsmi." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   staticData: { sitemap: false },
   component: ConsumersPage,
 });
@@ -14,8 +23,13 @@ function ConsumersPage() {
   const [rows, setRows] = useState<any[] | null>(null);
   const [search, setSearch] = useState("");
 
-  const reload = () => listFn({ data: { search: search || undefined } }).then(setRows).catch(() => setRows([]));
-  useEffect(() => { reload(); /* eslint-disable-next-line */ }, []);
+  const reload = () =>
+    listFn({ data: { search: search || undefined } })
+      .then(setRows)
+      .catch(() => setRows([]));
+  useEffect(() => {
+    reload(); /* eslint-disable-next-line */
+  }, []);
 
   return (
     <div>
@@ -32,7 +46,12 @@ function ConsumersPage() {
             placeholder="Search email…"
             className="rounded-md border border-border bg-card px-3 py-1.5 text-sm"
           />
-          <button onClick={reload} className="rounded-md bg-mahogany px-3 py-1.5 text-xs text-cream">Search</button>
+          <button
+            onClick={reload}
+            className="rounded-md bg-mahogany px-3 py-1.5 text-xs text-cream"
+          >
+            Search
+          </button>
         </div>
       </div>
 
@@ -50,8 +69,20 @@ function ConsumersPage() {
             </tr>
           </thead>
           <tbody>
-            {rows === null && <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>}
-            {rows?.length === 0 && <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">No consumers.</td></tr>}
+            {rows === null && (
+              <tr>
+                <td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">
+                  Loading…
+                </td>
+              </tr>
+            )}
+            {rows?.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">
+                  No consumers.
+                </td>
+              </tr>
+            )}
             {rows?.map((p) => (
               <tr key={p.id} className="border-t border-border">
                 <td className="px-4 py-2">{p.display_name || "-"}</td>
@@ -60,7 +91,9 @@ function ConsumersPage() {
                 <td className="px-4 py-2 font-mono">{p.try_ons_month}</td>
                 <td className="px-4 py-2 font-mono">{p.wishlist_count}</td>
                 <td className="px-4 py-2">{p.quiz_completed ? "✓" : "-"}</td>
-                <td className="px-4 py-2 font-mono text-xs">{new Date(p.created_at).toLocaleDateString()}</td>
+                <td className="px-4 py-2 font-mono text-xs">
+                  {new Date(p.created_at).toLocaleDateString()}
+                </td>
               </tr>
             ))}
           </tbody>

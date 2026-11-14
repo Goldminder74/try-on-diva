@@ -39,7 +39,11 @@ export const Route = createFileRoute("/portal/commission")({
   head: () => ({
     meta: [
       { title: "Commission - Wigsmi Retailer Portal" },
-      { name: "description", content: "See the visits Wigsmi sends to your shop and the commission owed on orders that come from them." },
+      {
+        name: "description",
+        content:
+          "See the visits Wigsmi sends to your shop and the commission owed on orders that come from them.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -89,9 +93,7 @@ function PortalCommission() {
     let on = true;
     Promise.all([
       load(),
-      myWigs().then((r) =>
-        (r.wigs ?? []).map((w: any) => ({ id: w.id, name: w.name })),
-      ),
+      myWigs().then((r) => (r.wigs ?? []).map((w: any) => ({ id: w.id, name: w.name }))),
     ])
       .then(([result, list]) => {
         if (!on) return;
@@ -216,14 +218,12 @@ function PortalCommission() {
         <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
           Commission
         </p>
-        <h1 className="mt-1 font-display text-4xl text-mahogany">
-          Visits we send you
-        </h1>
+        <h1 className="mt-1 font-display text-4xl text-mahogany">Visits we send you</h1>
         <p className="mt-2 max-w-2xl text-sm text-foreground/80">
-          When a shopper clicks "Buy from {retailer.website ?? "your shop"}" on a
-          Wigsmi listing, we send them to your product page with a Wigsmi reference
-          code. If they order, you tell us and we add commission at the rate you
-          agreed. Nothing is charged automatically - you log each order yourself.
+          When a shopper clicks "Buy from {retailer.website ?? "your shop"}" on a Wigsmi listing, we
+          send them to your product page with a Wigsmi reference code. If they order, you tell us
+          and we add commission at the rate you agreed. Nothing is charged automatically - you log
+          each order yourself.
         </p>
       </header>
 
@@ -246,9 +246,7 @@ function PortalCommission() {
             <Label htmlFor="rate" className="text-sm font-medium text-mahogany">
               Commission rate
             </Label>
-            <span className="font-mono text-lg text-mahogany">
-              {(rateBps / 100).toFixed(0)}%
-            </span>
+            <span className="font-mono text-lg text-mahogany">{(rateBps / 100).toFixed(0)}%</span>
           </div>
           <Slider
             id="rate"
@@ -261,8 +259,8 @@ function PortalCommission() {
             disabled={!enabled}
           />
           <p className="mt-2 text-xs text-muted-foreground">
-            {money(100)} order → {money(commissionFor(100, rateBps))} to Wigsmi ·{" "}
-            {money(250)} order → {money(commissionFor(250, rateBps))}.
+            {money(100)} order → {money(commissionFor(100, rateBps))} to Wigsmi · {money(250)} order
+            → {money(commissionFor(250, rateBps))}.
           </p>
         </div>
 
@@ -273,8 +271,8 @@ function PortalCommission() {
             disabled={!enabled}
           />
           <span className="text-foreground/80">
-            I agree to log orders that came from a tracked Wigsmi visit and pay the
-            rate above on them.{" "}
+            I agree to log orders that came from a tracked Wigsmi visit and pay the rate above on
+            them.{" "}
             <Link to="/terms" className="text-mahogany underline">
               Read the terms
             </Link>
@@ -476,8 +474,8 @@ function PortalCommission() {
       <section className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
         <p className="font-display text-xl text-mahogany">Recent tracked visits</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Each code below was handed to your shop with the shopper. Match it to an
-          order when you log one.
+          Each code below was handed to your shop with the shopper. Match it to an order when you
+          log one.
         </p>
         {clicks.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">No tracked visits yet.</p>

@@ -15,7 +15,6 @@ import { captureUtmOnFirstVisit } from "@/lib/utm";
 import { AuthProvider } from "@/contexts/auth-context";
 import { CheckoutProvider } from "@/components/payments/CheckoutProvider";
 
-
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -85,11 +84,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Wigsmi" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@wigsmi" },
+      // Default share image, on the address the site is served from. Pages
+      // with their own image (a wig's photo) replace it.
+      { property: "og:image", content: "https://wigsmi.com/og-image.jpg" },
+      { name: "twitter:image", content: "https://wigsmi.com/og-image.jpg" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap",
+      },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/favicon.png" },

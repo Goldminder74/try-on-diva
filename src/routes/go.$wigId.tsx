@@ -105,9 +105,7 @@ export const Route = createFileRoute("/go/$wigId")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const wigId = decodeURIComponent(
-          new URL(request.url).pathname.replace(/^\/go\//, ""),
-        );
+        const wigId = decodeURIComponent(new URL(request.url).pathname.replace(/^\/go\//, ""));
         const backToCatalog = Response.redirect(new URL("/catalog", request.url), 302);
 
         if (!UUID_RE.test(wigId)) return backToCatalog;

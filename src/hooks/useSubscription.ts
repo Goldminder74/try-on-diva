@@ -40,10 +40,7 @@ export function useSubscription(opts?: { customerType?: "consumer" | "retailer" 
         .eq("user_id", user.id)
         .eq("environment", env);
       if (customerType) q = q.eq("customer_type", customerType);
-      const { data } = await q
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      const { data } = await q.order("created_at", { ascending: false }).limit(1).maybeSingle();
       if (!active) return;
       setSubscription((data as SubscriptionRow | null) ?? null);
       setLoading(false);

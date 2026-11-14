@@ -14,7 +14,6 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  
 
   // Resume plan selection after signup/login: if the user arrived from
   // /retailer with ?plan=&interval=, send them back to /portal/billing with
@@ -35,7 +34,9 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
         // Stash for the post-confirmation callback path too.
         try {
           sessionStorage.setItem("wigsmi:postAuthRedirect", redirectPath);
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,

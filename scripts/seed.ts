@@ -37,7 +37,9 @@ if (SEED_PASSWORD.length < 16) {
   process.exit(1);
 }
 if (!/localhost|127\.0\.0\.1/.test(SUPABASE_URL) && process.env.SEED_ALLOW_REMOTE !== "yes") {
-  console.error("Refusing to seed a remote database. Set SEED_ALLOW_REMOTE=yes if you really mean it.");
+  console.error(
+    "Refusing to seed a remote database. Set SEED_ALLOW_REMOTE=yes if you really mean it.",
+  );
   process.exit(1);
 }
 
@@ -71,7 +73,12 @@ const CONSUMERS = [
   { email: "zola@example.com", password: SEED_PASSWORD, name: "Zola" },
 ];
 
-async function ensureUser(email: string, password: string, name: string, role: "admin" | "retailer" | "consumer") {
+async function ensureUser(
+  email: string,
+  password: string,
+  name: string,
+  role: "admin" | "retailer" | "consumer",
+) {
   // Idempotent: find by email, else create.
   const { data: list } = await admin.auth.admin.listUsers();
   let user = list?.users.find((u) => u.email?.toLowerCase() === email.toLowerCase());
@@ -87,34 +94,211 @@ async function ensureUser(email: string, password: string, name: string, role: "
   }
   // An account that already exists keeps its own password.
   // Ensure role row (trigger inserts consumer by default).
-  await admin.from("user_roles").upsert(
-    { user_id: user.id, role },
-    { onConflict: "user_id,role" },
-  );
+  await admin.from("user_roles").upsert({ user_id: user.id, role }, { onConflict: "user_id,role" });
   return user.id;
 }
 
 const WIG_TEMPLATES = [
-  { name: "Lagos Honey 22\"", style: "lace-front", texture: "wavy", length: "long", origin: "brazilian", price: 289, colors: ["honey blonde", "caramel"], desc: "Body-wave lace front in honey ombre. Pre-plucked HD lace." },
-  { name: "Brooklyn Bob 12\"", style: "bob", texture: "straight", length: "short", origin: "peruvian", price: 169, colors: ["jet black"], desc: "Sleek blunt-cut bob with bone-straight ends." },
-  { name: "Goddess Kinky 26\"", style: "kinky-straight", texture: "4a", length: "bust", origin: "brazilian", price: 349, colors: ["natural black"], desc: "Yaki kinky-straight for a relaxed-hair blend." },
-  { name: "Sahara Curl 18\"", style: "loose-wave", texture: "curly", length: "medium", origin: "peruvian", price: 219, colors: ["dark brown"], desc: "Loose deep-wave curls with bounce that holds overnight." },
-  { name: "Velvet Pixie 8\"", style: "pixie", texture: "4b", length: "short", origin: "synthetic", price: 79, colors: ["rich black"], desc: "Tapered pixie with finger-coiled crown." },
-  { name: "Knotless Goddess 30\"", style: "braided", texture: "4c", length: "bust", origin: "synthetic", price: 129, colors: ["1B", "burgundy"], desc: "Knotless goddess braids pre-installed on a lace cap." },
-  { name: "Mahogany Wave 20\"", style: "loose-wave", texture: "wavy", length: "long", origin: "brazilian", price: 259, colors: ["mahogany"], desc: "Glueless lace front in warm mahogany tones." },
-  { name: "Royal Yaki 24\"", style: "kinky-straight", texture: "4a", length: "long", origin: "peruvian", price: 309, colors: ["natural black"], desc: "Yaki straight blow-out texture for matched blends." },
-  { name: "Ivory Bob 10\"", style: "bob", texture: "straight", length: "short", origin: "brazilian", price: 189, colors: ["platinum"], desc: "Statement platinum bob with HD transparent lace." },
-  { name: "Coily Crown 16\"", style: "closure", texture: "4c", length: "medium", origin: "brazilian", price: 239, colors: ["1B"], desc: "5x5 closure unit with coily kinky curl pattern." },
-  { name: "Auburn Glow 22\"", style: "lace-front", texture: "wavy", length: "long", origin: "peruvian", price: 279, colors: ["auburn"], desc: "Auburn balayage on a body-wave 13x4 frontal." },
-  { name: "Twist & Coil 14\"", style: "braided", texture: "4b", length: "medium", origin: "synthetic", price: 99, colors: ["1B", "honey"], desc: "Senegalese twist crochet preset on a wig cap." },
-  { name: "Onyx Pixie 6\"", style: "pixie", texture: "straight", length: "short", origin: "synthetic", price: 69, colors: ["jet black"], desc: "Asymmetric pixie cut with side-swept fringe." },
-  { name: "Cinnamon Wave 24\"", style: "loose-wave", texture: "wavy", length: "long", origin: "brazilian", price: 299, colors: ["cinnamon"], desc: "Cinnamon-tinted body wave with face-framing layers." },
-  { name: "Silk Press 28\"", style: "kinky-straight", texture: "straight", length: "bust", origin: "brazilian", price: 359, colors: ["natural black"], desc: "Salon-finished silk press look out the box." },
-  { name: "Coco Closure 16\"", style: "closure", texture: "curly", length: "medium", origin: "peruvian", price: 229, colors: ["cocoa brown"], desc: "4x4 lace closure unit with deep-wave curls." },
-  { name: "Berry Bob 12\"", style: "bob", texture: "wavy", length: "short", origin: "brazilian", price: 179, colors: ["wine"], desc: "Tucked-edge bob with subtle wave and berry tone." },
-  { name: "Afro Cloud 14\"", style: "lace-front", texture: "4c", length: "medium", origin: "synthetic", price: 119, colors: ["1B"], desc: "Voluminous afro fro on a glueless lace front." },
-  { name: "Toffee Loose 22\"", style: "loose-wave", texture: "wavy", length: "long", origin: "peruvian", price: 269, colors: ["toffee"], desc: "Loose-wave toffee melt with HD ear-to-ear lace." },
-  { name: "Twist-Out Halo 18\"", style: "closure", texture: "4a", length: "medium", origin: "brazilian", price: 249, colors: ["natural black"], desc: "Pre-styled twist-out halo with defined coils." },
+  {
+    name: 'Lagos Honey 22"',
+    style: "lace-front",
+    texture: "wavy",
+    length: "long",
+    origin: "brazilian",
+    price: 289,
+    colors: ["honey blonde", "caramel"],
+    desc: "Body-wave lace front in honey ombre. Pre-plucked HD lace.",
+  },
+  {
+    name: 'Brooklyn Bob 12"',
+    style: "bob",
+    texture: "straight",
+    length: "short",
+    origin: "peruvian",
+    price: 169,
+    colors: ["jet black"],
+    desc: "Sleek blunt-cut bob with bone-straight ends.",
+  },
+  {
+    name: 'Goddess Kinky 26"',
+    style: "kinky-straight",
+    texture: "4a",
+    length: "bust",
+    origin: "brazilian",
+    price: 349,
+    colors: ["natural black"],
+    desc: "Yaki kinky-straight for a relaxed-hair blend.",
+  },
+  {
+    name: 'Sahara Curl 18"',
+    style: "loose-wave",
+    texture: "curly",
+    length: "medium",
+    origin: "peruvian",
+    price: 219,
+    colors: ["dark brown"],
+    desc: "Loose deep-wave curls with bounce that holds overnight.",
+  },
+  {
+    name: 'Velvet Pixie 8"',
+    style: "pixie",
+    texture: "4b",
+    length: "short",
+    origin: "synthetic",
+    price: 79,
+    colors: ["rich black"],
+    desc: "Tapered pixie with finger-coiled crown.",
+  },
+  {
+    name: 'Knotless Goddess 30"',
+    style: "braided",
+    texture: "4c",
+    length: "bust",
+    origin: "synthetic",
+    price: 129,
+    colors: ["1B", "burgundy"],
+    desc: "Knotless goddess braids pre-installed on a lace cap.",
+  },
+  {
+    name: 'Mahogany Wave 20"',
+    style: "loose-wave",
+    texture: "wavy",
+    length: "long",
+    origin: "brazilian",
+    price: 259,
+    colors: ["mahogany"],
+    desc: "Glueless lace front in warm mahogany tones.",
+  },
+  {
+    name: 'Royal Yaki 24"',
+    style: "kinky-straight",
+    texture: "4a",
+    length: "long",
+    origin: "peruvian",
+    price: 309,
+    colors: ["natural black"],
+    desc: "Yaki straight blow-out texture for matched blends.",
+  },
+  {
+    name: 'Ivory Bob 10"',
+    style: "bob",
+    texture: "straight",
+    length: "short",
+    origin: "brazilian",
+    price: 189,
+    colors: ["platinum"],
+    desc: "Statement platinum bob with HD transparent lace.",
+  },
+  {
+    name: 'Coily Crown 16"',
+    style: "closure",
+    texture: "4c",
+    length: "medium",
+    origin: "brazilian",
+    price: 239,
+    colors: ["1B"],
+    desc: "5x5 closure unit with coily kinky curl pattern.",
+  },
+  {
+    name: 'Auburn Glow 22"',
+    style: "lace-front",
+    texture: "wavy",
+    length: "long",
+    origin: "peruvian",
+    price: 279,
+    colors: ["auburn"],
+    desc: "Auburn balayage on a body-wave 13x4 frontal.",
+  },
+  {
+    name: 'Twist & Coil 14"',
+    style: "braided",
+    texture: "4b",
+    length: "medium",
+    origin: "synthetic",
+    price: 99,
+    colors: ["1B", "honey"],
+    desc: "Senegalese twist crochet preset on a wig cap.",
+  },
+  {
+    name: 'Onyx Pixie 6"',
+    style: "pixie",
+    texture: "straight",
+    length: "short",
+    origin: "synthetic",
+    price: 69,
+    colors: ["jet black"],
+    desc: "Asymmetric pixie cut with side-swept fringe.",
+  },
+  {
+    name: 'Cinnamon Wave 24"',
+    style: "loose-wave",
+    texture: "wavy",
+    length: "long",
+    origin: "brazilian",
+    price: 299,
+    colors: ["cinnamon"],
+    desc: "Cinnamon-tinted body wave with face-framing layers.",
+  },
+  {
+    name: 'Silk Press 28"',
+    style: "kinky-straight",
+    texture: "straight",
+    length: "bust",
+    origin: "brazilian",
+    price: 359,
+    colors: ["natural black"],
+    desc: "Salon-finished silk press look out the box.",
+  },
+  {
+    name: 'Coco Closure 16"',
+    style: "closure",
+    texture: "curly",
+    length: "medium",
+    origin: "peruvian",
+    price: 229,
+    colors: ["cocoa brown"],
+    desc: "4x4 lace closure unit with deep-wave curls.",
+  },
+  {
+    name: 'Berry Bob 12"',
+    style: "bob",
+    texture: "wavy",
+    length: "short",
+    origin: "brazilian",
+    price: 179,
+    colors: ["wine"],
+    desc: "Tucked-edge bob with subtle wave and berry tone.",
+  },
+  {
+    name: 'Afro Cloud 14"',
+    style: "lace-front",
+    texture: "4c",
+    length: "medium",
+    origin: "synthetic",
+    price: 119,
+    colors: ["1B"],
+    desc: "Voluminous afro fro on a glueless lace front.",
+  },
+  {
+    name: 'Toffee Loose 22"',
+    style: "loose-wave",
+    texture: "wavy",
+    length: "long",
+    origin: "peruvian",
+    price: 269,
+    colors: ["toffee"],
+    desc: "Loose-wave toffee melt with HD ear-to-ear lace.",
+  },
+  {
+    name: 'Twist-Out Halo 18"',
+    style: "closure",
+    texture: "4a",
+    length: "medium",
+    origin: "brazilian",
+    price: 249,
+    colors: ["natural black"],
+    desc: "Pre-styled twist-out halo with defined coils.",
+  },
 ];
 
 function img(seed: string) {
@@ -161,7 +345,10 @@ async function seedWigs(retailerIds: string[]) {
 }
 
 async function seedAnalytics(retailerIds: string[]) {
-  const { data: wigs } = await admin.from("wigs").select("id, retailer_id").in("retailer_id", retailerIds);
+  const { data: wigs } = await admin
+    .from("wigs")
+    .select("id, retailer_id")
+    .in("retailer_id", retailerIds);
   if (!wigs?.length) return;
   const devices = ["mobile", "desktop", "tablet"];
   const sources = ["direct", "embed", "instagram", "tiktok"];
@@ -189,8 +376,10 @@ async function seedAnalytics(retailerIds: string[]) {
     });
   }
   // chunked inserts to stay under payload limits
-  for (let i = 0; i < tryOns.length; i += 100) await admin.from("try_on_events").insert(tryOns.slice(i, i + 100));
-  for (let i = 0; i < clicks.length; i += 100) await admin.from("wig_clicks").insert(clicks.slice(i, i + 100));
+  for (let i = 0; i < tryOns.length; i += 100)
+    await admin.from("try_on_events").insert(tryOns.slice(i, i + 100));
+  for (let i = 0; i < clicks.length; i += 100)
+    await admin.from("wig_clicks").insert(clicks.slice(i, i + 100));
 }
 
 async function main() {
@@ -201,7 +390,11 @@ async function main() {
   const retailerIds: string[] = [];
   for (const r of RETAILERS) {
     const ownerId = await ensureUser(r.email, r.password, r.business, "retailer");
-    const { data: existing } = await admin.from("retailers").select("id").eq("slug", r.slug).maybeSingle();
+    const { data: existing } = await admin
+      .from("retailers")
+      .select("id")
+      .eq("slug", r.slug)
+      .maybeSingle();
     const row = {
       owner_id: ownerId,
       business_name: r.business,
@@ -227,8 +420,15 @@ async function main() {
     retailerIds.push(retailerId);
 
     // Widget embed
-    const { data: w } = await admin.from("widget_embeds").select("id").eq("retailer_id", retailerId).maybeSingle();
-    if (!w) await admin.from("widget_embeds").insert({ retailer_id: retailerId, widget_type: "full", config: {}, allowed_domains: [] });
+    const { data: w } = await admin
+      .from("widget_embeds")
+      .select("id")
+      .eq("retailer_id", retailerId)
+      .maybeSingle();
+    if (!w)
+      await admin
+        .from("widget_embeds")
+        .insert({ retailer_id: retailerId, widget_type: "full", config: {}, allowed_domains: [] });
   }
 
   console.log("Seeding consumers...");

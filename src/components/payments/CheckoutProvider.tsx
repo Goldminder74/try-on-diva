@@ -2,12 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createCheckoutSession } from "@/lib/payments.functions";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export interface CheckoutOptions {
   priceId: string;
@@ -30,8 +25,7 @@ const CheckoutContext = createContext<CheckoutContextValue | null>(null);
 
 function CheckoutFrame({ options }: { options: CheckoutOptions }) {
   const fetchClientSecret = useCallback(async (): Promise<string> => {
-    const returnUrl =
-      options.successUrl ?? `${window.location.origin}/checkout/success`;
+    const returnUrl = options.successUrl ?? `${window.location.origin}/checkout/success`;
     const result = await createCheckoutSession({
       data: {
         priceId: options.priceId,
@@ -46,7 +40,13 @@ function CheckoutFrame({ options }: { options: CheckoutOptions }) {
     if (!result.clientSecret) throw new Error("Checkout could not be started.");
     return result.clientSecret;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options.priceId, options.currency, options.customerEmail, options.userId, options.successUrl]);
+  }, [
+    options.priceId,
+    options.currency,
+    options.customerEmail,
+    options.userId,
+    options.successUrl,
+  ]);
 
   const checkoutOptions = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
 
@@ -82,7 +82,12 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
           <DialogHeader>
             <DialogTitle className="sr-only">Checkout</DialogTitle>
           </DialogHeader>
-          {options ? <CheckoutFrame key={`${options.priceId}-${options.currency ?? "GBP"}`} options={options} /> : null}
+          {options ? (
+            <CheckoutFrame
+              key={`${options.priceId}-${options.currency ?? "GBP"}`}
+              options={options}
+            />
+          ) : null}
         </DialogContent>
       </Dialog>
     </CheckoutContext.Provider>

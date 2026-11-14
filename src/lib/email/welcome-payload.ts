@@ -13,7 +13,11 @@ export function buildWelcomeEmail(input: {
       templateName: "retailer-welcome",
       recipientEmail: input.email,
       idempotencyKey: `retailer-welcome-${input.userId}`,
-      templateData: { name, businessName: input.businessName ?? undefined, portalUrl: `${input.origin}/portal` },
+      templateData: {
+        name,
+        businessName: input.businessName ?? undefined,
+        portalUrl: `${input.origin}/portal`,
+      },
     };
   }
   return {

@@ -8,7 +8,19 @@ import { SavedTryOns, DeleteAccountSection } from "@/components/account/ShopperD
 
 export const Route = createFileRoute("/_authenticated/app/profile")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Update your Wigsmi account details and preferences." }, { property: "og:title", content: "Profile - Wigsmi" }, { property: "og:description", content: "Update your Wigsmi account details and preferences." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Profile - Wigsmi" }] }),
+  head: () => ({
+    meta: [
+      { name: "description", content: "Update your Wigsmi account details and preferences." },
+      { property: "og:title", content: "Profile - Wigsmi" },
+      {
+        property: "og:description",
+        content: "Update your Wigsmi account details and preferences.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Profile - Wigsmi" },
+    ],
+  }),
   component: Profile,
 });
 
@@ -29,9 +41,13 @@ function Profile() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("user_roles").select("role").eq("user_id", user.id).then(({ data }) => {
-      setIsShopper(!(data ?? []).some((r) => r.role === "retailer" || r.role === "admin"));
-    });
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .then(({ data }) => {
+        setIsShopper(!(data ?? []).some((r) => r.role === "retailer" || r.role === "admin"));
+      });
   }, [user]);
 
   useEffect(() => {
@@ -50,7 +66,9 @@ function Profile() {
     try {
       const ext = f.name.split(".").pop() || "jpg";
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("user-photos").upload(path, f, { upsert: true });
+      const { error: upErr } = await supabase.storage
+        .from("user-photos")
+        .upload(path, f, { upsert: true });
       if (upErr) throw upErr;
       const { data } = supabase.storage.from("user-photos").createSignedUrl
         ? await supabase.storage.from("user-photos").createSignedUrl(path, 60 * 60)
@@ -115,23 +133,42 @@ function Profile() {
 
       <div className="mt-8 space-y-4">
         <Field label="Display name">
-          <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} className={inputCls} />
+          <input
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            className={inputCls}
+          />
         </Field>
         <Field label="Email">
           <input value={user?.email ?? ""} disabled className={`${inputCls} opacity-60`} />
         </Field>
         <Field label="Country">
-          <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="e.g. United Kingdom" className={inputCls} />
+          <input
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            placeholder="e.g. United Kingdom"
+            className={inputCls}
+          />
         </Field>
 
         {error && <p className="text-sm text-error">{error}</p>}
         {msg && <p className="text-sm text-gold-dark">{msg}</p>}
 
         <div className="flex items-center justify-between pt-2">
-          <button onClick={onSave} disabled={busy} className="rounded-md bg-mahogany px-5 py-2.5 text-sm text-cream hover:bg-mahogany-soft disabled:opacity-50">
+          <button
+            onClick={onSave}
+            disabled={busy}
+            className="rounded-md bg-mahogany px-5 py-2.5 text-sm text-cream hover:bg-mahogany-soft disabled:opacity-50"
+          >
             {busy ? "Saving…" : "Save changes"}
           </button>
-          <button onClick={async () => { await signOut(); nav({ to: "/" }); }} className="text-sm text-muted-foreground hover:text-mahogany">
+          <button
+            onClick={async () => {
+              await signOut();
+              nav({ to: "/" });
+            }}
+            className="text-sm text-muted-foreground hover:text-mahogany"
+          >
             Sign out
           </button>
         </div>
@@ -152,12 +189,15 @@ function Profile() {
   );
 }
 
-const inputCls = "w-full rounded-md border border-border bg-input px-3 py-2.5 text-sm focus:border-mahogany focus:outline-none focus:ring-2 focus:ring-mahogany/20";
+const inputCls =
+  "w-full rounded-md border border-border bg-input px-3 py-2.5 text-sm focus:border-mahogany focus:outline-none focus:ring-2 focus:ring-mahogany/20";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block font-mono text-[11px] uppercase tracking-wider text-gold-dark">{label}</span>
+      <span className="mb-1 block font-mono text-[11px] uppercase tracking-wider text-gold-dark">
+        {label}
+      </span>
       {children}
     </label>
   );

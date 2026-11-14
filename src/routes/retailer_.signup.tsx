@@ -6,7 +6,15 @@ export const Route = createFileRoute("/retailer_/signup")({
   staticData: { sitemap: false },
   head: () => ({
     links: [{ rel: "canonical", href: "https://wigsmi.com/retailer/signup" }],
-    meta: [{ property: "og:title", content: "Become a Wigsmi retailer - Free 1-month trial" }, { property: "og:description", content: "Register your wig shop with Wigsmi and start a free 1-month retailer trial." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
+    meta: [
+      { name: "robots", content: "noindex, follow" },
+      { property: "og:title", content: "Become a Wigsmi retailer - Free 1-month trial" },
+      {
+        property: "og:description",
+        content: "Register your wig shop with Wigsmi and start a free 1-month retailer trial.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Become a Wigsmi retailer - Free 1-month trial" },
       {
         name: "description",

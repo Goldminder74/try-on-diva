@@ -16,10 +16,7 @@ export const getMyRetailerContext = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
+    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
 
     const isRetailer = (roles ?? []).some((r) => r.role === "retailer");
     const isAdmin = (roles ?? []).some((r) => r.role === "admin");
@@ -30,20 +27,38 @@ export const getMyRetailerContext = createServerFn({ method: "GET" })
       .eq("owner_id", userId)
       .maybeSingle();
 
-    const { data: billing } = retailer ? await supabase.from("retailer_billing_details").select("vat_number").eq("retailer_id", retailer.id).maybeSingle() : { data: null };
-    return { isRetailer, isAdmin, retailer: retailer ? { ...retailer, vat_number: billing?.vat_number ?? null } : null };
+    const { data: billing } = retailer
+      ? await supabase
+          .from("retailer_billing_details")
+          .select("vat_number")
+          .eq("retailer_id", retailer.id)
+          .maybeSingle()
+      : { data: null };
+    return {
+      isRetailer,
+      isAdmin,
+      retailer: retailer ? { ...retailer, vat_number: billing?.vat_number ?? null } : null,
+    };
   });
 
 const onboardingSchema = z.object({
   business_name: z.string().min(2).max(120),
   legal_business_name: z.string().min(2).max(200),
-  vat_number: z.string().trim().max(32).regex(/^[A-Za-z0-9 -]*$/).optional(),
+  vat_number: z
+    .string()
+    .trim()
+    .max(32)
+    .regex(/^[A-Za-z0-9 -]*$/)
+    .optional(),
   display_name: z.string().min(2).max(120),
   website: z.string().url().optional().or(z.literal("")),
   country: z.string().max(80).optional(),
   contact_name: z.string().max(120).optional(),
   currency: z.enum(["GBP", "USD", "EUR", "NGN", "ZAR", "CAD"]).default("GBP"),
-  brand_primary: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  brand_primary: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .optional(),
   referral_source: z.string().max(120).optional(),
 });
 
@@ -84,12 +99,11 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
     };
 
     if (existing) {
-      const { error } = await supabase
-        .from("retailers")
-        .update(payload)
-        .eq("id", existing.id);
+      const { error } = await supabase.from("retailers").update(payload).eq("id", existing.id);
       if (error) throw error;
-      const billing = await supabase.from("retailer_billing_details").upsert({ retailer_id: existing.id, vat_number: data.vat_number || null });
+      const billing = await supabase
+        .from("retailer_billing_details")
+        .upsert({ retailer_id: existing.id, vat_number: data.vat_number || null });
       if (billing.error) throw billing.error;
       return { id: existing.id };
     }
@@ -108,7 +122,9 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw error;
-    const billing = await supabase.from("retailer_billing_details").upsert({ retailer_id: created.id, vat_number: data.vat_number || null });
+    const billing = await supabase
+      .from("retailer_billing_details")
+      .upsert({ retailer_id: created.id, vat_number: data.vat_number || null });
     if (billing.error) throw billing.error;
     return { id: created.id };
   });
@@ -117,33 +133,43 @@ const updateRetailerSchema = z.object({
   display_name: z.string().min(2).optional(),
   business_name: z.string().min(2).optional(),
   legal_business_name: z.string().min(2).max(200).optional(),
-  vat_number: z.string().trim().max(32).regex(/^[A-Za-z0-9 -]*$/).nullable().optional(),
+  vat_number: z
+    .string()
+    .trim()
+    .max(32)
+    .regex(/^[A-Za-z0-9 -]*$/)
+    .nullable()
+    .optional(),
   website: z.string().url().nullable().optional(),
   country: z.string().nullable().optional(),
   contact_name: z.string().nullable().optional(),
   currency: z.string().optional(),
-  brand_primary: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  brand_primary: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .optional(),
   widget_cta_text: z.string().max(60).optional(),
   logo_url: z.string().url().nullable().optional(),
 });
 
 export const updateRetailer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: z.infer<typeof updateRetailerSchema>) =>
-    updateRetailerSchema.parse(d),
-  )
+  .inputValidator((d: z.infer<typeof updateRetailerSchema>) => updateRetailerSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { vat_number: _vatNumber, ...retailerPatch } = data;
-    const { error } = await supabase
-      .from("retailers")
-      .update(retailerPatch)
-      .eq("owner_id", userId);
+    const { error } = await supabase.from("retailers").update(retailerPatch).eq("owner_id", userId);
     if (error) throw error;
     if (data.vat_number !== undefined) {
-      const { data: retailer } = await supabase.from("retailers").select("id").eq("owner_id", userId).maybeSingle();
+      const { data: retailer } = await supabase
+        .from("retailers")
+        .select("id")
+        .eq("owner_id", userId)
+        .maybeSingle();
       if (!retailer) throw new Error("Finish onboarding first.");
-      const billing = await supabase.from("retailer_billing_details").upsert({ retailer_id: retailer.id, vat_number: data.vat_number || null });
+      const billing = await supabase
+        .from("retailer_billing_details")
+        .upsert({ retailer_id: retailer.id, vat_number: data.vat_number || null });
       if (billing.error) throw billing.error;
     }
     return { ok: true };
@@ -211,7 +237,13 @@ const wigSchema = z.object({
 async function getRetailerEntitlement(
   supabase: any,
   userId: string,
-): Promise<{ retailerId: string; effectivePlan: string; cap: number; trialActive: boolean; hasPaidSub: boolean }> {
+): Promise<{
+  retailerId: string;
+  effectivePlan: string;
+  cap: number;
+  trialActive: boolean;
+  hasPaidSub: boolean;
+}> {
   const { data: retailer } = await supabase
     .from("retailers")
     .select("id, plan, trial_ends_at")
@@ -224,15 +256,17 @@ async function getRetailerEntitlement(
     .select("plan, status, current_period_end")
     .eq("user_id", userId)
     .eq("customer_type", "retailer")
-    .eq("environment", import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN?.startsWith("pk_live_") ? "live" : "sandbox")
+    .eq(
+      "environment",
+      import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN?.startsWith("pk_live_") ? "live" : "sandbox",
+    )
     .not("stripe_subscription_id", "is", null)
     .order("created_at", { ascending: false })
     .limit(1);
   const sub = subRows?.[0];
   const paidPlan = retailerPlanFromSub(sub);
   const hasPaidSub = !!paidPlan;
-  const trialActive =
-    !!retailer.trial_ends_at && new Date(retailer.trial_ends_at) > new Date();
+  const trialActive = !!retailer.trial_ends_at && new Date(retailer.trial_ends_at) > new Date();
   const effectivePlan = paidPlan ?? (trialActive ? "starter" : "expired");
   const cap = PLAN_WIG_CAPS[effectivePlan] ?? 0;
   return { retailerId: retailer.id, effectivePlan, cap, trialActive, hasPaidSub };
@@ -314,11 +348,7 @@ export const saveMyWig = createServerFn({ method: "POST" })
       return { id: data.id };
     }
 
-    const { data: created, error } = await supabase
-      .from("wigs")
-      .insert(row)
-      .select("id")
-      .single();
+    const { data: created, error } = await supabase.from("wigs").insert(row).select("id").single();
     if (error) throw error;
     return { id: created.id };
   });
@@ -363,10 +393,23 @@ export const getActivationStatus = createServerFn({ method: "GET" })
       };
     }
     const [wigs, published, widget, tryOn] = await Promise.all([
-      supabase.from("wigs").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id),
-      supabase.from("wigs").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id).eq("is_published", true),
-      supabase.from("widget_embeds").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id),
-      supabase.from("try_on_events").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id),
+      supabase
+        .from("wigs")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", retailer.id),
+      supabase
+        .from("wigs")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", retailer.id)
+        .eq("is_published", true),
+      supabase
+        .from("widget_embeds")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", retailer.id),
+      supabase
+        .from("try_on_events")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", retailer.id),
     ]);
     return {
       profileDone: !!retailer.onboarding_completed,
@@ -434,7 +477,10 @@ const widgetUpdateSchema = z.object({
   widget_type: z.enum(["full", "button"]).optional(),
   is_active: z.boolean().optional(),
   allowed_domains: z.array(z.string().min(1).max(253)).max(20).optional(),
-  accent_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  accent_color: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .optional(),
   cta_text: z.string().min(1).max(60).optional(),
 });
 
@@ -461,7 +507,11 @@ export const updateMyWidget = createServerFn({ method: "POST" })
     if (data.is_active !== undefined) patch.is_active = data.is_active;
     if (data.allowed_domains !== undefined) {
       patch.allowed_domains = data.allowed_domains.map((d) =>
-        d.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, ""),
+        d
+          .trim()
+          .toLowerCase()
+          .replace(/^https?:\/\//, "")
+          .replace(/\/.*$/, ""),
       );
     }
     if (data.accent_color !== undefined) {
@@ -515,16 +565,30 @@ export const getRetailerMetrics = createServerFn({ method: "GET" })
       .select("id, trial_ends_at, plan")
       .eq("owner_id", userId)
       .maybeSingle();
-    if (!retailer)
-      return { wigs: 0, tryOns30d: 0, clicks30d: 0, published: 0, retailer: null };
+    if (!retailer) return { wigs: 0, tryOns30d: 0, clicks30d: 0, published: 0, retailer: null };
 
     const since = new Date(Date.now() - 30 * 86400 * 1000).toISOString();
 
     const [wigs, published, tryOns, clicks] = await Promise.all([
-      supabase.from("wigs").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id),
-      supabase.from("wigs").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id).eq("is_published", true),
-      supabase.from("try_on_events").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id).gte("created_at", since),
-      supabase.from("wig_clicks").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id).gte("created_at", since),
+      supabase
+        .from("wigs")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", retailer.id),
+      supabase
+        .from("wigs")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", retailer.id)
+        .eq("is_published", true),
+      supabase
+        .from("try_on_events")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", retailer.id)
+        .gte("created_at", since),
+      supabase
+        .from("wig_clicks")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", retailer.id)
+        .gte("created_at", since),
     ]);
 
     return {

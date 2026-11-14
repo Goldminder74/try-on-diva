@@ -17,11 +17,15 @@ export const Route = createFileRoute("/wig/$id")({
     return { wig, related };
   },
   head: ({ loaderData, params }) => {
-    if (!loaderData) return { meta: [{ title: "Wig not found - Wigsmi" }, { name: "robots", content: "noindex" }] };
+    if (!loaderData)
+      return {
+        meta: [{ title: "Wig not found - Wigsmi" }, { name: "robots", content: "noindex" }],
+      };
     const { wig } = loaderData;
     const url = pageUrl(`/wig/${encodeURIComponent(params.id)}`);
     const title = `${wig.name.slice(0, 50)} - Wigsmi`;
-    const description = wig.description || `Explore ${wig.name} from ${wig.retailer} and try it on with Wigsmi.`;
+    const description =
+      wig.description || `Explore ${wig.name} from ${wig.retailer} and try it on with Wigsmi.`;
     const image = productShareImage(wig.images[0]);
     return {
       links: [{ rel: "canonical", href: url }],
@@ -33,17 +37,36 @@ export const Route = createFileRoute("/wig/$id")({
         { property: "og:url", content: url },
         { property: "og:type", content: "product" },
         { name: "twitter:card", content: "summary_large_image" },
-        ...(image ? [{ property: "og:image", content: image }, { name: "twitter:image", content: image }] : []),
+        ...(image
+          ? [
+              { property: "og:image", content: image },
+              { name: "twitter:image", content: image },
+            ]
+          : []),
       ],
-      scripts: [{ type: "application/ld+json", children: JSON.stringify({
-        "@context": "https://schema.org", "@type": "Product", name: wig.name,
-        description, url, image: wig.images.map(absoluteImage),
-        offers: { "@type": "Offer", price: wig.price, priceCurrency: wig.currency,
-          url: wig.product_url || url,
-          availability: wig.in_stock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-          seller: { "@type": "Organization", name: wig.retailer },
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: wig.name,
+            description,
+            url,
+            image: wig.images.map(absoluteImage),
+            offers: {
+              "@type": "Offer",
+              price: wig.price,
+              priceCurrency: wig.currency,
+              url: wig.product_url || url,
+              availability: wig.in_stock
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+              seller: { "@type": "Organization", name: wig.retailer },
+            },
+          }),
         },
-      }) }],
+      ],
     };
   },
   component: WigDetail,
@@ -52,8 +75,15 @@ export const Route = createFileRoute("/wig/$id")({
       <Header />
       <div className="mx-auto max-w-md px-5 py-24 text-center">
         <h1 className="font-display text-4xl text-mahogany">Wig not found.</h1>
-        <p className="mt-3 text-sm text-muted-foreground">It may have been removed or the link is wrong.</p>
-        <Link to="/catalog" className="mt-6 inline-flex rounded-md bg-mahogany px-5 py-2 text-sm text-cream">Back to catalog</Link>
+        <p className="mt-3 text-sm text-muted-foreground">
+          It may have been removed or the link is wrong.
+        </p>
+        <Link
+          to="/catalog"
+          className="mt-6 inline-flex rounded-md bg-mahogany px-5 py-2 text-sm text-cream"
+        >
+          Back to catalog
+        </Link>
       </div>
       <Footer />
     </div>
@@ -67,9 +97,14 @@ export const Route = createFileRoute("/wig/$id")({
           <h1 className="font-display text-3xl text-mahogany">Couldn't load this wig.</h1>
           <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="mt-6 rounded-md bg-mahogany px-5 py-2 text-sm text-cream"
-          >Try again</button>
+          >
+            Try again
+          </button>
         </div>
         <Footer />
       </div>
@@ -85,7 +120,10 @@ function WigDetail() {
     <div className="min-h-screen bg-cream">
       <Header />
       <div className="mx-auto w-full max-w-7xl px-5 py-8">
-        <Link to="/catalog" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-mahogany">
+        <Link
+          to="/catalog"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-mahogany"
+        >
           <ArrowLeft className="h-4 w-4" /> Catalog
         </Link>
 
@@ -115,20 +153,30 @@ function WigDetail() {
 
           {/* Info */}
           <div>
-            <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">{wig.retailer}</p>
+            <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
+              {wig.retailer}
+            </p>
             <h1 className="mt-2 font-display text-4xl text-mahogany">{wig.name}</h1>
-            <p className="mt-3 font-mono text-2xl text-foreground">{formatPrice(wig.price, wig.currency)}</p>
+            <p className="mt-3 font-mono text-2xl text-foreground">
+              {formatPrice(wig.price, wig.currency)}
+            </p>
 
             <div className="mt-5 flex flex-wrap gap-2">
-              {[wig.style_type, wig.hair_texture, wig.hair_length, wig.hair_origin].map(t => (
-                <span key={t} className="rounded-full border border-border bg-card px-3 py-1 text-xs text-foreground">{t}</span>
+              {[wig.style_type, wig.hair_texture, wig.hair_length, wig.hair_origin].map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full border border-border bg-card px-3 py-1 text-xs text-foreground"
+                >
+                  {t}
+                </span>
               ))}
             </div>
 
             <p className="mt-6 leading-relaxed text-foreground/80">{wig.description}</p>
 
             <p className="mt-5 text-xs text-muted-foreground">
-              <span className="font-mono text-gold-dark">{wig.try_on_count.toLocaleString()}</span> people have tried this on.
+              <span className="font-mono text-gold-dark">{wig.try_on_count.toLocaleString()}</span>{" "}
+              people have tried this on.
             </p>
 
             <div className="mt-7 space-y-3">
@@ -151,7 +199,9 @@ function WigDetail() {
                 <ExternalLink className="h-4 w-4" /> Buy from {wig.retailer}
               </a>
               {isAffiliateLink(wig.product_url) && (
-                <p className="text-center text-xs text-muted-foreground">Wigsmi earns a commission if you buy from {wig.retailer}.</p>
+                <p className="text-center text-xs text-muted-foreground">
+                  Wigsmi earns a commission if you buy from {wig.retailer}.
+                </p>
               )}
             </div>
           </div>
@@ -162,7 +212,9 @@ function WigDetail() {
           <section className="mt-20">
             <h2 className="font-display text-2xl text-mahogany">You might also like</h2>
             <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-              {related.map((w: Wig) => <WigCard key={w.id} wig={w} />)}
+              {related.map((w: Wig) => (
+                <WigCard key={w.id} wig={w} />
+              ))}
             </div>
           </section>
         )}

@@ -16,7 +16,13 @@ function timezoneGuess(): PlanCurrency {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
     if (tz === "Africa/Lagos") return "USD";
-    if (/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Indiana|Kentucky|North_Dakota|Juneau|Sitka|Nome|Adak|Menominee|Metlakatla|Yakutat)/.test(tz) || tz === "Pacific/Honolulu") return "USD";
+    if (
+      /^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Indiana|Kentucky|North_Dakota|Juneau|Sitka|Nome|Adak|Menominee|Metlakatla|Yakutat)/.test(
+        tz,
+      ) ||
+      tz === "Pacific/Honolulu"
+    )
+      return "USD";
   } catch {
     /* ignore */
   }

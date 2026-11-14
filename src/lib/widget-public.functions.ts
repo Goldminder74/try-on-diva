@@ -10,9 +10,7 @@ const WIDGET_CALL_CAPS: Record<string, number> = {
 };
 
 export const getPublicWidgetData = createServerFn({ method: "GET" })
-  .inputValidator((d: { token: string }) =>
-    z.object({ token: z.string().uuid() }).parse(d),
-  )
+  .inputValidator((d: { token: string }) => z.object({ token: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const { data: widget } = await supabaseAdmin
       .from("widget_embeds")
@@ -25,7 +23,9 @@ export const getPublicWidgetData = createServerFn({ method: "GET" })
 
     const { data: retailer } = await supabaseAdmin
       .from("retailers")
-      .select("id, slug, display_name, brand_primary, widget_cta_text, logo_url, currency, plan, is_active, widget_calls_this_month, widget_calls_month_reset")
+      .select(
+        "id, slug, display_name, brand_primary, widget_cta_text, logo_url, currency, plan, is_active, widget_calls_this_month, widget_calls_month_reset",
+      )
       .eq("id", widget.retailer_id)
       .maybeSingle();
 

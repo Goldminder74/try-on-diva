@@ -28,7 +28,8 @@ async function logSend(row: {
     if (!url || !key) return;
     const sb = createClient(url, key, { auth: { persistSession: false } });
     const { error } = await sb.from("email_send_log").insert({ message_id: null, ...row });
-    if (error) console.error("[email] send log insert failed", { code: error.code, message: error.message });
+    if (error)
+      console.error("[email] send log insert failed", { code: error.code, message: error.message });
   } catch (err) {
     console.error("[email] send log insert threw", err);
   }
@@ -41,10 +42,18 @@ export async function serverSendTransactionalEmail(params: ServerSendParams) {
       idempotencyKey: params.idempotencyKey,
     });
     if (result.sent) {
-      await logSend({ template_name: params.templateName, recipient_email: params.recipientEmail, status: "sent" });
+      await logSend({
+        template_name: params.templateName,
+        recipient_email: params.recipientEmail,
+        status: "sent",
+      });
       return { ok: true as const };
     }
-    await logSend({ template_name: params.templateName, recipient_email: params.recipientEmail, status: "suppressed" });
+    await logSend({
+      template_name: params.templateName,
+      recipient_email: params.recipientEmail,
+      status: "suppressed",
+    });
     // Suppressed is a final outcome - don't retry.
     return { ok: true as const, suppressed: true };
   } catch (err) {

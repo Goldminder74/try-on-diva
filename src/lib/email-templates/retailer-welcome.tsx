@@ -11,7 +11,18 @@ import {
   Section,
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
-import { brand, main, outer, container, h1, text, muted, button, divider, Wordmark } from "./_styles";
+import {
+  brand,
+  main,
+  outer,
+  container,
+  h1,
+  text,
+  muted,
+  button,
+  divider,
+  Wordmark,
+} from "./_styles";
 
 interface Props {
   name?: string;
@@ -29,8 +40,8 @@ const RetailerWelcomeEmail = ({ name, businessName, portalUrl }: Props) => (
           <Wordmark />
           <Heading style={h1}>Welcome{name ? `, ${name}` : ""}.</Heading>
           <Text style={text}>
-            {businessName ? `${businessName} is` : "You're"} all set up on Wigsmi.
-            Your 1-month free trial has started - no card needed.
+            {businessName ? `${businessName} is` : "You're"} all set up on Wigsmi. Your 1-month free
+            trial has started - no card needed.
           </Text>
           <Text style={text}>Three quick steps to get live:</Text>
           <Text style={{ ...text, paddingLeft: 12 }}>

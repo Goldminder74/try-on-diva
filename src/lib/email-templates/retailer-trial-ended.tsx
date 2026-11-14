@@ -1,5 +1,15 @@
 import React from "react";
-import { Body, Container, Head, Heading, Html, Preview, Text, Button, Section } from "@react-email/components";
+import {
+  Body,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Preview,
+  Text,
+  Button,
+  Section,
+} from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 import { main, outer, container, h1, text, muted, button, divider, Wordmark } from "./_styles";
 
@@ -20,20 +30,19 @@ const RetailerTrialEndedEmail = ({ name, businessName, upgradeUrl }: Props) => (
           <Heading style={h1}>Your trial has ended.</Heading>
           <Text style={text}>
             Hi{name ? ` ${name}` : ""}, the free trial for
-            {businessName ? ` ${businessName}` : " your store"} has wrapped up. Your
-            widget and catalog are paused for now.
+            {businessName ? ` ${businessName}` : " your store"} has wrapped up. Your widget and
+            catalog are paused for now.
           </Text>
           <Text style={text}>
-            Pick a plan and we'll republish your wigs automatically - no
-            re-uploading, no reconfiguration.
+            Pick a plan and we'll republish your wigs automatically - no re-uploading, no
+            reconfiguration.
           </Text>
           <Button style={button} href={upgradeUrl ?? "https://wigsmi.com/portal/billing"}>
             Reactivate Wigsmi
           </Button>
           <div style={divider} />
           <Text style={muted}>
-            Not ready yet? Your catalog stays safe in your account. Sign back
-            in any time.
+            Not ready yet? Your catalog stays safe in your account. Sign back in any time.
           </Text>
         </Container>
       </Section>

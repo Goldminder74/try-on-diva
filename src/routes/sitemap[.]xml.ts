@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getRouterInstance } from "@tanstack/react-start";
-import { isSitemapRouteIncluded, sitemapPathForLocation, sitemapStaticPaths, sitemapXML, type SitemapEntry } from "@/lib/sitemap";
+import {
+  isSitemapRouteIncluded,
+  sitemapPathForLocation,
+  sitemapStaticPaths,
+  sitemapXML,
+  type SitemapEntry,
+} from "@/lib/sitemap";
 import { collectPublishedWigIds } from "@/lib/sitemap-content";
 import { listGuides } from "@/lib/guides";
 
@@ -17,7 +23,12 @@ export const Route = createFileRoute("/sitemap.xml")({
           const guideRouteId = "/guides/$slug";
           if (isSitemapRouteIncluded(router.routesById[guideRouteId])) {
             for (const g of listGuides()) {
-              const location = router.buildLocation({ to: "/guides/$slug", params: { slug: g.slug }, search: () => ({}), hash: "" });
+              const location = router.buildLocation({
+                to: "/guides/$slug",
+                params: { slug: g.slug },
+                search: () => ({}),
+                hash: "",
+              });
               const path = sitemapPathForLocation(router, location, guideRouteId);
               if (path) entries.push({ path });
             }
@@ -30,18 +41,32 @@ export const Route = createFileRoute("/sitemap.xml")({
             if (!key || !url) throw new Error("Public sitemap credentials unavailable");
             const client = createClient(url, key, {
               auth: { persistSession: false, autoRefreshToken: false },
-              global: { fetch: (input, init) => {
-                const headers = new Headers(init?.headers);
-                if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) headers.delete("Authorization");
-                headers.set("apikey", key);
-                return fetch(input, { ...init, headers });
-              } },
+              global: {
+                fetch: (input, init) => {
+                  const headers = new Headers(init?.headers);
+                  if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`)
+                    headers.delete("Authorization");
+                  headers.set("apikey", key);
+                  return fetch(input, { ...init, headers });
+                },
+              },
             });
-            const ids = await collectPublishedWigIds((offset, pageSize) => client.from("wigs")
-              .select("id").eq("is_published", true).is("deleted_at", null)
-              .order("id").range(offset, offset + pageSize - 1));
+            const ids = await collectPublishedWigIds((offset, pageSize) =>
+              client
+                .from("wigs")
+                .select("id")
+                .eq("is_published", true)
+                .is("deleted_at", null)
+                .order("id")
+                .range(offset, offset + pageSize - 1),
+            );
             for (const id of ids) {
-              const location = router.buildLocation({ to: "/wig/$id", params: { id }, search: () => ({}), hash: "" });
+              const location = router.buildLocation({
+                to: "/wig/$id",
+                params: { id },
+                search: () => ({}),
+                hash: "",
+              });
               const path = sitemapPathForLocation(router, location, routeId);
               if (path) entries.push({ path });
             }
@@ -51,7 +76,10 @@ export const Route = createFileRoute("/sitemap.xml")({
           });
         } catch (error) {
           console.error("Sitemap generation failed", error);
-          return new Response("Sitemap temporarily unavailable", { status: 503, headers: { "Cache-Control": "no-store" } });
+          return new Response("Sitemap temporarily unavailable", {
+            status: 503,
+            headers: { "Cache-Control": "no-store" },
+          });
         }
       },
     },

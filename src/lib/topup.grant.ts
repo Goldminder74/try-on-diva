@@ -19,14 +19,9 @@ export interface PackGrantArgs {
   purchasedAt?: Date;
 }
 
-export type PackGrantResult =
-  | { ok: true; granted: boolean; credits: number }
-  | { error: string };
+export type PackGrantResult = { ok: true; granted: boolean; credits: number } | { error: string };
 
-export async function grantPackCredits(
-  client: any,
-  args: PackGrantArgs,
-): Promise<PackGrantResult> {
+export async function grantPackCredits(client: any, args: PackGrantArgs): Promise<PackGrantResult> {
   const pack = getPackByPriceId(args.priceId);
   if (!pack) return { error: `Unknown try-on pack: ${args.priceId}` };
   if (!args.userId) return { error: "Missing user for try-on pack" };

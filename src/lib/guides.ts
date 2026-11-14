@@ -33,7 +33,9 @@ export function parseGuide(raw: string): { meta: Omit<GuideMeta, "readingMinutes
       metaTitle: str(fm.metaTitle || fm.title),
       metaDescription: str(fm.metaDescription),
       datePublished: str(fm.datePublished),
-      faq: Array.isArray(fm.faq) ? (fm.faq as GuideFaq[]).map((f) => ({ q: String(f.q), a: String(f.a) })) : [],
+      faq: Array.isArray(fm.faq)
+        ? (fm.faq as GuideFaq[]).map((f) => ({ q: String(f.q), a: String(f.a) }))
+        : [],
     },
     body: m[2],
   };

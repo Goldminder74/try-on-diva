@@ -73,14 +73,15 @@ describe("safeRetailerTarget", () => {
 
   it("refuses a look-alike domain that merely contains the retailer's name", () => {
     expect(
-      safeRetailerTarget("https://isacollective.co.uk.evil-example.com/x", "https://isacollective.co.uk"),
+      safeRetailerTarget(
+        "https://isacollective.co.uk.evil-example.com/x",
+        "https://isacollective.co.uk",
+      ),
     ).toBeNull();
   });
 
   it("refuses javascript: URLs, non-URLs and missing values", () => {
-    expect(
-      safeRetailerTarget("javascript:alert(1)", "https://isacollective.co.uk"),
-    ).toBeNull();
+    expect(safeRetailerTarget("javascript:alert(1)", "https://isacollective.co.uk")).toBeNull();
     expect(safeRetailerTarget("not a url", "https://isacollective.co.uk")).toBeNull();
     expect(safeRetailerTarget(null, "https://isacollective.co.uk")).toBeNull();
     expect(safeRetailerTarget("https://isacollective.co.uk/x", null)).toBeNull();

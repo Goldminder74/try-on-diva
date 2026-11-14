@@ -5,15 +5,45 @@ import { saveStyleQuiz } from "@/lib/consumer-profile.functions";
 
 export const Route = createFileRoute("/_authenticated/app/style-quiz")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Answer questions on face shape, skin tone, style and budget to get wig recommendations." }, { property: "og:title", content: "Style Quiz - Wigsmi" }, { property: "og:description", content: "Answer questions on face shape, skin tone, style and budget to get wig recommendations." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Style Quiz - Wigsmi" }] }),
+  head: () => ({
+    meta: [
+      {
+        name: "description",
+        content:
+          "Answer questions on face shape, skin tone, style and budget to get wig recommendations.",
+      },
+      { property: "og:title", content: "Style Quiz - Wigsmi" },
+      {
+        property: "og:description",
+        content:
+          "Answer questions on face shape, skin tone, style and budget to get wig recommendations.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Style Quiz - Wigsmi" },
+    ],
+  }),
   component: Quiz,
 });
 
 const FACE_SHAPES = [
-  { v: "oval", label: "Oval" }, { v: "round", label: "Round" }, { v: "heart", label: "Heart" },
-  { v: "square", label: "Square" }, { v: "long", label: "Long" }, { v: "diamond", label: "Diamond" },
+  { v: "oval", label: "Oval" },
+  { v: "round", label: "Round" },
+  { v: "heart", label: "Heart" },
+  { v: "square", label: "Square" },
+  { v: "long", label: "Long" },
+  { v: "diamond", label: "Diamond" },
 ] as const;
-const VIBES = ["Bob", "Long", "Glueless", "HD Wig", "Curly", "Body Wave", "Kinky Coily", "Straight"];
+const VIBES = [
+  "Bob",
+  "Long",
+  "Glueless",
+  "HD Wig",
+  "Curly",
+  "Body Wave",
+  "Kinky Coily",
+  "Straight",
+];
 const LIFESTYLES = ["Office", "Athletic", "Night out", "Stay-at-home", "Creative", "Travel"];
 const BUDGETS = [
   { v: "under-100", label: "Under £100" },
@@ -36,7 +66,8 @@ function Quiz() {
   const [life, setLife] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
-  const toggle = <T,>(arr: T[], v: T) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
+  const toggle = <T,>(arr: T[], v: T) =>
+    arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
 
   const submit = async () => {
     setBusy(true);
@@ -62,7 +93,9 @@ function Quiz() {
       body: (
         <div className="grid grid-cols-3 gap-3">
           {FACE_SHAPES.map((f) => (
-            <Pick key={f.v} active={face === f.v} onClick={() => setFace(f.v as Face)}>{f.label}</Pick>
+            <Pick key={f.v} active={face === f.v} onClick={() => setFace(f.v as Face)}>
+              {f.label}
+            </Pick>
           ))}
         </div>
       ),
@@ -76,7 +109,11 @@ function Quiz() {
               key={n}
               onClick={() => setSkin(n)}
               className={`flex h-14 w-14 items-center justify-center rounded-full border-2 text-xs ${skin === n ? "border-mahogany" : "border-transparent"}`}
-              style={{ backgroundColor: ["#F5D5B0", "#E0B080", "#B57A4A", "#7A4A26", "#4F2C12", "#2D1808"][n - 1] }}
+              style={{
+                backgroundColor: ["#F5D5B0", "#E0B080", "#B57A4A", "#7A4A26", "#4F2C12", "#2D1808"][
+                  n - 1
+                ],
+              }}
             >
               <span className="text-cream/80">{n}</span>
             </button>
@@ -89,7 +126,9 @@ function Quiz() {
       body: (
         <div className="flex flex-wrap gap-2">
           {VIBES.map((v) => (
-            <Pick key={v} active={vibes.includes(v)} onClick={() => setVibes(toggle(vibes, v))}>{v}</Pick>
+            <Pick key={v} active={vibes.includes(v)} onClick={() => setVibes(toggle(vibes, v))}>
+              {v}
+            </Pick>
           ))}
         </div>
       ),
@@ -99,7 +138,9 @@ function Quiz() {
       body: (
         <div className="grid grid-cols-2 gap-3">
           {BUDGETS.map((b) => (
-            <Pick key={b.v} active={budget === b.v} onClick={() => setBudget(b.v as Budget)}>{b.label}</Pick>
+            <Pick key={b.v} active={budget === b.v} onClick={() => setBudget(b.v as Budget)}>
+              {b.label}
+            </Pick>
           ))}
         </div>
       ),
@@ -109,7 +150,9 @@ function Quiz() {
       body: (
         <div className="flex flex-wrap gap-2">
           {LIFESTYLES.map((v) => (
-            <Pick key={v} active={life.includes(v)} onClick={() => setLife(toggle(life, v))}>{v}</Pick>
+            <Pick key={v} active={life.includes(v)} onClick={() => setLife(toggle(life, v))}>
+              {v}
+            </Pick>
           ))}
         </div>
       ),
@@ -120,7 +163,9 @@ function Quiz() {
 
   return (
     <div className="mx-auto w-full max-w-2xl px-5 py-12">
-      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Style quiz {step + 1} / {steps.length}</p>
+      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
+        Style quiz {step + 1} / {steps.length}
+      </p>
       <h1 className="mt-1 font-display text-4xl text-mahogany">{cur.label}.</h1>
 
       <div className="mt-8">{cur.body}</div>
@@ -154,7 +199,15 @@ function Quiz() {
   );
 }
 
-function Pick({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function Pick({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}

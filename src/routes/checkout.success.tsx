@@ -11,7 +11,18 @@ import { getStripeEnvironment } from "@/lib/stripe";
 export const Route = createFileRoute("/checkout/success")({
   staticData: { sitemap: false },
   head: () => ({
-    meta: [{ name: "description", content: "Your Wigsmi payment is confirmed and your plan is being activated." }, { property: "og:title", content: "Payment successful - Wigsmi" }, { property: "og:description", content: "Your Wigsmi payment is confirmed and your plan is being activated." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+    meta: [
+      {
+        name: "description",
+        content: "Your Wigsmi payment is confirmed and your plan is being activated.",
+      },
+      { property: "og:title", content: "Payment successful - Wigsmi" },
+      {
+        property: "og:description",
+        content: "Your Wigsmi payment is confirmed and your plan is being activated.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Payment successful - Wigsmi" },
       { name: "robots", content: "noindex" },
     ],
@@ -75,7 +86,8 @@ function CheckoutSuccess() {
       .catch(() => {});
   }, [kind, user, waited]);
 
-  const destination = kind === "retailer" ? "/portal/billing" : kind === "topup" ? "/app/try-on" : "/app";
+  const destination =
+    kind === "retailer" ? "/portal/billing" : kind === "topup" ? "/app/try-on" : "/app";
   const packCredited = kind === "topup" && (credits ?? 0) > 0;
   const settled = kind === "topup" ? packCredited : isActive;
 
@@ -94,7 +106,11 @@ function CheckoutSuccess() {
       <div className="max-w-md text-center">
         <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
         <h1 className="mt-5 font-display text-4xl text-mahogany">
-          {kind === "topup" ? (packCredited ? "You're all set." : "Payment received.") : "You're in."}
+          {kind === "topup"
+            ? packCredited
+              ? "You're all set."
+              : "Payment received."
+            : "You're in."}
         </h1>
         <p className="mt-3 text-muted-foreground">
           {kind === "topup" ? (

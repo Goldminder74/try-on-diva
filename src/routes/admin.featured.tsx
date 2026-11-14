@@ -6,7 +6,16 @@ import { toast } from "sonner";
 import { ArrowUp, ArrowDown, X, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/admin/featured")({
-  head: () => ({ meta: [{ title: "Featured wigs - Wigsmi Admin" }, { name: "description", content: "Choose which wigs are featured across Wigsmi." }, { property: "og:title", content: "Featured wigs - Wigsmi Admin" }, { property: "og:description", content: "Choose which wigs are featured across Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Featured wigs - Wigsmi Admin" },
+      { name: "description", content: "Choose which wigs are featured across Wigsmi." },
+      { property: "og:title", content: "Featured wigs - Wigsmi Admin" },
+      { property: "og:description", content: "Choose which wigs are featured across Wigsmi." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   staticData: { sitemap: false },
   component: FeaturedPage,
 });
@@ -23,10 +32,17 @@ function FeaturedPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    getFn({}).then((r) => { setWigs(r.wigs); setRetailers(r.retailers); }).catch(() => {});
+    getFn({})
+      .then((r) => {
+        setWigs(r.wigs);
+        setRetailers(r.retailers);
+      })
+      .catch(() => {});
   }, [getFn]);
 
-  useEffect(() => { if (picker) searchFn({ data: { q } }).then(setResults); }, [picker, q, searchFn]);
+  useEffect(() => {
+    if (picker) searchFn({ data: { q } }).then(setResults);
+  }, [picker, q, searchFn]);
 
   const retailerName = (id: string) => retailers.find((r) => r.id === id)?.business_name ?? "-";
 
@@ -58,7 +74,9 @@ function FeaturedPage() {
       setRetailers(r.retailers);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed");
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -67,28 +85,58 @@ function FeaturedPage() {
         <div>
           <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Curation</p>
           <h1 className="mt-1 font-display text-3xl text-mahogany">Featured wigs</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Up to 5 wigs shown on the consumer home and landing page.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Up to 5 wigs shown on the consumer home and landing page.
+          </p>
         </div>
-        <button onClick={save} disabled={saving} className="rounded-md bg-mahogany px-4 py-2 text-sm text-cream disabled:opacity-50">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="rounded-md bg-mahogany px-4 py-2 text-sm text-cream disabled:opacity-50"
+        >
           {saving ? "Saving…" : "Save order"}
         </button>
       </div>
 
       <div className="space-y-3">
         {wigs.map((w, i) => (
-          <div key={w.id} className="flex items-center gap-4 rounded-xl border border-border bg-card p-3">
+          <div
+            key={w.id}
+            className="flex items-center gap-4 rounded-xl border border-border bg-card p-3"
+          >
             <div className="font-mono text-xs text-muted-foreground w-6 text-center">#{i + 1}</div>
             <div className="h-16 w-16 overflow-hidden rounded-md bg-muted">
-              {w.images?.[0] && <img src={w.images[0]} alt={w.name} className="h-full w-full object-cover" />}
+              {w.images?.[0] && (
+                <img src={w.images[0]} alt={w.name} className="h-full w-full object-cover" />
+              )}
             </div>
             <div className="flex-1">
               <p className="font-medium">{w.name}</p>
-              <p className="font-mono text-xs text-muted-foreground">{retailerName(w.retailer_id)}</p>
+              <p className="font-mono text-xs text-muted-foreground">
+                {retailerName(w.retailer_id)}
+              </p>
             </div>
             <div className="flex gap-1">
-              <button onClick={() => move(i, -1)} disabled={i === 0} className="rounded-md border border-border p-1.5 disabled:opacity-30"><ArrowUp className="h-3.5 w-3.5" /></button>
-              <button onClick={() => move(i, 1)} disabled={i === wigs.length - 1} className="rounded-md border border-border p-1.5 disabled:opacity-30"><ArrowDown className="h-3.5 w-3.5" /></button>
-              <button onClick={() => remove(i)} className="rounded-md border border-destructive/40 p-1.5 text-destructive"><X className="h-3.5 w-3.5" /></button>
+              <button
+                onClick={() => move(i, -1)}
+                disabled={i === 0}
+                className="rounded-md border border-border p-1.5 disabled:opacity-30"
+              >
+                <ArrowUp className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => move(i, 1)}
+                disabled={i === wigs.length - 1}
+                className="rounded-md border border-border p-1.5 disabled:opacity-30"
+              >
+                <ArrowDown className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => remove(i)}
+                className="rounded-md border border-destructive/40 p-1.5 text-destructive"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
         ))}
@@ -103,8 +151,14 @@ function FeaturedPage() {
       </div>
 
       {picker && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setPicker(false)}>
-          <div className="w-full max-w-xl rounded-xl border border-border bg-cream p-5" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setPicker(false)}
+        >
+          <div
+            className="w-full max-w-xl rounded-xl border border-border bg-cream p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="mb-3 font-display text-lg text-mahogany">Pick a wig</h3>
             <input
               value={q}
@@ -114,9 +168,15 @@ function FeaturedPage() {
             />
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {results.map((w) => (
-                <button key={w.id} onClick={() => add(w)} className="flex w-full items-center gap-3 rounded-md border border-border p-2 text-left hover:border-mahogany">
+                <button
+                  key={w.id}
+                  onClick={() => add(w)}
+                  className="flex w-full items-center gap-3 rounded-md border border-border p-2 text-left hover:border-mahogany"
+                >
                   <div className="h-12 w-12 overflow-hidden rounded bg-muted">
-                    {w.images?.[0] && <img src={w.images[0]} alt={w.name} className="h-full w-full object-cover" />}
+                    {w.images?.[0] && (
+                      <img src={w.images[0]} alt={w.name} className="h-full w-full object-cover" />
+                    )}
                   </div>
                   <span className="text-sm">{w.name}</span>
                 </button>

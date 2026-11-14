@@ -13,7 +13,10 @@ export const Route = createFileRoute("/auth/callback")({
       { title: "Signing in | Wigsmi" },
       { name: "description", content: "Complete your Wigsmi sign-in and return to your account." },
       { property: "og:title", content: "Signing in | Wigsmi" },
-      { property: "og:description", content: "Complete your Wigsmi sign-in and return to your account." },
+      {
+        property: "og:description",
+        content: "Complete your Wigsmi sign-in and return to your account.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -27,9 +30,17 @@ async function saveSignupUtm(userId: string) {
     const utm = storedUtm();
     if (!utm.utm_source && !utm.utm_medium && !utm.utm_campaign) return;
     const since = new Date(Date.now() - 86400000).toISOString();
-    await supabase.from("profiles").update(utm).eq("id", userId)
-      .is("utm_source", null).is("utm_medium", null).is("utm_campaign", null).gte("created_at", since);
-  } catch { /* never block sign-in */ }
+    await supabase
+      .from("profiles")
+      .update(utm)
+      .eq("id", userId)
+      .is("utm_source", null)
+      .is("utm_medium", null)
+      .is("utm_campaign", null)
+      .gte("created_at", since);
+  } catch {
+    /* never block sign-in */
+  }
 }
 
 function Callback() {
@@ -52,9 +63,7 @@ function Callback() {
   }, [navigate]);
   return (
     <div className="flex min-h-screen items-center justify-center bg-cream">
-      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
-        Signing you in…
-      </p>
+      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Signing you in…</p>
     </div>
   );
 }

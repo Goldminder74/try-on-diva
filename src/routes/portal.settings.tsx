@@ -5,7 +5,16 @@ import { getMyRetailerContext, updateRetailer } from "@/lib/retailer.functions";
 
 export const Route = createFileRoute("/portal/settings")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ title: "Retailer settings | Wigsmi" }, { name: "description", content: "Manage your Wigsmi retailer settings." }, { property: "og:title", content: "Retailer settings | Wigsmi" }, { property: "og:description", content: "Manage your Wigsmi retailer settings." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Retailer settings | Wigsmi" },
+      { name: "description", content: "Manage your Wigsmi retailer settings." },
+      { property: "og:title", content: "Retailer settings | Wigsmi" },
+      { property: "og:description", content: "Manage your Wigsmi retailer settings." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Settings,
 });
 
@@ -82,9 +91,7 @@ function Settings() {
 
   return (
     <div className="max-w-2xl">
-      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
-        Settings
-      </p>
+      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Settings</p>
       <h1 className="mt-1 font-display text-4xl text-mahogany">Retailer settings.</h1>
 
       <form onSubmit={onSubmit} className="mt-8 space-y-5">
@@ -104,10 +111,22 @@ function Settings() {
             />
           </Field>
           <Field label="Legal business name">
-            <input value={form.legal_business_name} onChange={(e) => setForm({ ...form, legal_business_name: e.target.value })} required maxLength={200} className={inputCls} />
+            <input
+              value={form.legal_business_name}
+              onChange={(e) => setForm({ ...form, legal_business_name: e.target.value })}
+              required
+              maxLength={200}
+              className={inputCls}
+            />
           </Field>
           <Field label="VAT number (optional)">
-            <input value={form.vat_number} onChange={(e) => setForm({ ...form, vat_number: e.target.value })} maxLength={32} pattern="[A-Za-z0-9 -]*" className={inputCls} />
+            <input
+              value={form.vat_number}
+              onChange={(e) => setForm({ ...form, vat_number: e.target.value })}
+              maxLength={32}
+              pattern="[A-Za-z0-9 -]*"
+              className={inputCls}
+            />
           </Field>
           <Field label="Website">
             <input

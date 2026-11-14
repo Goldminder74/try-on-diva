@@ -70,9 +70,7 @@ export const createMyApiKey = createServerFn({ method: "POST" })
 
 export const revokeMyApiKey = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) =>
-    z.object({ id: z.string().uuid() }).parse(d),
-  )
+  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const retailerId = await getOwnedRetailerId(supabase, userId);

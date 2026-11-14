@@ -12,7 +12,6 @@ import { useCheckout } from "@/hooks/useCheckout";
 import { getMyTryOnCredits } from "@/lib/topup.functions";
 import { TRYON_PACKS, formatPackPrice } from "@/lib/topup";
 
-
 export const Route = createFileRoute("/_authenticated/app/subscription")({
   staticData: { sitemap: false },
   head: () => ({
@@ -124,7 +123,9 @@ function SubscriptionPage() {
   const onManage = async () => {
     setPortalBusy(true);
     try {
-      const result = await portal({ data: { environment: getStripeEnvironment(), customerType: "consumer" } });
+      const result = await portal({
+        data: { environment: getStripeEnvironment(), customerType: "consumer" },
+      });
       if ("error" in result) throw new Error(result.error);
       window.open(result.url, "_blank", "noopener");
     } catch (e) {
@@ -143,7 +144,9 @@ function SubscriptionPage() {
       <section className="mt-8 rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Current plan</p>
+            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+              Current plan
+            </p>
             <p className="mt-1 font-display text-3xl text-mahogany">{planLabel}</p>
             {subscription?.cancel_at_period_end && subscription.current_period_end && (
               <p className="mt-2 text-xs text-muted-foreground">
@@ -162,7 +165,11 @@ function SubscriptionPage() {
               disabled={portalBusy}
               className="inline-flex items-center gap-2 rounded-md border border-mahogany bg-card px-3 py-2 text-xs font-medium text-mahogany hover:bg-mahogany hover:text-cream disabled:opacity-50"
             >
-              {portalBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
+              {portalBusy ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <ExternalLink className="h-3.5 w-3.5" />
+              )}
               Manage billing
             </button>
           )}
@@ -181,14 +188,14 @@ function SubscriptionPage() {
 
       {/* Usage */}
       <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-        <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">This month</p>
+        <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          This month
+        </p>
         <div className="mt-2 flex items-baseline justify-between">
           <p className="font-display text-2xl text-mahogany">
             {loading ? "…" : used} <span className="text-base text-foreground/70">try-ons</span>
           </p>
-          <p className="text-sm text-muted-foreground">
-            {`of ${quotaCap}`}
-          </p>
+          <p className="text-sm text-muted-foreground">{`of ${quotaCap}`}</p>
         </div>
         {quotaCap !== null && (
           <>
@@ -200,7 +207,9 @@ function SubscriptionPage() {
             </div>
             {pct >= 100 && (
               <p className="mt-3 text-xs text-error">
-                {isFree ? "You've hit your free limit. Upgrade to Plus for 35 try-ons a month." : "You've reached this month's fair-use allowance. It resets on the date below."}
+                {isFree
+                  ? "You've hit your free limit. Upgrade to Plus for 35 try-ons a month."
+                  : "You've reached this month's fair-use allowance. It resets on the date below."}
               </p>
             )}
           </>

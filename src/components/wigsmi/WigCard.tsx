@@ -59,7 +59,9 @@ export function WigCard({ wig, savedInitial = false }: { wig: Wig; savedInitial?
       <div className="pt-3">
         <h3 className="line-clamp-1 text-sm font-medium text-foreground">{wig.name}</h3>
         <p className="mt-0.5 text-xs text-muted-foreground">{wig.retailer}</p>
-        <p className="mt-1 text-sm font-mono text-mahogany">{formatPrice(wig.price, wig.currency)}</p>
+        <p className="mt-1 text-sm font-mono text-mahogany">
+          {formatPrice(wig.price, wig.currency)}
+        </p>
       </div>
     </Link>
   );

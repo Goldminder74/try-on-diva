@@ -21,9 +21,7 @@ export function deploymentStripeEnv(): StripeEnv {
 const GATEWAY_STRIPE_BASE = "https://connector-gateway.lovable.dev/stripe";
 
 export function getConnectionApiKey(env: StripeEnv): string {
-  return env === "sandbox"
-    ? getEnv("STRIPE_SANDBOX_API_KEY")
-    : getEnv("STRIPE_LIVE_API_KEY");
+  return env === "sandbox" ? getEnv("STRIPE_SANDBOX_API_KEY") : getEnv("STRIPE_LIVE_API_KEY");
 }
 
 export function createStripeClient(env: StripeEnv): Stripe {
@@ -94,7 +92,11 @@ export function getStripeErrorMessage(error: unknown): string {
  */
 export function customerPaymentError(error: unknown, context: string): string {
   console.error(`[payments:${context}]`, getStripeErrorMessage(error));
-  const stripeError = (error ?? {}) as { type?: string; message?: string; raw?: { type?: string; message?: string } };
+  const stripeError = (error ?? {}) as {
+    type?: string;
+    message?: string;
+    raw?: { type?: string; message?: string };
+  };
   const type = stripeError.raw?.type ?? stripeError.type;
   const message = stripeError.raw?.message ?? stripeError.message;
   if (type === "card_error" && message) return message;

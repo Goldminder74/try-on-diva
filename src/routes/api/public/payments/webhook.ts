@@ -14,10 +14,7 @@ import { grantPackCredits } from "@/lib/topup.grant";
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase(): any {
   if (!_supabase) {
-    _supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    );
+    _supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   }
   return _supabase;
 }
@@ -78,7 +75,11 @@ async function claimEvent(eventId: string, type: string): Promise<boolean> {
  */
 async function releaseEvent(eventId: string) {
   if (!eventId) return;
-  await getSupabase().from("payment_webhook_events").delete().eq("event_id", eventId).throwOnError();
+  await getSupabase()
+    .from("payment_webhook_events")
+    .delete()
+    .eq("event_id", eventId)
+    .throwOnError();
 }
 
 async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
@@ -103,7 +104,8 @@ async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
       ...(ended && { is_active: false, trial_ends_at: null }),
       updated_at: new Date().toISOString(),
     })
-    .eq("owner_id", row.user_id).throwOnError();
+    .eq("owner_id", row.user_id)
+    .throwOnError();
 
   // Pause their listings so nothing paid-for stays live after access ends.
   const { data: retailer } = await sb
@@ -116,10 +118,24 @@ async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
       // Provider-portal downgrades cannot bypass the published catalogue cap.
       const cap = PLAN_WIG_CAPS[row.plan] ?? 0;
       if (Number.isFinite(cap)) {
-        const { data: excess } = await sb.from("wigs").select("id").eq("retailer_id", retailer.id)
-          .eq("is_published", true).order("created_at", { ascending: true }).order("id").range(cap, 100000).throwOnError();
-        if (excess?.length) await sb.from("wigs").update({ is_published: false, auto_unpublished_at: new Date().toISOString() })
-          .in("id", excess.map((wig: { id: string }) => wig.id)).throwOnError();
+        const { data: excess } = await sb
+          .from("wigs")
+          .select("id")
+          .eq("retailer_id", retailer.id)
+          .eq("is_published", true)
+          .order("created_at", { ascending: true })
+          .order("id")
+          .range(cap, 100000)
+          .throwOnError();
+        if (excess?.length)
+          await sb
+            .from("wigs")
+            .update({ is_published: false, auto_unpublished_at: new Date().toISOString() })
+            .in(
+              "id",
+              excess.map((wig: { id: string }) => wig.id),
+            )
+            .throwOnError();
       }
       return;
     }
@@ -131,7 +147,8 @@ async function syncRetailerPlanFromSub(subId: string, env: StripeEnv) {
         updated_at: new Date().toISOString(),
       })
       .eq("retailer_id", retailer.id)
-      .eq("is_published", true).throwOnError();
+      .eq("is_published", true)
+      .throwOnError();
   }
 }
 
@@ -169,7 +186,8 @@ async function handleSubscriptionCreated(sub: any, env: StripeEnv) {
         updated_at: new Date().toISOString(),
       },
       { onConflict: "stripe_subscription_id" },
-    ).throwOnError();
+    )
+    .throwOnError();
 
   if (ctype === "consumer") {
     const sb = getSupabase();
@@ -200,7 +218,8 @@ async function handleSubscriptionCreated(sub: any, env: StripeEnv) {
     await sb
       .from("retailers")
       .update({ plan, is_active: true, updated_at: new Date().toISOString() })
-      .eq("owner_id", userId).throwOnError();
+      .eq("owner_id", userId)
+      .throwOnError();
 
     const { data: retailer } = await sb
       .from("retailers")
@@ -288,7 +307,8 @@ async function handleSubscriptionUpdated(sub: any, env: StripeEnv) {
     .from("subscriptions")
     .update(update)
     .eq("stripe_subscription_id", sub.id)
-    .eq("environment", env).throwOnError();
+    .eq("environment", env)
+    .throwOnError();
   await syncRetailerPlanFromSub(sub.id, env);
 }
 
@@ -304,7 +324,8 @@ async function handleSubscriptionDeleted(sub: any, env: StripeEnv) {
     .from("subscriptions")
     .update(update)
     .eq("stripe_subscription_id", sub.id)
-    .eq("environment", env).throwOnError();
+    .eq("environment", env)
+    .throwOnError();
   await syncRetailerPlanFromSub(sub.id, env);
 }
 
@@ -312,9 +333,7 @@ async function handlePaymentFailed(invoice: any, env: StripeEnv) {
   const subId =
     typeof invoice?.subscription === "string"
       ? invoice.subscription
-      : invoice?.subscription?.id ??
-        invoice?.parent?.subscription_details?.subscription ??
-        null;
+      : (invoice?.subscription?.id ?? invoice?.parent?.subscription_details?.subscription ?? null);
   if (!subId) return;
   const sb = getSupabase();
   const { data: row } = await sb

@@ -6,7 +6,17 @@ import { AuthShell } from "@/components/auth/AuthShell";
 export const Route = createFileRoute("/auth/reset-password")({
   staticData: { sitemap: false },
   head: () => ({
-    links: [{ rel: "canonical", href: "https://wigsmi.com/auth/reset-password" }], meta: [{ name: "robots", content: "noindex" }, { name: "description", content: "Choose a new password for your Wigsmi account." }, { property: "og:title", content: "Set a new password - Wigsmi" }, { property: "og:description", content: "Choose a new password for your Wigsmi account." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Set a new password - Wigsmi" }] }),
+    links: [{ rel: "canonical", href: "https://wigsmi.com/auth/reset-password" }],
+    meta: [
+      { name: "robots", content: "noindex" },
+      { name: "description", content: "Choose a new password for your Wigsmi account." },
+      { property: "og:title", content: "Set a new password - Wigsmi" },
+      { property: "og:description", content: "Choose a new password for your Wigsmi account." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Set a new password - Wigsmi" },
+    ],
+  }),
   component: ResetPassword,
 });
 
@@ -42,10 +52,7 @@ function ResetPassword() {
     const uid = userRes.user?.id;
     let isRetailer = false;
     if (uid) {
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", uid);
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", uid);
       isRetailer = (roles ?? []).some((r) => r.role === "retailer");
     }
     setBusy(false);

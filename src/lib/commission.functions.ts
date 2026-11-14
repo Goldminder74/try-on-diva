@@ -165,15 +165,14 @@ export const getMyCommission = createServerFn({ method: "GET" })
 /** Turn commission on or off and set the rate the retailer agrees to pay. */
 export const saveCommissionSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { enabled: boolean; rateBps: number; acceptTerms: boolean }) =>
-      z
-        .object({
-          enabled: z.boolean(),
-          rateBps: z.number().int().min(0).max(2500),
-          acceptTerms: z.boolean(),
-        })
-        .parse(d),
+  .inputValidator((d: { enabled: boolean; rateBps: number; acceptTerms: boolean }) =>
+    z
+      .object({
+        enabled: z.boolean(),
+        rateBps: z.number().int().min(0).max(2500),
+        acceptTerms: z.boolean(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { supabase, userId } = context;
@@ -296,14 +295,13 @@ export const logCommissionSale = createServerFn({ method: "POST" })
  */
 export const setCommissionSaleStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { saleId: string; status: SaleStatus }) =>
-      z
-        .object({
-          saleId: z.string().uuid(),
-          status: z.enum(["pending", "confirmed", "settled", "void"]),
-        })
-        .parse(d),
+  .inputValidator((d: { saleId: string; status: SaleStatus }) =>
+    z
+      .object({
+        saleId: z.string().uuid(),
+        status: z.enum(["pending", "confirmed", "settled", "void"]),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { supabase, userId } = context;

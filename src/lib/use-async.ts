@@ -10,9 +10,21 @@ export function useAsync<T>(fn: () => Promise<T>, deps: ReadonlyArray<unknown> =
     setLoading(true);
     setError(null);
     fn()
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((e) => { if (!cancelled) { setError(e as Error); setLoading(false); } });
-    return () => { cancelled = true; };
+      .then((d) => {
+        if (!cancelled) {
+          setData(d);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setError(e as Error);
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 

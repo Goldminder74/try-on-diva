@@ -21,10 +21,21 @@ export const Route = createFileRoute("/_authenticated/app/try-on")({
   validateSearch: (s: Record<string, unknown>) => ({
     wig: typeof s.wig === "string" ? s.wig : undefined,
   }),
-  head: () => ({ meta: [{ name: "description", content: "Upload a selfie and see how a chosen wig looks on you." }, { property: "og:title", content: "Try on - Wigsmi" }, { property: "og:description", content: "Upload a selfie and see how a chosen wig looks on you." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Try on - Wigsmi" }] }),
+  head: () => ({
+    meta: [
+      { name: "description", content: "Upload a selfie and see how a chosen wig looks on you." },
+      { property: "og:title", content: "Try on - Wigsmi" },
+      {
+        property: "og:description",
+        content: "Upload a selfie and see how a chosen wig looks on you.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Try on - Wigsmi" },
+    ],
+  }),
   component: AppTryOn,
 });
-
 
 function AppTryOn() {
   const search = Route.useSearch();
@@ -75,7 +86,6 @@ function AppTryOn() {
 
   const fetchQuota = useServerFn(getTryOnQuota);
 
-
   useEffect(() => {
     setListStatus("loading");
     fetchFeaturedWigs(9)
@@ -109,7 +119,6 @@ function AppTryOn() {
     fetchQuota({ data: {} }).then((q) => setQuota({ remaining: q.remaining, isPaid: q.isPaid }));
   }, [fetchQuota, search.wig]);
 
-
   // A selfie uploaded on the public try-on page before we knew the visitor was
   // signed in: pick it up so they do not have to upload it again.
   useEffect(() => {
@@ -131,7 +140,8 @@ function AppTryOn() {
   const onFile = (f: File | undefined) => {
     if (!f) return;
     if (f.size > 10 * 1024 * 1024) return setError("File too large - max 10MB.");
-    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) return setError("Use JPEG, PNG or WebP.");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type))
+      return setError("Use JPEG, PNG or WebP.");
     setError(null);
     resetApply();
     setPhoto(f);
@@ -150,7 +160,6 @@ function AppTryOn() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingAuto, photo, wig, applying, blocked]);
 
-
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-10">
       <div className="flex items-end justify-between gap-4">
@@ -160,7 +169,8 @@ function AppTryOn() {
         </div>
         {quota && !quota.isPaid && (
           <p className="text-xs text-muted-foreground">
-            <span className="font-mono text-gold-dark">{(remaining ?? quota.remaining) ?? 0}</span> free try-ons left this month
+            <span className="font-mono text-gold-dark">{remaining ?? quota.remaining ?? 0}</span>{" "}
+            free try-ons left this month
           </p>
         )}
       </div>
@@ -169,8 +179,8 @@ function AppTryOn() {
         <div className="mt-6 rounded-xl border border-gold/30 bg-gold/10 p-5">
           <p className="font-display text-2xl text-mahogany">You've used this month's try-ons.</p>
           <p className="mt-2 text-sm text-foreground/80">
-            Free accounts get 5 a month, Plus gets 35 and Pro gets 100. Add a one-off
-            pack now, upgrade for more, or wait until the 1st.
+            Free accounts get 5 a month, Plus gets 35 and Pro gets 100. Add a one-off pack now,
+            upgrade for more, or wait until the 1st.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <button
@@ -181,7 +191,12 @@ function AppTryOn() {
               {packBusy && <RefreshCw className="h-4 w-4 animate-spin" />}
               Add {TRYON_PACKS[0].credits} try-ons for {formatPackPrice(TRYON_PACKS[0])}
             </button>
-            <Link to="/pricing" className="inline-flex rounded-md border border-mahogany px-4 py-2 text-sm text-mahogany hover:bg-mahogany hover:text-cream">See plans</Link>
+            <Link
+              to="/pricing"
+              className="inline-flex rounded-md border border-mahogany px-4 py-2 text-sm text-mahogany hover:bg-mahogany hover:text-cream"
+            >
+              See plans
+            </Link>
           </div>
         </div>
       )}
@@ -190,7 +205,6 @@ function AppTryOn() {
         <div>
           <SelectedWigBanner wig={wig} hasResult={Boolean(resultUrl)} hasPhoto={Boolean(photo)} />
           {resultUrl ? (
-
             <>
               <div className="relative overflow-hidden rounded-xl border border-border bg-card">
                 {shownUrl ? (
@@ -202,9 +216,7 @@ function AppTryOn() {
                 ) : (
                   <div className="flex aspect-[3/4] w-full flex-col items-center justify-center gap-2 text-mahogany">
                     <RefreshCw className="h-5 w-5 animate-spin" />
-                    <p className="font-display text-lg">
-                      Creating the {activeView} view…
-                    </p>
+                    <p className="font-display text-lg">Creating the {activeView} view…</p>
                   </div>
                 )}
               </div>
@@ -254,7 +266,11 @@ function AppTryOn() {
             </button>
             {(photo || resultUrl) && (
               <button
-                onClick={() => { setPhoto(null); setError(null); resetApply(); }}
+                onClick={() => {
+                  setPhoto(null);
+                  setError(null);
+                  resetApply();
+                }}
                 disabled={applying}
                 className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany disabled:opacity-50"
               >
@@ -266,7 +282,13 @@ function AppTryOn() {
               disabled={!wig || blocked || applying}
               className="inline-flex items-center gap-2 rounded-md bg-gold px-4 py-2 text-sm font-medium text-mahogany hover:bg-gold-dark hover:text-cream disabled:opacity-50"
             >
-              {applying ? (<><RefreshCw className="h-4 w-4 animate-spin" /> Generating…</>) : "Apply wig"}
+              {applying ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" /> Generating…
+                </>
+              ) : (
+                "Apply wig"
+              )}
             </button>
 
             <input
@@ -277,11 +299,15 @@ function AppTryOn() {
               onChange={(e) => onFile(e.target.files?.[0])}
             />
           </div>
-          {(error || applyError) && <p className="mt-3 text-sm text-error">{error || applyError}</p>}
+          {(error || applyError) && (
+            <p className="mt-3 text-sm text-error">{error || applyError}</p>
+          )}
         </div>
 
         <aside>
-          <p className="mb-3 font-mono text-xs uppercase tracking-wider text-gold-dark">Choose a wig</p>
+          <p className="mb-3 font-mono text-xs uppercase tracking-wider text-gold-dark">
+            Choose a wig
+          </p>
           {listStatus === "loading" ? (
             <p
               role="status"
@@ -308,7 +334,11 @@ function AppTryOn() {
                   onClick={() => onSelectWig(w)}
                   className={`group overflow-hidden rounded-md border-2 text-left transition-all ${wig?.id === w.id ? "border-gold" : "border-transparent hover:border-mahogany/40"}`}
                 >
-                  <img src={w.images[0]} alt={w.name} className="aspect-square w-full object-cover" />
+                  <img
+                    src={w.images[0]}
+                    alt={w.name}
+                    className="aspect-square w-full object-cover"
+                  />
                   <p className="px-1 py-1.5 text-[11px] leading-tight break-words">{w.name}</p>
                 </button>
               ))}
@@ -327,7 +357,6 @@ function AppTryOn() {
           </div>
         </aside>
       </div>
-
     </div>
   );
 }

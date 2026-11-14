@@ -2,12 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Trash2, X } from "lucide-react";
-import {
-  getMyWig,
-  saveMyWig,
-  deleteMyWig,
-  getMyRetailerContext,
-} from "@/lib/retailer.functions";
+import { getMyWig, saveMyWig, deleteMyWig, getMyRetailerContext } from "@/lib/retailer.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -15,7 +10,22 @@ type Params = { wigId: string };
 
 export const Route = createFileRoute("/portal/catalog/$wigId")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Add or edit a wig listing: photos, price, description and stock status." }, { property: "og:title", content: "Edit wig - Wigsmi Retailer" }, { property: "og:description", content: "Add or edit a wig listing: photos, price, description and stock status." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Edit wig - Wigsmi Retailer" }] }),
+  head: () => ({
+    meta: [
+      {
+        name: "description",
+        content: "Add or edit a wig listing: photos, price, description and stock status.",
+      },
+      { property: "og:title", content: "Edit wig - Wigsmi Retailer" },
+      {
+        property: "og:description",
+        content: "Add or edit a wig listing: photos, price, description and stock status.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Edit wig - Wigsmi Retailer" },
+    ],
+  }),
   component: WigEditor,
 });
 
@@ -99,9 +109,7 @@ function WigEditor() {
     setError(null);
     try {
       const ext = file.name.split(".").pop() || "jpg";
-      const path = `${user.id}/wigs/${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 8)}.${ext}`;
+      const path = `${user.id}/wigs/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("wig-images")
         .upload(path, file, { upsert: false });
@@ -181,7 +189,7 @@ function WigEditor() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className={inputCls}
-                placeholder="Amara Body Wave 22&quot;"
+                placeholder='Amara Body Wave 22"'
               />
             </Field>
             <Field label="Description">

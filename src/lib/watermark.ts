@@ -52,15 +52,15 @@ export async function watermarkImage(
   const brBrightness = sampleCorner(w - padding - markBoxW);
   const blBrightness = sampleCorner(padding);
   // Prefer the brighter corner (background, not hair). Bias toward BR.
-  let position: "br" | "bl" = opts.position
-    ?? (blBrightness - brBrightness > 25 ? "bl" : "br");
+  const position: "br" | "bl" = opts.position ?? (blBrightness - brBrightness > 25 ? "bl" : "br");
   const targetW = w * 0.13;
   const fontFamily = `Georgia, "Times New Roman", serif`;
   const measure = (size: number) => {
     ctx.font = `500 ${size}px ${fontFamily}`;
     return ctx.measureText("wigsmi.").width;
   };
-  let lo = 8, hi = 200;
+  let lo = 8,
+    hi = 200;
   for (let i = 0; i < 18; i++) {
     const mid = (lo + hi) >> 1;
     if (measure(mid) < targetW) lo = mid + 1;

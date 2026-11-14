@@ -2,7 +2,11 @@
 // Kept in a first-party cookie so server handlers (Buy clicks, anonymous
 // try-ons) can read them, and passed into sign-up so the profile keeps them.
 
-export type Utm = { utm_source: string | null; utm_medium: string | null; utm_campaign: string | null };
+export type Utm = {
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+};
 
 export const UTM_COOKIE = "wigsmi_utm";
 const KEYS = ["utm_source", "utm_medium", "utm_campaign"] as const;
@@ -33,7 +37,11 @@ export function utmFromCookieHeader(header: string | null | undefined): Utm {
   if (!part) return { ...EMPTY };
   try {
     const parsed = JSON.parse(decodeURIComponent(part.slice(UTM_COOKIE.length + 1)));
-    return { utm_source: clean(parsed?.utm_source), utm_medium: clean(parsed?.utm_medium), utm_campaign: clean(parsed?.utm_campaign) };
+    return {
+      utm_source: clean(parsed?.utm_source),
+      utm_medium: clean(parsed?.utm_medium),
+      utm_campaign: clean(parsed?.utm_campaign),
+    };
   } catch {
     return { ...EMPTY };
   }

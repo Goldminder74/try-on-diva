@@ -37,9 +37,7 @@ export function useRetailerStatus(): RetailerStatus {
   const retailer = ctxQ.data?.retailer;
   const ent = entQ.data;
 
-  const trialEndsAt = retailer?.trial_ends_at
-    ? new Date(retailer.trial_ends_at as string)
-    : null;
+  const trialEndsAt = retailer?.trial_ends_at ? new Date(retailer.trial_ends_at as string) : null;
   const now = Date.now();
   const trialDaysLeft =
     trialEndsAt && trialEndsAt.getTime() > now

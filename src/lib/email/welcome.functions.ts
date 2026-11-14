@@ -16,7 +16,10 @@ export const sendWelcomeEmail = createServerFn({ method: "POST" })
     const { serverSendTransactionalEmail } = await import("./server-send");
 
     const { buildWelcomeEmail } = await import("./welcome-payload");
-    const { data: roleRows } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
     const roles = (roleRows ?? []).map((r: { role: string }) => r.role);
     const meta = (claims?.user_metadata ?? {}) as Record<string, unknown>;
 

@@ -1,5 +1,15 @@
 import React from "react";
-import { Body, Container, Head, Heading, Html, Preview, Text, Button, Section } from "@react-email/components";
+import {
+  Body,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Preview,
+  Text,
+  Button,
+  Section,
+} from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 import { main, outer, container, h1, text, muted, button, divider, Wordmark } from "./_styles";
 
@@ -22,15 +32,13 @@ const ConsumerSubscribedEmail = ({ name, plan, appUrl }: Props) => (
           <Wordmark />
           <Heading style={h1}>You're on {planLabel(plan)}.</Heading>
           <Text style={text}>
-            Hi{name ? ` ${name}` : ""}, your Wigsmi subscription is active.
-            Your monthly try-ons are unlocked, so upload a selfie and see yourself
-            in as many styles as you like.
+            Hi{name ? ` ${name}` : ""}, your Wigsmi subscription is active. Your monthly try-ons are
+            unlocked, so upload a selfie and see yourself in as many styles as you like.
           </Text>
           {plan === "pro" ? (
             <Text style={text}>
-              As a Pro member your downloads come without the Wigsmi watermark,
-              your saved looks are kept for good, and your try-ons run on our
-              highest quality setting.
+              As a Pro member your downloads come without the Wigsmi watermark, your saved looks are
+              kept for good, and your try-ons run on our highest quality setting.
             </Text>
           ) : null}
           <Button style={button} href={appUrl ?? "https://wigsmi.com/app/try-on"}>
@@ -38,8 +46,8 @@ const ConsumerSubscribedEmail = ({ name, plan, appUrl }: Props) => (
           </Button>
           <div style={divider} />
           <Text style={muted}>
-            You can view invoices or cancel any time from your account. Reply to
-            this email if you need a hand.
+            You can view invoices or cancel any time from your account. Reply to this email if you
+            need a hand.
           </Text>
         </Container>
       </Section>

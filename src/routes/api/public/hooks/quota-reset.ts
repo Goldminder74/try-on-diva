@@ -5,10 +5,7 @@ import { cronAuthorized } from "@/lib/cron-auth";
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase(): any {
   if (!_supabase) {
-    _supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    );
+    _supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   }
   return _supabase;
 }
@@ -30,21 +27,13 @@ export const Route = createFileRoute("/api/public/hooks/quota-reset")({
             .from("consumer_profiles")
             .update({
               try_on_count_this_month: 0,
-              try_on_month_reset: new Date(
-                new Date().getFullYear(),
-                new Date().getMonth(),
-                1,
-              )
+              try_on_month_reset: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
                 .toISOString()
                 .slice(0, 10),
             })
             .lt(
               "try_on_month_reset",
-              new Date(
-                new Date().getFullYear(),
-                new Date().getMonth(),
-                1,
-              )
+              new Date(new Date().getFullYear(), new Date().getMonth(), 1)
                 .toISOString()
                 .slice(0, 10),
             )

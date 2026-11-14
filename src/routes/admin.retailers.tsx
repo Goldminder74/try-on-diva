@@ -5,7 +5,16 @@ import { listRetailers, setRetailerActive, extendRetailerTrial } from "@/lib/adm
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/retailers")({
-  head: () => ({ meta: [{ title: "Retailers - Wigsmi Admin" }, { name: "description", content: "Review and manage retailer accounts on Wigsmi." }, { property: "og:title", content: "Retailers - Wigsmi Admin" }, { property: "og:description", content: "Review and manage retailer accounts on Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Retailers - Wigsmi Admin" },
+      { name: "description", content: "Review and manage retailer accounts on Wigsmi." },
+      { property: "og:title", content: "Retailers - Wigsmi Admin" },
+      { property: "og:description", content: "Review and manage retailer accounts on Wigsmi." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   staticData: { sitemap: false },
   component: RetailersPage,
 });
@@ -18,8 +27,13 @@ function RetailersPage() {
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
 
-  const reload = () => listFn({ data: { search: search || undefined } }).then(setRows).catch(() => setRows([]));
-  useEffect(() => { reload(); /* eslint-disable-next-line */ }, []);
+  const reload = () =>
+    listFn({ data: { search: search || undefined } })
+      .then(setRows)
+      .catch(() => setRows([]));
+  useEffect(() => {
+    reload(); /* eslint-disable-next-line */
+  }, []);
 
   const onToggle = async (r: any) => {
     setBusy(r.id);
@@ -62,7 +76,12 @@ function RetailersPage() {
             placeholder="Search business name…"
             className="rounded-md border border-border bg-card px-3 py-1.5 text-sm"
           />
-          <button onClick={reload} className="rounded-md bg-mahogany px-3 py-1.5 text-xs text-cream">Search</button>
+          <button
+            onClick={reload}
+            className="rounded-md bg-mahogany px-3 py-1.5 text-xs text-cream"
+          >
+            Search
+          </button>
         </div>
       </div>
 
@@ -81,8 +100,20 @@ function RetailersPage() {
             </tr>
           </thead>
           <tbody>
-            {rows === null && <tr><td colSpan={8} className="px-4 py-6 text-center text-muted-foreground">Loading…</td></tr>}
-            {rows?.length === 0 && <tr><td colSpan={8} className="px-4 py-6 text-center text-muted-foreground">No retailers.</td></tr>}
+            {rows === null && (
+              <tr>
+                <td colSpan={8} className="px-4 py-6 text-center text-muted-foreground">
+                  Loading…
+                </td>
+              </tr>
+            )}
+            {rows?.length === 0 && (
+              <tr>
+                <td colSpan={8} className="px-4 py-6 text-center text-muted-foreground">
+                  No retailers.
+                </td>
+              </tr>
+            )}
             {rows?.map((r) => (
               <tr key={r.id} className="border-t border-border">
                 <td className="px-4 py-2">
@@ -91,12 +122,21 @@ function RetailersPage() {
                 </td>
                 <td className="px-4 py-2 text-muted-foreground">{r.country ?? "-"}</td>
                 <td className="px-4 py-2 capitalize">{r.plan}</td>
-                <td className="px-4 py-2 font-mono text-xs">{r.trial_ends_at ? new Date(r.trial_ends_at).toLocaleDateString() : "-"}</td>
+                <td className="px-4 py-2 font-mono text-xs">
+                  {r.trial_ends_at ? new Date(r.trial_ends_at).toLocaleDateString() : "-"}
+                </td>
                 <td className="px-4 py-2 font-mono">{r.wig_count}</td>
                 <td className="px-4 py-2 font-mono">{r.try_ons_30d}</td>
                 <td className="px-4 py-2">
-                  {r.is_active ? <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs text-success">Active</span>
-                    : <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-xs text-destructive">Suspended</span>}
+                  {r.is_active ? (
+                    <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs text-success">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-xs text-destructive">
+                      Suspended
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-2 text-right">
                   <div className="inline-flex gap-1">
@@ -104,12 +144,16 @@ function RetailersPage() {
                       onClick={() => onExtend(r)}
                       disabled={busy === r.id}
                       className="rounded-md border border-border px-2 py-1 text-xs hover:border-mahogany disabled:opacity-50"
-                    >+30d trial</button>
+                    >
+                      +30d trial
+                    </button>
                     <button
                       onClick={() => onToggle(r)}
                       disabled={busy === r.id}
                       className={`rounded-md px-2 py-1 text-xs disabled:opacity-50 ${r.is_active ? "border border-destructive/40 text-destructive" : "bg-mahogany text-cream"}`}
-                    >{r.is_active ? "Suspend" : "Reactivate"}</button>
+                    >
+                      {r.is_active ? "Suspend" : "Reactivate"}
+                    </button>
                   </div>
                 </td>
               </tr>

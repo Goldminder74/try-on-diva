@@ -19,9 +19,15 @@ export const Route = createFileRoute("/faq")({
       { name: "twitter:card", content: "summary" },
       { property: "og:type", content: "website" },
       { title: "FAQ - Wigsmi" },
-      { name: "description", content: "Answers to common questions for wig buyers and retailers using Wigsmi." },
+      {
+        name: "description",
+        content: "Answers to common questions for wig buyers and retailers using Wigsmi.",
+      },
       { property: "og:title", content: "FAQ - Wigsmi" },
-      { property: "og:description", content: "Answers to common questions for wig buyers and retailers using Wigsmi." },
+      {
+        property: "og:description",
+        content: "Answers to common questions for wig buyers and retailers using Wigsmi.",
+      },
     ],
   }),
   component: FAQPage,
@@ -142,8 +148,7 @@ function FAQPage() {
     const q = query.trim().toLowerCase();
     if (!q) return activeList;
     return activeList.filter(
-      (item) =>
-        item.q.toLowerCase().includes(q) || item.a.toLowerCase().includes(q)
+      (item) => item.q.toLowerCase().includes(q) || item.a.toLowerCase().includes(q),
     );
   }, [activeList, query]);
 
@@ -231,9 +236,7 @@ function FAQPage() {
 
         {/* Footer CTA */}
         <div className="mt-10 rounded-xl border border-border bg-card p-6 text-center shadow-[var(--shadow-card)]">
-          <p className="font-display text-lg text-mahogany">
-            Still have a question?
-          </p>
+          <p className="font-display text-lg text-mahogany">Still have a question?</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Email{" "}
             <a

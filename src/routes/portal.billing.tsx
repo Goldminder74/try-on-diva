@@ -17,11 +17,7 @@ import { toast } from "sonner";
 import { RetailerPlanCards } from "@/components/retailer/RetailerPlanCards";
 import { formatMinor } from "@/lib/plan-prices";
 import { usePlanCurrency } from "@/hooks/usePlanCurrency";
-import {
-  type RetailerPlanId,
-  getPlanDisplayName,
-  getPlanById,
-} from "@/lib/retailer-plans";
+import { type RetailerPlanId, getPlanDisplayName, getPlanById } from "@/lib/retailer-plans";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,10 +43,18 @@ function formatMoney(amountMinor: number, currency: string) {
   return formatMinor(amountMinor, currency);
 }
 
-
 export const Route = createFileRoute("/portal/billing")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ title: "Retailer billing | Wigsmi" }, { name: "description", content: "Manage your Wigsmi retailer billing." }, { property: "og:title", content: "Retailer billing | Wigsmi" }, { property: "og:description", content: "Manage your Wigsmi retailer billing." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Retailer billing | Wigsmi" },
+      { name: "description", content: "Manage your Wigsmi retailer billing." },
+      { property: "og:title", content: "Retailer billing | Wigsmi" },
+      { property: "og:description", content: "Manage your Wigsmi retailer billing." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: BillingPage,
 });
 
@@ -125,15 +129,16 @@ function BillingPage() {
   useEffect(() => {
     if (!user) return;
     invoicesFn({ data: { environment: getStripeEnvironment(), customerType: "retailer" } })
-      .then((result) => { if ("error" in result) throw new Error(result.error); setInvoices(result); })
+      .then((result) => {
+        if ("error" in result) throw new Error(result.error);
+        setInvoices(result);
+      })
       .catch(() => setInvoices([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, sub?.stripe_subscription_id]);
 
   const isPaidActive =
-    !!sub &&
-    subscriptionIsValid(sub) &&
-    PAID_PLAN_IDS.includes(sub.plan as RetailerPlanId);
+    !!sub && subscriptionIsValid(sub) && PAID_PLAN_IDS.includes(sub.plan as RetailerPlanId);
 
   const currentPlanId = isPaidActive ? (sub!.plan as RetailerPlanId) : null;
 
@@ -238,12 +243,20 @@ function BillingPage() {
         {isPaidActive ? (
           <>
             <p className="mt-2 text-sm text-muted-foreground">
-              Current plan: <span className="font-medium text-foreground">{getPlanDisplayName(currentPlanId)}</span>
-              {sub?.billing_interval === "year" && <span className="text-foreground"> · Yearly</span>}
-              {sub?.billing_interval === "month" && <span className="text-foreground"> · Monthly</span>}
+              Current plan:{" "}
+              <span className="font-medium text-foreground">
+                {getPlanDisplayName(currentPlanId)}
+              </span>
+              {sub?.billing_interval === "year" && (
+                <span className="text-foreground"> · Yearly</span>
+              )}
+              {sub?.billing_interval === "month" && (
+                <span className="text-foreground"> · Monthly</span>
+              )}
               {sub?.status && (
                 <>
-                  {" "}· Status: <span className="capitalize">{sub.status}</span>
+                  {" "}
+                  · Status: <span className="capitalize">{sub.status}</span>
                 </>
               )}
             </p>
@@ -257,23 +270,24 @@ function BillingPage() {
               disabled={busy === "portal"}
               className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-mahogany px-3 py-1.5 text-xs text-mahogany hover:bg-mahogany hover:text-cream disabled:opacity-50"
             >
-              {busy === "portal" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
+              {busy === "portal" ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <ExternalLink className="h-3.5 w-3.5" />
+              )}
               Manage subscription
             </button>
           </>
         ) : (
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-            You don't have an active subscription yet. Pick a plan below to
-            keep your wigs published and your widget live after your trial
-            ends. <Sparkles className="inline h-3.5 w-3.5 text-gold" />
+            You don't have an active subscription yet. Pick a plan below to keep your wigs published
+            and your widget live after your trial ends.{" "}
+            <Sparkles className="inline h-3.5 w-3.5 text-gold" />
           </p>
         )}
       </div>
 
-      <RetailerPlanCards
-        currentPlanId={currentPlanId}
-        onSwitch={onSwitchPlan}
-      />
+      <RetailerPlanCards currentPlanId={currentPlanId} onSwitch={onSwitchPlan} />
       {previewBusy && (
         <p className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
           <Loader2 className="h-3 w-3 animate-spin" /> Calculating proration…
@@ -297,13 +311,24 @@ function BillingPage() {
                 {invoices.map((inv) => (
                   <tr key={inv.id} className="border-t border-border">
                     <td className="px-4 py-2">
-                      {inv.billedAt ? new Date(inv.billedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-"}
+                      {inv.billedAt
+                        ? new Date(inv.billedAt).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "-"}
                     </td>
                     <td className="px-4 py-2 font-mono">{formatMoney(inv.total, inv.currency)}</td>
                     <td className="px-4 py-2 capitalize text-muted-foreground">{inv.status}</td>
                     <td className="px-4 py-2 text-right">
                       {inv.invoiceUrl ? (
-                        <a href={inv.invoiceUrl} target="_blank" rel="noopener" className="inline-flex items-center gap-1 text-mahogany underline">
+                        <a
+                          href={inv.invoiceUrl}
+                          target="_blank"
+                          rel="noopener"
+                          className="inline-flex items-center gap-1 text-mahogany underline"
+                        >
                           <FileText className="h-3.5 w-3.5" /> PDF
                         </a>
                       ) : (
@@ -315,7 +340,9 @@ function BillingPage() {
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">All prices include any applicable taxes.</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            All prices include any applicable taxes.
+          </p>
         </div>
       )}
 
@@ -327,10 +354,7 @@ function BillingPage() {
         .
       </p>
 
-      <AlertDialog
-        open={!!switchPreview}
-        onOpenChange={(open) => !open && setSwitchPreview(null)}
-      >
+      <AlertDialog open={!!switchPreview} onOpenChange={(open) => !open && setSwitchPreview(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Switch to {switchPreview?.planName}?</AlertDialogTitle>
@@ -354,15 +378,16 @@ function BillingPage() {
                     toward your next invoice.
                   </p>
                 )}
-                {switchPreview && switchPreview.immediateAmount === 0 && (
-                  <p>No charge today.</p>
-                )}
+                {switchPreview && switchPreview.immediateAmount === 0 && <p>No charge today.</p>}
                 {switchPreview?.nextBilledAt && (
                   <p className="text-muted-foreground">
                     Next renewal: {formatMoney(switchPreview.nextAmount, switchPreview.currency)} on{" "}
                     {new Date(switchPreview.nextBilledAt).toLocaleDateString("en-GB", {
-                      day: "numeric", month: "long", year: "numeric",
-                    })}.
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                    .
                   </p>
                 )}
               </div>

@@ -40,9 +40,8 @@ export function TrialExpiredPaywall() {
           Your trial has ended.
         </h1>
         <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
-          Your wigs and widget are paused for now. Pick a plan and we'll
-          republish everything automatically - no re-uploading, no
-          reconfiguration.
+          Your wigs and widget are paused for now. Pick a plan and we'll republish everything
+          automatically - no re-uploading, no reconfiguration.
         </p>
       </div>
 
@@ -65,4 +64,3 @@ export function TrialExpiredPaywall() {
     </div>
   );
 }
-

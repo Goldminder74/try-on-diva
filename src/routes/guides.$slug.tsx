@@ -12,7 +12,10 @@ export const Route = createFileRoute("/guides/$slug")({
     return guide;
   },
   head: ({ loaderData: g }) => {
-    if (!g) return { meta: [{ title: "Guide not found - Wigsmi" }, { name: "robots", content: "noindex" }] };
+    if (!g)
+      return {
+        meta: [{ title: "Guide not found - Wigsmi" }, { name: "robots", content: "noindex" }],
+      };
     const url = `https://wigsmi.com/guides/${g.slug}`;
     return {
       links: [{ rel: "canonical", href: url }],
@@ -43,18 +46,20 @@ export const Route = createFileRoute("/guides/$slug")({
           }),
         },
         ...(g.faq.length
-          ? [{
-              type: "application/ld+json",
-              children: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "FAQPage",
-                mainEntity: g.faq.map((f) => ({
-                  "@type": "Question",
-                  name: f.q,
-                  acceptedAnswer: { "@type": "Answer", text: f.a },
-                })),
-              }),
-            }]
+          ? [
+              {
+                type: "application/ld+json",
+                children: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  mainEntity: g.faq.map((f) => ({
+                    "@type": "Question",
+                    name: f.q,
+                    acceptedAnswer: { "@type": "Answer", text: f.a },
+                  })),
+                }),
+              },
+            ]
           : []),
       ],
     };
@@ -64,7 +69,9 @@ export const Route = createFileRoute("/guides/$slug")({
       <Header />
       <main className="mx-auto max-w-xl px-5 py-24 text-center">
         <h1 className="font-display text-3xl text-mahogany">Guide not found</h1>
-        <Link to="/guides" className="mt-6 inline-block text-mahogany underline">See all guides</Link>
+        <Link to="/guides" className="mt-6 inline-block text-mahogany underline">
+          See all guides
+        </Link>
       </main>
       <Footer />
     </div>
@@ -84,20 +91,32 @@ function GuidePage() {
     navigate({ href });
   };
   const date = new Date(`${g.datePublished}T00:00:00Z`).toLocaleDateString("en-GB", {
-    day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
   });
   return (
     <div className="min-h-screen bg-cream">
       <Header />
       <main className="mx-auto w-full max-w-[70ch] px-5 py-14">
-        <Link to="/guides" className="font-mono text-xs uppercase tracking-wider text-gold-dark hover:text-mahogany">
+        <Link
+          to="/guides"
+          className="font-mono text-xs uppercase tracking-wider text-gold-dark hover:text-mahogany"
+        >
           Wig buying guides
         </Link>
-        <h1 className="mt-4 font-display text-4xl leading-tight text-mahogany md:text-5xl">{g.title}</h1>
+        <h1 className="mt-4 font-display text-4xl leading-tight text-mahogany md:text-5xl">
+          {g.title}
+        </h1>
         <p className="mt-4 text-sm text-muted-foreground">
           <time dateTime={g.datePublished}>{date}</time> · {g.readingMinutes} min read
         </p>
-        <article className="guide-prose mt-10" onClick={onClick} dangerouslySetInnerHTML={{ __html: g.html }} />
+        <article
+          className="guide-prose mt-10"
+          onClick={onClick}
+          dangerouslySetInnerHTML={{ __html: g.html }}
+        />
         <div className="mt-14 rounded-xl border border-border bg-card p-8 text-center">
           <Link
             to="/try-on"

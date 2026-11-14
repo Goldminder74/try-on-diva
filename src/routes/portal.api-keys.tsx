@@ -3,11 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Key, Copy, Check, Loader2, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
-import {
-  listMyApiKeys,
-  createMyApiKey,
-  revokeMyApiKey,
-} from "@/lib/api-keys.functions";
+import { listMyApiKeys, createMyApiKey, revokeMyApiKey } from "@/lib/api-keys.functions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +18,14 @@ import {
 export const Route = createFileRoute("/portal/api-keys")({
   staticData: { sitemap: false },
   head: () => ({
-    meta: [{ property: "og:title", content: "API keys - Wigsmi" }, { property: "og:description", content: "Create and revoke API keys for connecting your shop to Wigsmi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
+    meta: [
+      { property: "og:title", content: "API keys - Wigsmi" },
+      {
+        property: "og:description",
+        content: "Create and revoke API keys for connecting your shop to Wigsmi.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "API keys - Wigsmi" },
       { name: "description", content: "Manage API keys for headless Wigsmi access." },
     ],
@@ -109,8 +112,8 @@ function ApiKeysPage() {
         <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Portal</p>
         <h1 className="mt-1 font-display text-3xl text-mahogany md:text-4xl">API keys</h1>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Use API keys to access your Wigsmi catalog programmatically - from
-          a custom storefront, a Shopify app, or any backend integration.
+          Use API keys to access your Wigsmi catalog programmatically - from a custom storefront, a
+          Shopify app, or any backend integration.
         </p>
       </header>
 
@@ -166,7 +169,9 @@ function ApiKeysPage() {
                         month: "short",
                         year: "numeric",
                       })}
-                      {k.last_used_at ? ` · last used ${new Date(k.last_used_at).toLocaleDateString("en-GB")}` : " · never used"}
+                      {k.last_used_at
+                        ? ` · last used ${new Date(k.last_used_at).toLocaleDateString("en-GB")}`
+                        : " · never used"}
                     </p>
                   </div>
                   <button
@@ -206,8 +211,8 @@ function ApiKeysPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Your new API key</AlertDialogTitle>
             <AlertDialogDescription>
-              Copy this now - for security, we won't show it to you again. If
-              you lose it, you'll need to generate a new one.
+              Copy this now - for security, we won't show it to you again. If you lose it, you'll
+              need to generate a new one.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="rounded-md border border-border bg-sand/40 p-3">
@@ -234,8 +239,7 @@ function ApiKeysPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Revoke this key?</AlertDialogTitle>
             <AlertDialogDescription>
-              Any integration using this key will stop working immediately.
-              This can't be undone.
+              Any integration using this key will stop working immediately. This can't be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

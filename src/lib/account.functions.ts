@@ -33,10 +33,14 @@ export const listMyTryOns = createServerFn({ method: "GET" })
     const list = rows ?? [];
     const paths = list.map((r) => r.result_url).filter((p) => isOwnStoragePath(p, userId));
     const signed = paths.length
-      ? (await supabase.storage.from(BUCKET).createSignedUrls(paths, 3600)).data ?? []
+      ? ((await supabase.storage.from(BUCKET).createSignedUrls(paths, 3600)).data ?? [])
       : [];
     const byPath = new Map(signed.map((s: any) => [s.path, s.signedUrl]));
-    return list.map((r) => ({ id: r.id, createdAt: r.created_at, url: (byPath.get(r.result_url) as string) ?? null }));
+    return list.map((r) => ({
+      id: r.id,
+      createdAt: r.created_at,
+      url: (byPath.get(r.result_url) as string) ?? null,
+    }));
   });
 
 /** Delete one of the caller's try-ons: the database row and the stored image. */
@@ -46,22 +50,34 @@ export const deleteMyTryOn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
-      .from("tryon_results").select("id, user_id, result_url").eq("id", data.id).maybeSingle();
+      .from("tryon_results")
+      .select("id, user_id, result_url")
+      .eq("id", data.id)
+      .maybeSingle();
     if (error) throw error;
     if (!row || row.user_id !== userId) throw new Error("Try-on not found.");
     if (isOwnStoragePath(row.result_url, userId)) {
       const { error: rmErr } = await supabase.storage.from(BUCKET).remove([row.result_url]);
       if (rmErr) throw rmErr;
     }
-    const { error: delErr } = await supabase.from("tryon_results").delete().eq("id", row.id).eq("user_id", userId);
+    const { error: delErr } = await supabase
+      .from("tryon_results")
+      .delete()
+      .eq("id", row.id)
+      .eq("user_id", userId);
     if (delErr) throw delErr;
     return { ok: true };
   });
 
 async function removeAllTryOns(client: any, userId: string) {
-  const { data: rows, error } = await client.from("tryon_results").select("id, result_url").eq("user_id", userId);
+  const { data: rows, error } = await client
+    .from("tryon_results")
+    .select("id, result_url")
+    .eq("user_id", userId);
   if (error) throw error;
-  const paths = (rows ?? []).map((r: any) => r.result_url).filter((p: string) => isOwnStoragePath(p, userId));
+  const paths = (rows ?? [])
+    .map((r: any) => r.result_url)
+    .filter((p: string) => isOwnStoragePath(p, userId));
   // Also sweep any stray files left in the user's folder.
   const { data: listed } = await client.storage.from(BUCKET).list(userId, { limit: 1000 });
   for (const f of listed ?? []) {
@@ -100,9 +116,8 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     await assertShopper(supabase, userId);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { createStripeClient, deploymentStripeEnv, getStripeErrorMessage } = await import(
-      "@/lib/stripe.server"
-    );
+    const { createStripeClient, deploymentStripeEnv, getStripeErrorMessage } =
+      await import("@/lib/stripe.server");
     const admin: any = supabaseAdmin;
 
     // 1. Stripe: cancel subscriptions immediately and anonymise the customer.
@@ -117,7 +132,10 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
         if (s.environment !== "sandbox" && s.environment !== "live") continue;
         const stripe = createStripeClient(s.environment);
         if (s.stripe_subscription_id && shouldCancelOnDelete(s.status)) {
-          await stripe.subscriptions.cancel(s.stripe_subscription_id, { prorate: false, invoice_now: false });
+          await stripe.subscriptions.cancel(s.stripe_subscription_id, {
+            prorate: false,
+            invoice_now: false,
+          });
         }
         if (s.stripe_customer_id) customers.set(s.stripe_customer_id, s.environment);
       }
@@ -137,7 +155,10 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
       }
       for (const [id, env] of customers) {
         await createStripeClient(env).customers.update(id, {
-          name: "", email: "", phone: "", description: "Deleted Wigsmi account",
+          name: "",
+          email: "",
+          phone: "",
+          description: "Deleted Wigsmi account",
           metadata: { userId: "", deleted_account: "true" },
         });
       }
@@ -161,7 +182,10 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     }
 
     // 4. Personal data.
-    for (const [table, col] of [["wishlist_items", "user_id"], ["consumer_profiles", "user_id"]] as const) {
+    for (const [table, col] of [
+      ["wishlist_items", "user_id"],
+      ["consumer_profiles", "user_id"],
+    ] as const) {
       const { error } = await admin.from(table).delete().eq(col, userId);
       if (error) throw error;
     }
@@ -169,11 +193,17 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
     // 5. Keep financial records, unlinked from the person.
     const now = new Date().toISOString();
     {
-      const { error } = await admin.from("subscriptions").update({ user_id: null, profile_id: null, status: "canceled", updated_at: now }).or(`user_id.eq.${userId},profile_id.eq.${userId}`);
+      const { error } = await admin
+        .from("subscriptions")
+        .update({ user_id: null, profile_id: null, status: "canceled", updated_at: now })
+        .or(`user_id.eq.${userId},profile_id.eq.${userId}`);
       if (error) throw error;
     }
     {
-      const { error } = await admin.from("try_on_credits").update({ user_id: null, updated_at: now }).eq("user_id", userId);
+      const { error } = await admin
+        .from("try_on_credits")
+        .update({ user_id: null, updated_at: now })
+        .eq("user_id", userId);
       if (error) throw error;
     }
 

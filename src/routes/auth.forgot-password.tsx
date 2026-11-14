@@ -6,7 +6,20 @@ import { AuthShell } from "@/components/auth/AuthShell";
 export const Route = createFileRoute("/auth/forgot-password")({
   staticData: { sitemap: false },
   head: () => ({
-    links: [{ rel: "canonical", href: "https://wigsmi.com/auth/forgot-password" }], meta: [{ name: "robots", content: "noindex" }, { name: "description", content: "Request a link by email to reset your Wigsmi password." }, { property: "og:title", content: "Reset your password - Wigsmi" }, { property: "og:description", content: "Request a link by email to reset your Wigsmi password." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Reset your password - Wigsmi" }] }),
+    links: [{ rel: "canonical", href: "https://wigsmi.com/auth/forgot-password" }],
+    meta: [
+      { name: "robots", content: "noindex" },
+      { name: "description", content: "Request a link by email to reset your Wigsmi password." },
+      { property: "og:title", content: "Reset your password - Wigsmi" },
+      {
+        property: "og:description",
+        content: "Request a link by email to reset your Wigsmi password.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Reset your password - Wigsmi" },
+    ],
+  }),
   component: ForgotPassword,
 });
 
@@ -33,7 +46,9 @@ function ForgotPassword() {
       <div className="w-full max-w-sm">
         <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Reset password</p>
         <h1 className="mt-1 font-display text-4xl text-mahogany">Forgot your password?</h1>
-        <p className="mt-3 text-sm text-muted-foreground">We'll email you a link to set a new one.</p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          We'll email you a link to set a new one.
+        </p>
 
         {sent ? (
           <p className="mt-6 rounded-md border border-gold/30 bg-gold/10 p-4 text-sm text-gold-dark">
@@ -60,7 +75,10 @@ function ForgotPassword() {
           </form>
         )}
 
-        <Link to="/auth/login" className="mt-6 block text-xs text-muted-foreground hover:text-mahogany">
+        <Link
+          to="/auth/login"
+          className="mt-6 block text-xs text-muted-foreground hover:text-mahogany"
+        >
           ← Back to log in
         </Link>
       </div>

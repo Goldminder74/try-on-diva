@@ -9,7 +9,16 @@ import { useAuth } from "@/contexts/auth-context";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Personalised wig picks and recent try-ons for you." }, { property: "og:title", content: "For You - Wigsmi" }, { property: "og:description", content: "Personalised wig picks and recent try-ons for you." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "For You - Wigsmi" }] }),
+  head: () => ({
+    meta: [
+      { name: "description", content: "Personalised wig picks and recent try-ons for you." },
+      { property: "og:title", content: "For You - Wigsmi" },
+      { property: "og:description", content: "Personalised wig picks and recent try-ons for you." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "For You - Wigsmi" },
+    ],
+  }),
   component: ForYou,
 });
 
@@ -35,8 +44,7 @@ function ForYou() {
           const lc = v.map((x: string) => x.toLowerCase());
           const matched = all.filter(
             (w) =>
-              lc.includes(w.style_type.toLowerCase()) ||
-              lc.includes(w.hair_texture.toLowerCase()),
+              lc.includes(w.style_type.toLowerCase()) || lc.includes(w.hair_texture.toLowerCase()),
           );
           setPicks(matched.slice(0, 8));
         } else {
@@ -53,7 +61,10 @@ function ForYou() {
     };
   }, [fetchProfile]);
 
-  const greeting = (user?.user_metadata?.display_name as string | undefined) || user?.email?.split("@")[0] || "friend";
+  const greeting =
+    (user?.user_metadata?.display_name as string | undefined) ||
+    user?.email?.split("@")[0] ||
+    "friend";
 
   return (
     <div className="mx-auto w-full max-w-7xl px-5 py-10">
@@ -98,7 +109,9 @@ function Grid({ items }: { items: Wig[] | null }) {
   if (!items) {
     return (
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => <WigCardSkeleton key={i} />)}
+        {Array.from({ length: 4 }).map((_, i) => (
+          <WigCardSkeleton key={i} />
+        ))}
       </div>
     );
   }
@@ -107,7 +120,9 @@ function Grid({ items }: { items: Wig[] | null }) {
   }
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-      {items.map((w) => <WigCard key={w.id} wig={w} />)}
+      {items.map((w) => (
+        <WigCard key={w.id} wig={w} />
+      ))}
     </div>
   );
 }

@@ -10,7 +10,22 @@ import { Plus, TrendingUp, Eye, MousePointerClick, Package, Check, ArrowRight } 
 
 export const Route = createFileRoute("/portal/")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "See your retailer trial status, catalogue size and try-on activity at a glance." }, { property: "og:title", content: "Dashboard - Wigsmi Retailer" }, { property: "og:description", content: "See your retailer trial status, catalogue size and try-on activity at a glance." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Dashboard - Wigsmi Retailer" }] }),
+  head: () => ({
+    meta: [
+      {
+        name: "description",
+        content: "See your retailer trial status, catalogue size and try-on activity at a glance.",
+      },
+      { property: "og:title", content: "Dashboard - Wigsmi Retailer" },
+      {
+        property: "og:description",
+        content: "See your retailer trial status, catalogue size and try-on activity at a glance.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Dashboard - Wigsmi Retailer" },
+    ],
+  }),
   component: PortalIndex,
 });
 
@@ -23,9 +38,7 @@ function PortalIndex() {
   const getActivation = useServerFn(getActivationStatus);
 
   const [loading, setLoading] = useState(true);
-  const [metrics, setMetrics] = useState<Awaited<ReturnType<typeof getMetrics>> | null>(
-    null,
-  );
+  const [metrics, setMetrics] = useState<Awaited<ReturnType<typeof getMetrics>> | null>(null);
   const [activation, setActivation] = useState<Activation | null>(null);
   const [retailerName, setRetailerName] = useState("");
 
@@ -70,15 +83,12 @@ function PortalIndex() {
     <div>
       <div className="flex items-end justify-between">
         <div>
-          <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
-            Dashboard
-          </p>
-          <h1 className="mt-1 font-display text-4xl text-mahogany">
-            Welcome, {retailerName}.
-          </h1>
+          <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Dashboard</p>
+          <h1 className="mt-1 font-display text-4xl text-mahogany">Welcome, {retailerName}.</h1>
         </div>
         <Link
-          to="/portal/catalog/$wigId" params={{ wigId: "new" }}
+          to="/portal/catalog/$wigId"
+          params={{ wigId: "new" }}
           className="inline-flex items-center gap-1.5 rounded-md bg-mahogany px-4 py-2 text-sm text-cream hover:bg-mahogany-soft"
         >
           <Plus className="h-4 w-4" /> Add wig
@@ -87,8 +97,8 @@ function PortalIndex() {
 
       {daysLeft !== null && metrics?.retailer?.plan === "starter" && (
         <div className="mt-6 rounded-xl border border-gold/40 bg-gold/10 p-4 text-sm text-gold-dark">
-          <strong className="font-medium">Free trial:</strong> {daysLeft} days remaining.
-          Your card is never charged automatically.
+          <strong className="font-medium">Free trial:</strong> {daysLeft} days remaining. Your card
+          is never charged automatically.
         </div>
       )}
 
@@ -135,7 +145,8 @@ function ActivationCard({ activation }: { activation: Activation }) {
       done: activation.hasWig,
       title: "Add your first wig",
       helper: "Photos, price, style - at least one wig.",
-      to: "/portal/catalog/$wigId", params: { wigId: "new" },
+      to: "/portal/catalog/$wigId",
+      params: { wigId: "new" },
       cta: "Add a wig",
     },
     {
@@ -172,12 +183,8 @@ function ActivationCard({ activation }: { activation: Activation }) {
     return (
       <div className="mt-10 flex items-center justify-between rounded-2xl border border-success/40 bg-success/5 p-6">
         <div>
-          <p className="font-mono text-xs uppercase tracking-wider text-success">
-            You're live
-          </p>
-          <h2 className="mt-1 font-display text-2xl text-mahogany">
-            Everything's set up.
-          </h2>
+          <p className="font-mono text-xs uppercase tracking-wider text-success">You're live</p>
+          <h2 className="mt-1 font-display text-2xl text-mahogany">Everything's set up.</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Your widget is on your store and shoppers are trying on wigs.
           </p>
@@ -262,15 +269,7 @@ function ActivationCard({ activation }: { activation: Activation }) {
   );
 }
 
-function Stat({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-}) {
+function Stat({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <div className="flex items-center justify-between text-muted-foreground">

@@ -2,12 +2,23 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export type StyleType =
-  | "Lace Front" | "HD Wig" | "Glueless" | "Closure"
-  | "Bob" | "Long" | "Braided/Protective" | "360 Lace";
+  | "Lace Front"
+  | "HD Wig"
+  | "Glueless"
+  | "Closure"
+  | "Bob"
+  | "Long"
+  | "Braided/Protective"
+  | "360 Lace";
 
 export type HairTexture =
-  | "Kinky Coily" | "Kinky Straight" | "Deep Wave"
-  | "Body Wave" | "Straight" | "Curly" | "Loose Wave";
+  | "Kinky Coily"
+  | "Kinky Straight"
+  | "Deep Wave"
+  | "Body Wave"
+  | "Straight"
+  | "Curly"
+  | "Loose Wave";
 
 export interface Wig {
   id: string;
@@ -32,10 +43,23 @@ export interface Wig {
 }
 
 export const STYLE_TYPES: StyleType[] = [
-  "Lace Front", "HD Wig", "Glueless", "Closure", "Bob", "Long", "Braided/Protective", "360 Lace",
+  "Lace Front",
+  "HD Wig",
+  "Glueless",
+  "Closure",
+  "Bob",
+  "Long",
+  "Braided/Protective",
+  "360 Lace",
 ];
 export const HAIR_TEXTURES: HairTexture[] = [
-  "Kinky Coily", "Kinky Straight", "Deep Wave", "Body Wave", "Straight", "Curly", "Loose Wave",
+  "Kinky Coily",
+  "Kinky Straight",
+  "Deep Wave",
+  "Body Wave",
+  "Straight",
+  "Curly",
+  "Loose Wave",
 ];
 
 export function formatPrice(price: number, currency: string) {
@@ -173,7 +197,11 @@ export async function fetchWigById(id: string): Promise<Wig | null> {
   return wig ?? null;
 }
 
-export async function fetchRelatedWigs(styleType: string, excludeId: string, limit = 4): Promise<Wig[]> {
+export async function fetchRelatedWigs(
+  styleType: string,
+  excludeId: string,
+  limit = 4,
+): Promise<Wig[]> {
   const { data, error } = await supabase
     .from("wigs")
     .select(SELECT)
@@ -220,8 +248,15 @@ export async function fetchWigsByRetailerId(retailerId: string, limit = 24): Pro
 }
 
 const AFFILIATE_HOSTS = [
-  "awin1.com", "anrdoezrs.net", "dpbolvw.net", "jdoqocy.com", "kqzyfj.com",
-  "tkqlhce.com", "impact.com", "sjv.io", "pxf.io",
+  "awin1.com",
+  "anrdoezrs.net",
+  "dpbolvw.net",
+  "jdoqocy.com",
+  "kqzyfj.com",
+  "tkqlhce.com",
+  "impact.com",
+  "sjv.io",
+  "pxf.io",
 ];
 
 /** True when the product URL goes through a known affiliate network. */
@@ -239,12 +274,17 @@ export function isAffiliateLink(productUrl: string | null | undefined): boolean 
 export function affiliateDisclosure(retailers: string[]): string | null {
   const names = Array.from(new Set(retailers.filter(Boolean)));
   if (names.length === 0) return null;
-  const list = names.length === 1
-    ? names[0]
-    : `${names.slice(0, -1).join(", ")} or ${names[names.length - 1]}`;
+  const list =
+    names.length === 1
+      ? names[0]
+      : `${names.slice(0, -1).join(", ")} or ${names[names.length - 1]}`;
   return `Wigsmi earns a commission if you buy from ${list}.`;
 }
 
-export function catalogueDisclosure(wigs: Pick<Wig, "retailer" | "product_url">[] | null | undefined): string | null {
-  return affiliateDisclosure((wigs ?? []).filter((w) => isAffiliateLink(w.product_url)).map((w) => w.retailer));
+export function catalogueDisclosure(
+  wigs: Pick<Wig, "retailer" | "product_url">[] | null | undefined,
+): string | null {
+  return affiliateDisclosure(
+    (wigs ?? []).filter((w) => isAffiliateLink(w.product_url)).map((w) => w.retailer),
+  );
 }

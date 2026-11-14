@@ -68,9 +68,7 @@ export function RetailerPlanCards({
         currency,
         customerEmail: user.email ?? undefined,
         customData: { userId: user.id, plan: planId },
-        successUrl:
-          successUrl ||
-          `${window.location.origin}/checkout/success?type=retailer`,
+        successUrl: successUrl || `${window.location.origin}/checkout/success?type=retailer`,
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not start checkout");
@@ -82,31 +80,27 @@ export function RetailerPlanCards({
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center gap-3">
-      <div className="inline-flex rounded-full border border-border bg-card p-1">
-        <button
-          type="button"
-          onClick={() => setInterval("monthly")}
-          className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-            interval === "monthly"
-              ? "bg-mahogany text-cream"
-              : "text-foreground/70"
-          }`}
-        >
-          Monthly
-        </button>
-        <button
-          type="button"
-          onClick={() => setInterval("yearly")}
-          className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-            interval === "yearly"
-              ? "bg-mahogany text-cream"
-              : "text-foreground/70"
-          }`}
-        >
-          Yearly <span className="ml-1 text-gold">-35%</span>
-        </button>
-      </div>
-      <CurrencySwitch />
+        <div className="inline-flex rounded-full border border-border bg-card p-1">
+          <button
+            type="button"
+            onClick={() => setInterval("monthly")}
+            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+              interval === "monthly" ? "bg-mahogany text-cream" : "text-foreground/70"
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            type="button"
+            onClick={() => setInterval("yearly")}
+            className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+              interval === "yearly" ? "bg-mahogany text-cream" : "text-foreground/70"
+            }`}
+          >
+            Yearly <span className="ml-1 text-gold">-35%</span>
+          </button>
+        </div>
+        <CurrencySwitch />
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
@@ -128,7 +122,9 @@ export function RetailerPlanCards({
                 </span>
               )}
               <p className="font-display text-xl text-mahogany">{p.name}</p>
-              <p className="mt-3 font-mono text-3xl">{formatRetailerPlanPrice(p, interval, currency)}</p>
+              <p className="mt-3 font-mono text-3xl">
+                {formatRetailerPlanPrice(p, interval, currency)}
+              </p>
               <p className="text-xs text-muted-foreground">{periodLabel}</p>
               <p className="mt-2 text-sm text-muted-foreground">{p.tagline}</p>
               <ul className="mt-4 space-y-2">

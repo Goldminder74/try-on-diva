@@ -64,7 +64,9 @@ describe("purgeAnonymousTryOns", () => {
   });
 
   it("reports a failure instead of throwing, so the trial check still completes", async () => {
-    const sb = { storage: { from: () => ({ list: async () => ({ data: null, error: new Error("down") }) }) } };
+    const sb = {
+      storage: { from: () => ({ list: async () => ({ data: null, error: new Error("down") }) }) },
+    };
     const result = await purgeAnonymousTryOns(sb, now);
     expect(result.error).toBe("clean-up failed");
   });

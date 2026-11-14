@@ -7,7 +7,18 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import { LayoutDashboard, Package, Settings, LogOut, ExternalLink, CreditCard, Code2, BarChart3, Key, Percent } from "lucide-react";
+import {
+  LayoutDashboard,
+  Package,
+  Settings,
+  LogOut,
+  ExternalLink,
+  CreditCard,
+  Code2,
+  BarChart3,
+  Key,
+  Percent,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { Wordmark } from "@/components/wigsmi/Wordmark";
@@ -15,9 +26,23 @@ import { PastDueBanner } from "@/components/PastDueBanner";
 import { TrialEndingBanner, TrialExpiredPaywall } from "@/components/retailer/TrialGate";
 import { useRetailerStatus } from "@/hooks/use-retailer-status";
 
-
 export const Route = createFileRoute("/portal")({
-  head: () => ({ meta: [{ title: "Retailer portal - Wigsmi" }, { name: "description", content: "Manage your Wigsmi retailer catalogue, widget, billing and analytics." }, { property: "og:title", content: "Retailer portal - Wigsmi" }, { property: "og:description", content: "Manage your Wigsmi retailer catalogue, widget, billing and analytics." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Retailer portal - Wigsmi" },
+      {
+        name: "description",
+        content: "Manage your Wigsmi retailer catalogue, widget, billing and analytics.",
+      },
+      { property: "og:title", content: "Retailer portal - Wigsmi" },
+      {
+        property: "og:description",
+        content: "Manage your Wigsmi retailer catalogue, widget, billing and analytics.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   staticData: { sitemap: "exclude-subtree" },
   // The session is browser-stored; a server guard cannot see it on a hard refresh.
   ssr: false,
@@ -153,9 +178,7 @@ function PortalLayout() {
           </nav>
         </aside>
 
-        <main className="flex-1 min-w-0">
-          {showPaywall ? <TrialExpiredPaywall /> : <Outlet />}
-        </main>
+        <main className="flex-1 min-w-0">{showPaywall ? <TrialExpiredPaywall /> : <Outlet />}</main>
       </div>
     </div>
   );

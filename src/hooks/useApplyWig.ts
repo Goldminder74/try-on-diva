@@ -65,71 +65,77 @@ export function useApplyWig(wig: Wig | null, photo: File | null): UseApplyWig {
 
   // All three angles are generated together in one request and count as a
   // single try-on. The `view` argument is kept only for call-site compatibility.
-  const applyWig = useCallback(async (_view: TryOnView = "front") => {
-    const view: TryOnView = "front";
-    if (!wig) return setError("Pick a wig first.");
-    if (!wig.images?.[0]) return setError("This wig has no product image.");
-    if (!photo) return setError("Upload a selfie first.");
+  const applyWig = useCallback(
+    async (_view: TryOnView = "front") => {
+      const view: TryOnView = "front";
+      if (!wig) return setError("Pick a wig first.");
+      if (!wig.images?.[0]) return setError("This wig has no product image.");
+      if (!photo) return setError("Upload a selfie first.");
 
-    setError(null);
-    // A fresh front view starts a new set; side/back are added to the set.
-    if (view === "front") {
-      setResultUrl(null);
-      setViews({ front: null, side: null, back: null });
-    }
-    setGeneratingView(view);
-    setApplying(true);
-    try {
-      // Freemium quota gate (also records the analytics event + increments the
-      // monthly count). Blocks generation once the free allowance is used up.
-      const gate = await record({ data: { wigId: wig.id } });
-      if (!gate.allowed) {
-        setBlocked(true);
-        setError("Free try-on limit reached this month."); // surface it, not just the banner
-        return;
+      setError(null);
+      // A fresh front view starts a new set; side/back are added to the set.
+      if (view === "front") {
+        setResultUrl(null);
+        setViews({ front: null, side: null, back: null });
       }
-      setRemaining(gate.remaining ?? null);
+      setGeneratingView(view);
+      setApplying(true);
+      try {
+        // Freemium quota gate (also records the analytics event + increments the
+        // monthly count). Blocks generation once the free allowance is used up.
+        const gate = await record({ data: { wigId: wig.id } });
+        if (!gate.allowed) {
+          setBlocked(true);
+          setError("Free try-on limit reached this month."); // surface it, not just the banner
+          return;
+        }
+        setRemaining(gate.remaining ?? null);
 
-      // Convert the uploaded selfie and call the generation server function.
-      const userPhotoBase64 = await blobToBase64(photo);
-      const userPhotoMimeType = photo.type as "image/jpeg" | "image/png" | "image/webp";
-      const toAbsolute = (u: string) => new URL(u, window.location.origin).href;
-      const wigImageUrl = toAbsolute(wig.images[0]);
-      const wigImageUrls = (wig.images ?? []).slice(0, 4).map(toAbsolute);
+        // Convert the uploaded selfie and call the generation server function.
+        const userPhotoBase64 = await blobToBase64(photo);
+        const userPhotoMimeType = photo.type as "image/jpeg" | "image/png" | "image/webp";
+        const toAbsolute = (u: string) => new URL(u, window.location.origin).href;
+        const wigImageUrl = toAbsolute(wig.images[0]);
+        const wigImageUrls = (wig.images ?? []).slice(0, 4).map(toAbsolute);
 
-      const out = await runGenerate({
-        data: {
-          userPhotoBase64,
-          userPhotoMimeType,
-          wigId: wig.id,
-          wigImageUrl,
-          wigImageUrls,
-          wigName: wig.name,
-          wigStyleType: wig.style_type || "wig",
-          wigColour: wig.colors?.[0] || "natural",
-          view,
-        },
-      });
+        const out = await runGenerate({
+          data: {
+            userPhotoBase64,
+            userPhotoMimeType,
+            wigId: wig.id,
+            wigImageUrl,
+            wigImageUrls,
+            wigName: wig.name,
+            wigStyleType: wig.style_type || "wig",
+            wigColour: wig.colors?.[0] || "natural",
+            view,
+          },
+        });
 
-
-      if (!out?.signedUrl) {
-        setError("Generation returned no image URL.");
-        return;
+        if (!out?.signedUrl) {
+          setError("Generation returned no image URL.");
+          return;
+        }
+        setViews({
+          front: out.views?.front ?? out.signedUrl,
+          side: out.views?.side ?? null,
+          back: out.views?.back ?? null,
+        });
+        setResultUrl(out.signedUrl);
+      } catch (err) {
+        if (view === "front") setResultUrl(null);
+        setError(
+          err instanceof Error && /limit reached/i.test(err.message)
+            ? err.message
+            : "Something went wrong generating your try-on. Please try again in a moment.",
+        );
+      } finally {
+        setGeneratingView(null);
+        setApplying(false);
       }
-      setViews({
-        front: out.views?.front ?? out.signedUrl,
-        side: out.views?.side ?? null,
-        back: out.views?.back ?? null,
-      });
-      setResultUrl(out.signedUrl);
-    } catch (err) {
-      if (view === "front") setResultUrl(null);
-      setError(err instanceof Error && /limit reached/i.test(err.message) ? err.message : "Something went wrong generating your try-on. Please try again in a moment.");
-    } finally {
-      setGeneratingView(null);
-      setApplying(false);
-    }
-  }, [wig, photo, record, runGenerate]);
+    },
+    [wig, photo, record, runGenerate],
+  );
 
   return { applying, error, resultUrl, views, generatingView, blocked, remaining, applyWig, reset };
 }

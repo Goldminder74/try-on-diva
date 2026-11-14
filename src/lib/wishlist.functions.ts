@@ -23,9 +23,7 @@ export const listWishlist = createServerFn({ method: "GET" })
 
 export const toggleWishlist = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { wigId: string }) =>
-    z.object({ wigId: z.string().uuid() }).parse(d),
-  )
+  .inputValidator((d: { wigId: string }) => z.object({ wigId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: existing } = await supabase

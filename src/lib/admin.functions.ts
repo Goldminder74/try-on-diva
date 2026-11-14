@@ -39,14 +39,21 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
       supabaseAdmin.from("wigs").select("id", { count: "exact", head: true }),
       supabaseAdmin.from("try_on_events").select("created_at").gte("created_at", since30),
-      supabaseAdmin.from("wig_clicks").select("id", { count: "exact", head: true }).gte("created_at", since30),
-      supabaseAdmin.from("subscriptions").select("plan, status, billing_interval, current_period_end").in("status", ["active", "trialing"]),
+      supabaseAdmin
+        .from("wig_clicks")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", since30),
+      supabaseAdmin
+        .from("subscriptions")
+        .select("plan, status, billing_interval, current_period_end")
+        .in("status", ["active", "trialing"]),
     ]);
 
     const retailerRows = retailers.data ?? [];
     const now = Date.now();
     const activeRetailers = retailerRows.filter(
-      (r: any) => r.is_active && (new Date(r.trial_ends_at || 0).getTime() > now || r.plan !== "starter"),
+      (r: any) =>
+        r.is_active && (new Date(r.trial_ends_at || 0).getTime() > now || r.plan !== "starter"),
     ).length;
 
     // MRR - convert yearly to monthly equivalent.
@@ -86,7 +93,11 @@ export const getRecentSignups = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const [retailers, consumers] = await Promise.all([
-      supabaseAdmin.from("retailers").select("id, business_name, slug, country, created_at").order("created_at", { ascending: false }).limit(10),
+      supabaseAdmin
+        .from("retailers")
+        .select("id, business_name, slug, country, created_at")
+        .order("created_at", { ascending: false })
+        .limit(10),
       supabaseAdmin
         .from("profiles")
         .select("id, display_name, email, country, created_at")
@@ -105,7 +116,9 @@ export const listRetailers = createServerFn({ method: "GET" })
     await assertAdmin(context.supabase, context.userId);
     let q = supabaseAdmin
       .from("retailers")
-      .select("id, business_name, slug, country, plan, trial_ends_at, is_active, created_at, owner_id")
+      .select(
+        "id, business_name, slug, country, plan, trial_ends_at, is_active, created_at, owner_id",
+      )
       .order("created_at", { ascending: false });
     if (data.search) q = q.ilike("business_name", `%${data.search}%`);
     const { data: rows } = await q;
@@ -116,12 +129,20 @@ export const listRetailers = createServerFn({ method: "GET" })
     const since = new Date(Date.now() - 30 * 86400000).toISOString();
     const [wigsAgg, tryAgg] = await Promise.all([
       supabaseAdmin.from("wigs").select("retailer_id").in("retailer_id", ids),
-      supabaseAdmin.from("try_on_events").select("retailer_id").in("retailer_id", ids).gte("created_at", since),
+      supabaseAdmin
+        .from("try_on_events")
+        .select("retailer_id")
+        .in("retailer_id", ids)
+        .gte("created_at", since),
     ]);
     const wigCount = new Map<string, number>();
-    for (const w of wigsAgg.data ?? []) { if (w.retailer_id) wigCount.set(w.retailer_id, (wigCount.get(w.retailer_id) ?? 0) + 1); }
+    for (const w of wigsAgg.data ?? []) {
+      if (w.retailer_id) wigCount.set(w.retailer_id, (wigCount.get(w.retailer_id) ?? 0) + 1);
+    }
     const tryCount = new Map<string, number>();
-    for (const t of tryAgg.data ?? []) { if (t.retailer_id) tryCount.set(t.retailer_id, (tryCount.get(t.retailer_id) ?? 0) + 1); }
+    for (const t of tryAgg.data ?? []) {
+      if (t.retailer_id) tryCount.set(t.retailer_id, (tryCount.get(t.retailer_id) ?? 0) + 1);
+    }
 
     return rows.map((r: any) => ({
       ...r,
@@ -132,23 +153,39 @@ export const listRetailers = createServerFn({ method: "GET" })
 
 export const setRetailerActive = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; active: boolean }) => z.object({ id: z.string().uuid(), active: z.boolean() }).parse(d))
+  .inputValidator((d: { id: string; active: boolean }) =>
+    z.object({ id: z.string().uuid(), active: z.boolean() }).parse(d),
+  )
   .handler(async ({ context, data }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { error } = await supabaseAdmin.from("retailers").update({ is_active: data.active }).eq("id", data.id);
+    const { error } = await supabaseAdmin
+      .from("retailers")
+      .update({ is_active: data.active })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
 export const extendRetailerTrial = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; days: number }) => z.object({ id: z.string().uuid(), days: z.number().int().min(1).max(365) }).parse(d))
+  .inputValidator((d: { id: string; days: number }) =>
+    z.object({ id: z.string().uuid(), days: z.number().int().min(1).max(365) }).parse(d),
+  )
   .handler(async ({ context, data }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { data: r } = await supabaseAdmin.from("retailers").select("trial_ends_at").eq("id", data.id).maybeSingle();
+    const { data: r } = await supabaseAdmin
+      .from("retailers")
+      .select("trial_ends_at")
+      .eq("id", data.id)
+      .maybeSingle();
     const base = r?.trial_ends_at ? new Date(r.trial_ends_at) : new Date();
-    const next = new Date(Math.max(base.getTime(), Date.now()) + data.days * 86400000).toISOString();
-    const { error } = await supabaseAdmin.from("retailers").update({ trial_ends_at: next }).eq("id", data.id);
+    const next = new Date(
+      Math.max(base.getTime(), Date.now()) + data.days * 86400000,
+    ).toISOString();
+    const { error } = await supabaseAdmin
+      .from("retailers")
+      .update({ trial_ends_at: next })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { trial_ends_at: next };
   });
@@ -171,13 +208,17 @@ export const listConsumers = createServerFn({ method: "GET" })
     const ids = profiles.map((p: any) => p.id);
 
     const [cps, wishes] = await Promise.all([
-      supabaseAdmin.from("consumer_profiles").select("user_id, try_on_count_this_month, quiz_completed_at").in("user_id", ids),
+      supabaseAdmin
+        .from("consumer_profiles")
+        .select("user_id, try_on_count_this_month, quiz_completed_at")
+        .in("user_id", ids),
       supabaseAdmin.from("wishlist_items").select("user_id").in("user_id", ids),
     ]);
     const cpMap = new Map<string, any>();
     for (const c of cps.data ?? []) cpMap.set(c.user_id, c);
     const wishCount = new Map<string, number>();
-    for (const w of wishes.data ?? []) wishCount.set(w.user_id, (wishCount.get(w.user_id) ?? 0) + 1);
+    for (const w of wishes.data ?? [])
+      wishCount.set(w.user_id, (wishCount.get(w.user_id) ?? 0) + 1);
 
     return profiles.map((p: any) => ({
       ...p,
@@ -206,7 +247,10 @@ export const listAdminCatalog = createServerFn({ method: "GET" })
     const pageSize = 60;
     let q = supabaseAdmin
       .from("wigs")
-      .select("id, name, retailer_id, images, price, currency, style_type, hair_texture, is_published, is_featured, featured_rank, in_stock, created_at", { count: "exact" })
+      .select(
+        "id, name, retailer_id, images, price, currency, style_type, hair_texture, is_published, is_featured, featured_rank, in_stock, created_at",
+        { count: "exact" },
+      )
       .order("created_at", { ascending: false })
       .range((data.page - 1) * pageSize, data.page * pageSize - 1);
 
@@ -230,10 +274,15 @@ export const listAdminCatalog = createServerFn({ method: "GET" })
 
 export const setWigPublished = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; published: boolean }) => z.object({ id: z.string().uuid(), published: z.boolean() }).parse(d))
+  .inputValidator((d: { id: string; published: boolean }) =>
+    z.object({ id: z.string().uuid(), published: z.boolean() }).parse(d),
+  )
   .handler(async ({ context, data }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { error } = await supabaseAdmin.from("wigs").update({ is_published: data.published }).eq("id", data.id);
+    const { error } = await supabaseAdmin
+      .from("wigs")
+      .update({ is_published: data.published })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -268,14 +317,22 @@ export const getFeaturedWigs = createServerFn({ method: "GET" })
 
 export const setFeaturedWigs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { ids: string[] }) => z.object({ ids: z.array(z.string().uuid()).max(5) }).parse(d))
+  .inputValidator((d: { ids: string[] }) =>
+    z.object({ ids: z.array(z.string().uuid()).max(5) }).parse(d),
+  )
   .handler(async ({ context, data }) => {
     await assertAdmin(context.supabase, context.userId);
     // Clear old featured set
-    await supabaseAdmin.from("wigs").update({ is_featured: false, featured_rank: null }).eq("is_featured", true);
+    await supabaseAdmin
+      .from("wigs")
+      .update({ is_featured: false, featured_rank: null })
+      .eq("is_featured", true);
     // Re-mark in order
     for (let i = 0; i < data.ids.length; i++) {
-      await supabaseAdmin.from("wigs").update({ is_featured: true, featured_rank: i + 1 }).eq("id", data.ids[i]);
+      await supabaseAdmin
+        .from("wigs")
+        .update({ is_featured: true, featured_rank: i + 1 })
+        .eq("id", data.ids[i]);
     }
     return { ok: true };
   });

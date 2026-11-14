@@ -16,10 +16,7 @@ import { listAllCommissionSales, setCommissionSaleStatus } from "@/lib/commissio
 export const Route = createFileRoute("/admin/commission")({
   staticData: { sitemap: false },
   head: () => ({
-    meta: [
-      { title: "Commission - Wigsmi Admin" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Commission - Wigsmi Admin" }, { name: "robots", content: "noindex" }],
   }),
   component: AdminCommission,
 });
@@ -99,12 +96,10 @@ function AdminCommission() {
           <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
             Commission
           </p>
-          <h1 className="mt-1 font-display text-4xl text-mahogany">
-            Orders from Wigsmi visits
-          </h1>
+          <h1 className="mt-1 font-display text-4xl text-mahogany">Orders from Wigsmi visits</h1>
           <p className="mt-2 max-w-2xl text-sm text-foreground/80">
-            Retailers log each order themselves. Check one against the tracked visit
-            and the shop's own records, then settle it here.
+            Retailers log each order themselves. Check one against the tracked visit and the shop's
+            own records, then settle it here.
           </p>
         </div>
         <button

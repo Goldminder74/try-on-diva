@@ -3,9 +3,7 @@
 
 @source "../src";
 
-
 @custom-variant dark (&:is(.dark *));
-
 
 /*
  * Wigsmi design system.
@@ -64,16 +62,16 @@
   --radius: 0.5rem;
 
   /* Wigsmi palette in oklch */
-  --mahogany: oklch(0.245 0.05 45);          /* #3D1C02 */
+  --mahogany: oklch(0.245 0.05 45); /* #3D1C02 */
   --mahogany-soft: oklch(0.32 0.06 45);
-  --gold: oklch(0.745 0.115 85);             /* #C9A84C */
-  --gold-dark: oklch(0.62 0.115 75);         /* #A67C35 */
-  --sienna: oklch(0.585 0.135 40);           /* #B85C38 */
-  --cream: oklch(0.975 0.012 80);            /* #FAF7F2 */
-  --sand: oklch(0.945 0.018 75);             /* #F3EDE4 */
-  --dark: oklch(0.16 0.018 50);              /* #1A0F00 */
-  --success: oklch(0.5 0.09 155);            /* #2D6A4F */
-  --error: oklch(0.48 0.165 15);             /* #9B2335 */
+  --gold: oklch(0.745 0.115 85); /* #C9A84C */
+  --gold-dark: oklch(0.62 0.115 75); /* #A67C35 */
+  --sienna: oklch(0.585 0.135 40); /* #B85C38 */
+  --cream: oklch(0.975 0.012 80); /* #FAF7F2 */
+  --sand: oklch(0.945 0.018 75); /* #F3EDE4 */
+  --dark: oklch(0.16 0.018 50); /* #1A0F00 */
+  --success: oklch(0.5 0.09 155); /* #2D6A4F */
+  --error: oklch(0.48 0.165 15); /* #9B2335 */
 
   --background: var(--cream);
   --foreground: var(--dark);
@@ -98,7 +96,7 @@
 
 .dark {
   /* Retailer dashboard dark mode */
-  --background: oklch(0.13 0.014 50);        /* #0E0804 */
+  --background: oklch(0.13 0.014 50); /* #0E0804 */
   --foreground: var(--cream);
   --card: oklch(0.18 0.018 50);
   --card-foreground: var(--cream);
@@ -134,7 +132,11 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, h4, .font-display {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
     font-family: var(--font-display);
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -166,21 +168,33 @@
   }
 
   @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 
   .animate-slide-in-bottom {
     animation: slide-in-bottom 280ms cubic-bezier(0.16, 1, 0.3, 1);
   }
   @keyframes slide-in-bottom {
-    from { transform: translateY(100%); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 
-
   .card-hover {
-    transition: box-shadow 200ms ease, border-left-color 200ms ease, transform 200ms ease;
+    transition:
+      box-shadow 200ms ease,
+      border-left-color 200ms ease,
+      transform 200ms ease;
     border-left: 3px solid transparent;
   }
   .card-hover:hover {
@@ -190,15 +204,54 @@
 }
 
 /* Long-form guide articles */
-.guide-prose { font-size: 1.0625rem; line-height: 1.8; color: var(--color-foreground); }
-.guide-prose > * + * { margin-top: 1.25em; }
-.guide-prose h2 { font-family: var(--font-display); color: var(--color-mahogany); font-size: 1.75rem; line-height: 1.25; margin-top: 2.25em; }
-.guide-prose h3 { font-family: var(--font-display); color: var(--color-mahogany); font-size: 1.35rem; margin-top: 1.75em; }
-.guide-prose ul, .guide-prose ol { padding-left: 1.4em; }
-.guide-prose ul { list-style: disc; }
-.guide-prose ol { list-style: decimal; }
-.guide-prose li + li { margin-top: 0.5em; }
-.guide-prose li::marker { color: var(--color-gold-dark); }
-.guide-prose strong { color: var(--color-mahogany); font-weight: 600; }
-.guide-prose a { color: var(--color-mahogany); text-decoration: underline; text-decoration-color: var(--color-gold); text-underline-offset: 3px; overflow-wrap: anywhere; }
-.guide-prose a:hover { text-decoration-color: var(--color-mahogany); }
+.guide-prose {
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--color-foreground);
+}
+.guide-prose > * + * {
+  margin-top: 1.25em;
+}
+.guide-prose h2 {
+  font-family: var(--font-display);
+  color: var(--color-mahogany);
+  font-size: 1.75rem;
+  line-height: 1.25;
+  margin-top: 2.25em;
+}
+.guide-prose h3 {
+  font-family: var(--font-display);
+  color: var(--color-mahogany);
+  font-size: 1.35rem;
+  margin-top: 1.75em;
+}
+.guide-prose ul,
+.guide-prose ol {
+  padding-left: 1.4em;
+}
+.guide-prose ul {
+  list-style: disc;
+}
+.guide-prose ol {
+  list-style: decimal;
+}
+.guide-prose li + li {
+  margin-top: 0.5em;
+}
+.guide-prose li::marker {
+  color: var(--color-gold-dark);
+}
+.guide-prose strong {
+  color: var(--color-mahogany);
+  font-weight: 600;
+}
+.guide-prose a {
+  color: var(--color-mahogany);
+  text-decoration: underline;
+  text-decoration-color: var(--color-gold);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+.guide-prose a:hover {
+  text-decoration-color: var(--color-mahogany);
+}

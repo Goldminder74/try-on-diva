@@ -27,7 +27,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { formatMinor, formatPlanPrice, formatZero, priceMinor, type PlanCurrency } from "@/lib/plan-prices";
+import {
+  formatMinor,
+  formatPlanPrice,
+  formatZero,
+  priceMinor,
+  type PlanCurrency,
+} from "@/lib/plan-prices";
 import { CurrencySwitch, usePlanCurrency } from "@/hooks/usePlanCurrency";
 
 /** Price lines for a paid plan, read from the shared Stripe-matching config. */
@@ -55,7 +61,11 @@ export const Route = createFileRoute("/pricing")({
       { name: "twitter:card", content: "summary" },
       { property: "og:type", content: "website" },
       { title: "Pricing - Wigsmi" },
-      { name: "description", content: "Wigsmi pricing for consumers. Start free with 5 try-ons a month, or get 35 a month from £4.99/month." },
+      {
+        name: "description",
+        content:
+          "Wigsmi pricing for consumers. Start free with 5 try-ons a month, or get 35 a month from £4.99/month.",
+      },
       { property: "og:title", content: "Pricing - Wigsmi" },
       { property: "og:description", content: "Free, Plus and Pro plans for Wigsmi consumers." },
     ],
@@ -251,7 +261,9 @@ function Pricing() {
         toast.error(res.error);
         return;
       }
-      toast.success("Subscription cancelled. You keep access until the end of your billing period.");
+      toast.success(
+        "Subscription cancelled. You keep access until the end of your billing period.",
+      );
       setConfirmCancel(false);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not cancel subscription");
@@ -281,8 +293,12 @@ function Pricing() {
       <div className="mx-auto w-full max-w-6xl px-5 py-16">
         <div className="text-center">
           <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Pricing</p>
-          <h1 className="mt-2 font-display text-5xl text-mahogany md:text-6xl">Simple. Warm. Yours.</h1>
-          <p className="mx-auto mt-4 max-w-md text-muted-foreground">Start free. Upgrade only if Wigsmi becomes part of your routine.</p>
+          <h1 className="mt-2 font-display text-5xl text-mahogany md:text-6xl">
+            Simple. Warm. Yours.
+          </h1>
+          <p className="mx-auto mt-4 max-w-md text-muted-foreground">
+            Start free. Upgrade only if Wigsmi becomes part of your routine.
+          </p>
 
           <div className="mt-7 inline-flex rounded-full border border-border bg-card p-1">
             <button
@@ -311,16 +327,27 @@ function Pricing() {
               You're on{" "}
               <span className="capitalize text-foreground">
                 {subscription.plan}
-                {subscription.billing_interval === "year" ? " · Yearly" : subscription.billing_interval === "month" ? " · Monthly" : ""}
+                {subscription.billing_interval === "year"
+                  ? " · Yearly"
+                  : subscription.billing_interval === "month"
+                    ? " · Monthly"
+                    : ""}
               </span>
               .{" "}
-              <button onClick={onManage} className="text-mahogany underline" disabled={busyId === "portal"}>
+              <button
+                onClick={onManage}
+                className="text-mahogany underline"
+                disabled={busyId === "portal"}
+              >
                 Manage subscription
               </button>
               {isConsumerSub && subscription?.status !== "canceled" && (
                 <>
                   {" · "}
-                  <button onClick={() => setConfirmCancel(true)} className="text-mahogany underline">
+                  <button
+                    onClick={() => setConfirmCancel(true)}
+                    className="text-mahogany underline"
+                  >
                     Cancel
                   </button>
                 </>
@@ -330,7 +357,7 @@ function Pricing() {
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {PLANS.map(p => {
+          {PLANS.map((p) => {
             const priceId = p.priceIds[interval];
             const isCurrent = currentPlanKey === p.planKey;
             const busy = busyId === p.planKey || (busyId === null && checkoutLoading);
@@ -351,10 +378,16 @@ function Pricing() {
                 <p className="font-display text-2xl text-mahogany">{p.name}</p>
                 {showYearly && d.monthlyEquivYearly ? (
                   <>
-                    <p className="mt-3 font-mono text-4xl text-foreground">{d.monthlyEquivYearly}</p>
-                    <p className="text-xs text-muted-foreground">per month, billed annually ({d.yearly}/yr)</p>
+                    <p className="mt-3 font-mono text-4xl text-foreground">
+                      {d.monthlyEquivYearly}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      per month, billed annually ({d.yearly}/yr)
+                    </p>
                     {d.yearlySavings && (
-                      <p className="mt-1 text-xs font-medium text-gold-dark">Save {d.yearlySavings}/yr</p>
+                      <p className="mt-1 text-xs font-medium text-gold-dark">
+                        Save {d.yearlySavings}/yr
+                      </p>
                     )}
                   </>
                 ) : (
@@ -369,10 +402,16 @@ function Pricing() {
                 <ul className="mt-6 space-y-2.5">
                   {p.features.map(([on, label], i) => (
                     <li key={i} className="flex items-start gap-2 text-sm">
-                      {on
-                        ? <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-                        : <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/60" />}
-                      <span className={on ? "text-foreground" : "text-muted-foreground line-through"}>{label}</span>
+                      {on ? (
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                      ) : (
+                        <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/60" />
+                      )}
+                      <span
+                        className={on ? "text-foreground" : "text-muted-foreground line-through"}
+                      >
+                        {label}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -405,13 +444,11 @@ function Pricing() {
 
         <div className="mt-8 rounded-xl border border-gold/40 bg-gold/10 p-6 md:flex md:items-center md:justify-between md:gap-6">
           <div>
-            <p className="font-display text-2xl text-mahogany">
-              Need more this month?
-            </p>
+            <p className="font-display text-2xl text-mahogany">Need more this month?</p>
             <p className="mt-1 text-sm text-foreground/80">
               {TRYON_PACKS[0].label} for {formatPackPrice(TRYON_PACKS[0], currency)} - a one-off
-              top-up on any plan, yours to use for {TRYON_PACKS[0].validMonths} months.
-              Your monthly allowance is always used first.
+              top-up on any plan, yours to use for {TRYON_PACKS[0].validMonths} months. Your monthly
+              allowance is always used first.
             </p>
           </div>
           <button
@@ -429,14 +466,14 @@ function Pricing() {
         </p>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Are you a wig retailer? <Link to="/retailer" className="text-mahogany underline">See retailer plans →</Link>
+          Are you a wig retailer?{" "}
+          <Link to="/retailer" className="text-mahogany underline">
+            See retailer plans →
+          </Link>
         </p>
       </div>
 
-      <AlertDialog
-        open={!!previewState}
-        onOpenChange={(open) => !open && setPreviewState(null)}
-      >
+      <AlertDialog open={!!previewState} onOpenChange={(open) => !open && setPreviewState(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Switch to {previewState?.planName}?</AlertDialogTitle>
@@ -460,15 +497,16 @@ function Pricing() {
                     toward your next invoice.
                   </p>
                 )}
-                {previewState && previewState.immediateAmount === 0 && (
-                  <p>No charge today.</p>
-                )}
+                {previewState && previewState.immediateAmount === 0 && <p>No charge today.</p>}
                 {previewState?.nextBilledAt && (
                   <p className="text-muted-foreground">
                     Next renewal: {formatMinor(previewState.nextAmount, previewState.currency)} on{" "}
                     {new Date(previewState.nextBilledAt).toLocaleDateString("en-GB", {
-                      day: "numeric", month: "long", year: "numeric",
-                    })}.
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                    .
                   </p>
                 )}
               </div>
@@ -492,7 +530,9 @@ function Pricing() {
               You'll keep your current plan until{" "}
               {subscription?.current_period_end
                 ? new Date(subscription.current_period_end).toLocaleDateString("en-GB", {
-                    day: "numeric", month: "long", year: "numeric",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
                   })
                 : "the end of this billing period"}
               , then move to Free. You can resubscribe any time.

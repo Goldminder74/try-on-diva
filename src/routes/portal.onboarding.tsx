@@ -1,14 +1,20 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  getMyRetailerContext,
-  saveRetailerOnboarding,
-} from "@/lib/retailer.functions";
+import { getMyRetailerContext, saveRetailerOnboarding } from "@/lib/retailer.functions";
 
 export const Route = createFileRoute("/portal/onboarding")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ title: "Retailer onboarding | Wigsmi" }, { name: "description", content: "Manage your Wigsmi retailer onboarding." }, { property: "og:title", content: "Retailer onboarding | Wigsmi" }, { property: "og:description", content: "Manage your Wigsmi retailer onboarding." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Retailer onboarding | Wigsmi" },
+      { name: "description", content: "Manage your Wigsmi retailer onboarding." },
+      { property: "og:title", content: "Retailer onboarding | Wigsmi" },
+      { property: "og:description", content: "Manage your Wigsmi retailer onboarding." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Onboarding,
 });
 
@@ -58,8 +64,7 @@ function Onboarding() {
           business_name: retailer.business_name ?? "",
           vat_number: retailer.vat_number ?? "",
           legal_business_name:
-            (ctx.retailer as { legal_business_name?: string | null })
-              .legal_business_name ?? "",
+            (ctx.retailer as { legal_business_name?: string | null }).legal_business_name ?? "",
           display_name: retailer.display_name ?? "",
           website: retailer.website ?? "",
           country: retailer.country ?? "",
@@ -74,8 +79,7 @@ function Onboarding() {
     });
   }, [getCtx, navigate]);
 
-  const set = <K extends keyof Form>(k: K, v: Form[K]) =>
-    setForm((f) => ({ ...f, [k]: v }));
+  const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
 
   const onFinish = async (e: FormEvent) => {
     e.preventDefault();
@@ -119,10 +123,7 @@ function Onboarding() {
       <form onSubmit={onFinish} className="space-y-6 rounded-2xl border border-border bg-card p-8">
         {step === 1 && (
           <>
-            <Heading
-              kicker="Tell us about your business"
-              title="Your shop, in your words."
-            />
+            <Heading kicker="Tell us about your business" title="Your shop, in your words." />
             <Field label="Business name">
               <input
                 required
@@ -141,12 +142,18 @@ function Onboarding() {
                 placeholder="e.g. Sienna Hair Co. Ltd"
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                Your registered legal entity name. Required for billing and tax
-                compliance. Not shown to shoppers.
+                Your registered legal entity name. Required for billing and tax compliance. Not
+                shown to shoppers.
               </p>
             </Field>
             <Field label="VAT number (optional)">
-              <input value={form.vat_number} onChange={(e) => set("vat_number", e.target.value)} maxLength={32} pattern="[A-Za-z0-9 -]*" className={inputCls} />
+              <input
+                value={form.vat_number}
+                onChange={(e) => set("vat_number", e.target.value)}
+                maxLength={32}
+                pattern="[A-Za-z0-9 -]*"
+                className={inputCls}
+              />
             </Field>
             <Field label="Display name (shown to shoppers)">
               <input
@@ -238,10 +245,7 @@ function Onboarding() {
 
         {step === 5 && (
           <>
-            <Heading
-              kicker="Almost done"
-              title="One last thing - how did you hear about us?"
-            />
+            <Heading kicker="Almost done" title="One last thing - how did you hear about us?" />
             <Field label="Referral source (optional)">
               <select
                 value={form.referral_source}
@@ -258,8 +262,8 @@ function Onboarding() {
               </select>
             </Field>
             <p className="rounded-md border border-gold/30 bg-gold/10 p-4 text-sm text-gold-dark">
-              You're starting a free 1-month trial. No card required. Add up to 30 wigs
-              on the Starter plan.
+              You're starting a free 1-month trial. No card required. Add up to 30 wigs on the
+              Starter plan.
             </p>
           </>
         )}
@@ -302,9 +306,7 @@ function Onboarding() {
 function Heading({ kicker, title }: { kicker: string; title: string }) {
   return (
     <div>
-      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
-        {kicker}
-      </p>
+      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">{kicker}</p>
       <h1 className="mt-1 font-display text-3xl text-mahogany">{title}</h1>
     </div>
   );

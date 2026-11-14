@@ -58,15 +58,19 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       returnUrl: string;
       environment: StripeEnv;
     }) => {
-      return z.object({
-        priceId: z
-          .string()
-          .max(120)
-          .refine(isCheckoutPriceId, () => ({ message: "Unknown plan or pack." })),
-        currency: z.enum(["GBP", "USD"]).default("GBP"),
-        customerEmail: z.string().email().max(254).optional(), userId: z.string().uuid().optional(),
-        returnUrl: z.string().url().max(2048), environment: z.enum(["sandbox", "live"]),
-      }).parse(data);
+      return z
+        .object({
+          priceId: z
+            .string()
+            .max(120)
+            .refine(isCheckoutPriceId, () => ({ message: "Unknown plan or pack." })),
+          currency: z.enum(["GBP", "USD"]).default("GBP"),
+          customerEmail: z.string().email().max(254).optional(),
+          userId: z.string().uuid().optional(),
+          returnUrl: z.string().url().max(2048),
+          environment: z.enum(["sandbox", "live"]),
+        })
+        .parse(data);
     },
   )
   .handler(async ({ data, context }): Promise<CheckoutSessionResult> => {
@@ -167,17 +171,13 @@ export const syncMySubscription = createServerFn({ method: "POST" })
         status: "all",
         limit: 5,
       });
-      const sub = subs.data.find((s) =>
-        ["active", "trialing", "past_due"].includes(s.status),
-      );
+      const sub = subs.data.find((s) => ["active", "trialing", "past_due"].includes(s.status));
       if (!sub) return { synced: false };
 
       const item = sub.items.data[0];
       const lookupKey = (item?.price as any)?.lookup_key as string | undefined;
       const priceId = lookupKey ?? item?.price?.id ?? "unknown_price";
-      const productId = lookupKey
-        ? lookupKey.replace(/_(monthly|yearly)$/, "")
-        : "unknown_product";
+      const productId = lookupKey ? lookupKey.replace(/_(monthly|yearly)$/, "") : "unknown_product";
       const plan = productId.replace(/^(consumer_|retailer_)/, "");
       const ctype = productId.startsWith("retailer_") ? "retailer" : "consumer";
       const periodStart = (item as any)?.current_period_start ?? (sub as any).current_period_start;
@@ -196,9 +196,7 @@ export const syncMySubscription = createServerFn({ method: "POST" })
           customer_type: ctype,
           status: sub.status,
           billing_interval: item?.price?.recurring?.interval ?? null,
-          current_period_start: periodStart
-            ? new Date(periodStart * 1000).toISOString()
-            : null,
+          current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
           current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
           cancel_at_period_end: sub.cancel_at_period_end ?? false,
           environment,

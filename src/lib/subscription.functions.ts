@@ -15,10 +15,18 @@ const customerTypeSchema = z.enum(["consumer", "retailer"]);
 async function checkPlanChange(supabase: any, userId: string, priceId: string, type: string) {
   let published = 0;
   if (type === "retailer") {
-    const { data: retailer, error } = await supabase.from("retailers").select("id").eq("owner_id", userId).maybeSingle();
+    const { data: retailer, error } = await supabase
+      .from("retailers")
+      .select("id")
+      .eq("owner_id", userId)
+      .maybeSingle();
     if (error) throw error;
     if (retailer) {
-      const result = await supabase.from("wigs").select("id", { count: "exact", head: true }).eq("retailer_id", retailer.id).eq("is_published", true);
+      const result = await supabase
+        .from("wigs")
+        .select("id", { count: "exact", head: true })
+        .eq("retailer_id", retailer.id)
+        .eq("is_published", true);
       if (result.error) throw result.error;
       published = result.count ?? 0;
     }
@@ -39,9 +47,8 @@ async function resolvePriceByLookupKey(
 /** Open the hosted billing portal so the user can manage their subscription. */
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
-      z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
+  .inputValidator((d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+    z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
   .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
     const { supabase, userId } = context;
@@ -158,41 +165,42 @@ export const previewPlanChange = createServerFn({ method: "POST" })
     }
 
     try {
-    await checkPlanChange(supabase, userId, data.newPriceId, data.customerType);
-    const stripe = createStripeClient(data.environment as StripeEnv);
-    const price = await resolvePriceByLookupKey(stripe, data.newPriceId);
-    const current = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
-    const itemId = current.items.data[0]?.id;
-    if (!itemId) throw new Error("Subscription has no billable item.");
+      await checkPlanChange(supabase, userId, data.newPriceId, data.customerType);
+      const stripe = createStripeClient(data.environment as StripeEnv);
+      const price = await resolvePriceByLookupKey(stripe, data.newPriceId);
+      const current = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
+      const itemId = current.items.data[0]?.id;
+      if (!itemId) throw new Error("Subscription has no billable item.");
 
-    const preview = await (stripe.invoices as any).createPreview({
-      customer: sub.stripe_customer_id,
-      subscription: sub.stripe_subscription_id,
-      subscription_details: {
-        items: [{ id: itemId, price: price.id, quantity: 1 }],
-        proration_behavior: "always_invoice",
-      },
-    });
+      const preview = await (stripe.invoices as any).createPreview({
+        customer: sub.stripe_customer_id,
+        subscription: sub.stripe_subscription_id,
+        subscription_details: {
+          items: [{ id: itemId, price: price.id, quantity: 1 }],
+          proration_behavior: "always_invoice",
+        },
+      });
 
-    const currentItem = current.items.data[0];
-    const periodEnd =
-      (currentItem as any)?.current_period_end ?? (current as any).current_period_end;
+      const currentItem = current.items.data[0];
+      const periodEnd =
+        (currentItem as any)?.current_period_end ?? (current as any).current_period_end;
 
-    return {
-      currency: (preview.currency as string)?.toUpperCase() ?? "GBP",
-      immediateAmount: Number(preview.amount_due ?? 0),
-      nextAmount: Number(price.unit_amount ?? 0),
-      nextBilledAt: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
-    };
-    } catch (error) { return { error: customerPaymentError(error, "subscription") }; }
+      return {
+        currency: (preview.currency as string)?.toUpperCase() ?? "GBP",
+        immediateAmount: Number(preview.amount_due ?? 0),
+        nextAmount: Number(price.unit_amount ?? 0),
+        nextBilledAt: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      };
+    } catch (error) {
+      return { error: customerPaymentError(error, "subscription") };
+    }
   });
 
 /** Cancel the user's subscription at period end (keeps access until then). */
 export const cancelSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
-      z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
+  .inputValidator((d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+    z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
   .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { supabase, userId } = context;
@@ -236,9 +244,8 @@ interface InvoiceRow {
 /** List the user's recent invoices. */
 export const listInvoices = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
-      z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
+  .inputValidator((d: { environment: "sandbox" | "live"; customerType: "consumer" | "retailer" }) =>
+    z.object({ environment: envSchema, customerType: customerTypeSchema }).parse(d),
   )
   .handler(async ({ data, context }): Promise<InvoiceRow[] | { error: string }> => {
     const { supabase, userId } = context;
@@ -256,20 +263,22 @@ export const listInvoices = createServerFn({ method: "GET" })
     if (!sub?.stripe_customer_id) return [];
 
     try {
-    const stripe = createStripeClient(data.environment as StripeEnv);
-    const list = await stripe.invoices.list({
-      customer: sub.stripe_customer_id,
-      limit: 12,
-    });
+      const stripe = createStripeClient(data.environment as StripeEnv);
+      const list = await stripe.invoices.list({
+        customer: sub.stripe_customer_id,
+        limit: 12,
+      });
 
-    return list.data.map((inv) => ({
-      id: inv.id ?? "",
-      number: inv.number ?? null,
-      status: inv.status ?? "unknown",
-      currency: (inv.currency ?? "gbp").toUpperCase(),
-      total: Number(inv.total ?? 0),
-      billedAt: inv.created ? new Date(inv.created * 1000).toISOString() : null,
-      invoiceUrl: inv.hosted_invoice_url ?? inv.invoice_pdf ?? null,
-    }));
-    } catch (error) { return { error: customerPaymentError(error, "subscription") }; }
+      return list.data.map((inv) => ({
+        id: inv.id ?? "",
+        number: inv.number ?? null,
+        status: inv.status ?? "unknown",
+        currency: (inv.currency ?? "gbp").toUpperCase(),
+        total: Number(inv.total ?? 0),
+        billedAt: inv.created ? new Date(inv.created * 1000).toISOString() : null,
+        invoiceUrl: inv.hosted_invoice_url ?? inv.invoice_pdf ?? null,
+      }));
+    } catch (error) {
+      return { error: customerPaymentError(error, "subscription") };
+    }
   });

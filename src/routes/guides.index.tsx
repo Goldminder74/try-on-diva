@@ -40,7 +40,9 @@ function GuidesIndex() {
                 className="block h-full rounded-xl border border-border bg-card p-6 shadow-sm transition hover:border-gold"
               >
                 <h2 className="font-display text-2xl text-mahogany">{g.title}</h2>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{g.metaDescription}</p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {g.metaDescription}
+                </p>
                 <p className="mt-4 font-mono text-xs uppercase tracking-wider text-gold-dark">
                   {g.readingMinutes} min read
                 </p>

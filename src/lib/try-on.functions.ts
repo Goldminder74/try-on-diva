@@ -3,11 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  type ConsumerTier,
-  consumerTier,
-  planFeatures,
-} from "@/lib/entitlements";
+import { type ConsumerTier, consumerTier, planFeatures } from "@/lib/entitlements";
 import { deploymentStripeEnv } from "@/lib/stripe.server";
 
 // A "try-on" is one set of three angles (front, side, back) generated together
@@ -46,7 +42,6 @@ export const getMyPlanFeatures = createServerFn({ method: "GET" })
     return planFeatures(await getConsumerTier(supabase, userId));
   });
 
-
 // Signed URLs for stored try-on results last 7 days.
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 7;
 const TRYONS_BUCKET = "tryons";
@@ -79,23 +74,16 @@ Before you output, compare your result against the product images: if the length
 // https://ai.google.dev/gemini-api/docs/image-generation:
 //   gemini-nano-banana-2.1 = Nano Banana 2.1
 //   gemini-3-pro-image     = Nano Banana Pro (stable)
-const GEMINI_MODELS = [
-  "gemini-nano-banana-2.1",
-  "gemini-3-pro-image",
-] as const;
+const GEMINI_MODELS = ["gemini-nano-banana-2.1", "gemini-3-pro-image"] as const;
 
 // The front view is the one the shopper judges the product by, so it runs on the
 // higher-fidelity Pro model first and falls back to Nano Banana 2.1. Side and back views
 // keep the faster ordering; all three still run in parallel.
-const FRONT_MODELS = [
-  "gemini-3-pro-image",
-  "gemini-nano-banana-2.1",
-] as const;
+const FRONT_MODELS = ["gemini-3-pro-image", "gemini-nano-banana-2.1"] as const;
 
 function modelsForView(view: TryOnView): readonly string[] {
   return view === "front" ? FRONT_MODELS : GEMINI_MODELS;
 }
-
 
 // Largest image accepted from a shopper or fetched for a product: 10 MB.
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -111,15 +99,27 @@ function sniffImageMime(bytes: Uint8Array): ImageMime | null {
   }
   if (
     bytes.length >= 8 &&
-    bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 &&
-    bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47 &&
+    bytes[4] === 0x0d &&
+    bytes[5] === 0x0a &&
+    bytes[6] === 0x1a &&
+    bytes[7] === 0x0a
   ) {
     return "image/png";
   }
   if (
     bytes.length >= 12 &&
-    bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
-    bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
   ) {
     return "image/webp";
   }
@@ -168,7 +168,8 @@ function isFetchableImageUrl(raw: string): boolean {
   }
   if (url.protocol !== "https:") return false;
   const host = url.hostname.toLowerCase();
-  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".internal")) return false;
+  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".internal"))
+    return false;
   if (host.endsWith(".local") || !host.includes(".")) return false;
   // Literal IP addresses (v4 or v6) are never a shop's image host.
   if (/^[0-9.]+$/.test(host) || host.includes(":") || host.startsWith("[")) return false;
@@ -218,12 +219,16 @@ async function fetchWigReferenceImages(
   );
 
   const images = settled
-    .filter((s): s is PromiseFulfilledResult<{ base64: string; mimeType: string }> =>
-      s.status === "fulfilled")
+    .filter(
+      (s): s is PromiseFulfilledResult<{ base64: string; mimeType: string }> =>
+        s.status === "fulfilled",
+    )
     .map((s) => s.value);
 
   if (images.length === 0) {
-    const reason = settled.find((s) => s.status === "rejected") as PromiseRejectedResult | undefined;
+    const reason = settled.find((s) => s.status === "rejected") as
+      | PromiseRejectedResult
+      | undefined;
     throw new Error(
       reason?.reason instanceof Error ? reason.reason.message : "Could not fetch wig image.",
     );
@@ -262,7 +267,6 @@ async function resolveWigReferenceImages(
     .filter(Boolean);
   return fetchWigReferenceImages(dbUrls);
 }
-
 
 // The prompt carries no catalogue text: only the camera-angle instruction is
 // appended. Photographs are the sole visual source of truth.
@@ -324,10 +328,8 @@ async function callGeminiImageAPI(input: {
   // Try each candidate model in order; return the first that yields an image.
   const failures: string[] = [];
   for (const model of input.models ?? GEMINI_MODELS) {
-
     try {
-      const endpoint =
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -345,8 +347,7 @@ async function callGeminiImageAPI(input: {
       const parts: any[] = json?.candidates?.[0]?.content?.parts ?? [];
       // REST responses use camelCase (inlineData); accept snake_case defensively too.
       const imagePart = parts.find((p) => p?.inlineData?.data || p?.inline_data?.data);
-      const data: string | undefined =
-        imagePart?.inlineData?.data ?? imagePart?.inline_data?.data;
+      const data: string | undefined = imagePart?.inlineData?.data ?? imagePart?.inline_data?.data;
       const mimeType: string =
         imagePart?.inlineData?.mimeType ?? imagePart?.inline_data?.mime_type ?? "image/png";
 
@@ -415,9 +416,7 @@ async function storeTryOnResult(
  */
 export const getTryOnSignedUrl = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) =>
-    z.object({ id: z.string().uuid() }).parse(d),
-  )
+  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -522,141 +521,140 @@ export const generateTryOn = createServerFn({ method: "POST" })
         })
         .parse(d),
   )
-  .handler(safeGeneration("authenticated", async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const selfie = checkedSelfie(data.userPhotoBase64);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  .handler(
+    safeGeneration("authenticated", async ({ data, context }) => {
+      const { supabase, userId } = context;
+      const selfie = checkedSelfie(data.userPhotoBase64);
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // 0. Reserve the quota slot atomically BEFORE spending money on generation.
-    //    consume_try_on() increments in a single statement guarded by the free
-    //    limit, so parallel tabs cannot both slip past the last free try-on.
-    const tier = await getConsumerTier(supabase, userId);
-    const features = planFeatures(tier);
-    //    The server spends on the shopper's behalf: the spend and refund
-    //    functions are not callable with a browser key.
-    const { data: reservation, error: reserveErr } = await (supabaseAdmin as any).rpc(
-      "consume_try_on_as",
-      {
-        _user_id: userId,
-        _limit: features.monthlyTryOns,
-        _environment: deploymentStripeEnv(),
-      },
-    );
-
-    if (reserveErr) throw reserveErr;
-    const reserved = Array.isArray(reservation) ? reservation[0] : reservation;
-    if (!reserved?.allowed) {
-      throw new Error(
-        tier === "free"
-          ? "Free try-on limit reached this month. Buy a 10 try-on pack for £2.99, or it resets on the 1st."
-          : `Monthly try-on limit reached (${features.monthlyTryOns} on your plan). Buy a 10 try-on pack for £2.99, or it resets on the 1st.`,
-      );
-    }
-
-    // Which bucket paid for this try-on: the plan's monthly allowance or a
-    // purchased pack. A refund has to go back to the same one.
-    const paidFrom: string = reserved.source ?? "quota";
-    const creditId: string | null = reserved.credit_id ?? null;
-
-    // Any failure past this point refunds the reserved try-on.
-    const refund = async () => {
-      try {
-        await (supabaseAdmin as any).rpc("refund_try_on_as", {
+      // 0. Reserve the quota slot atomically BEFORE spending money on generation.
+      //    consume_try_on() increments in a single statement guarded by the free
+      //    limit, so parallel tabs cannot both slip past the last free try-on.
+      const tier = await getConsumerTier(supabase, userId);
+      const features = planFeatures(tier);
+      //    The server spends on the shopper's behalf: the spend and refund
+      //    functions are not callable with a browser key.
+      const { data: reservation, error: reserveErr } = await (supabaseAdmin as any).rpc(
+        "consume_try_on_as",
+        {
           _user_id: userId,
-          _source: paidFrom,
-          _credit_id: creditId,
-        });
-      } catch {
-        /* best effort */
-      }
-    };
-
-    try {
-      // 1. Fetch every available photograph of this product as reference.
-      const wigImages = await resolveWigReferenceImages(supabase as any, data.wigId);
-
-      // 2. Generate all three camera angles in parallel, so the full set comes
-      //    back in roughly the time one image used to take.
-      const settled = await Promise.allSettled(
-        ALL_VIEWS.map(async (view) => {
-          const generated = await callGeminiImageAPI({
-            prompt: buildTryOnPrompt(view),
-            userPhotoBase64: selfie.base64,
-            userPhotoMimeType: selfie.mimeType,
-            wigImages,
-            models: features.priorityGeneration ? FRONT_MODELS : modelsForView(view),
-          });
-
-          const stored = await storeTryOnResult(supabase, userId, {
-            wigId: data.wigId,
-            imageBase64: generated.imageBase64,
-          });
-          return { view, generated, stored };
-        }),
+          _limit: features.monthlyTryOns,
+          _environment: deploymentStripeEnv(),
+        },
       );
 
-      const views: Record<TryOnView, string | null> = { front: null, side: null, back: null };
-      let front: { id: string | null; path: string; signedUrl: string; model: string } | null = null;
-      for (const outcome of settled) {
-        if (outcome.status !== "fulfilled") continue;
-        const { view, stored, generated } = outcome.value;
-        views[view] = stored.signedUrl;
-        if (view === "front") {
-          front = {
-            id: stored.id,
-            path: stored.path,
-            signedUrl: stored.signedUrl,
-            model: generated.model,
-          };
-        }
-      }
-
-      // The front view is the headline result: without it, the try-on failed.
-      if (!front) {
-        const reason = settled.find((s) => s.status === "rejected") as
-          | PromiseRejectedResult
-          | undefined;
+      if (reserveErr) throw reserveErr;
+      const reserved = Array.isArray(reservation) ? reservation[0] : reservation;
+      if (!reserved?.allowed) {
         throw new Error(
-          reason?.reason instanceof Error ? reason.reason.message : "Try-on generation failed.",
+          tier === "free"
+            ? "Free try-on limit reached this month. Buy a 10 try-on pack for £2.99, or it resets on the 1st."
+            : `Monthly try-on limit reached (${features.monthlyTryOns} on your plan). Buy a 10 try-on pack for £2.99, or it resets on the 1st.`,
         );
       }
-      const stored = front;
 
+      // Which bucket paid for this try-on: the plan's monthly allowance or a
+      // purchased pack. A refund has to go back to the same one.
+      const paidFrom: string = reserved.source ?? "quota";
+      const creditId: string | null = reserved.credit_id ?? null;
 
-      // 4. Record the single analytics event for this try-on.
-      const { data: wig } = await supabase
-        .from("wigs")
-        .select("retailer_id")
-        .eq("id", data.wigId)
-        .maybeSingle();
-      const { error: evErr } = await supabase.from("try_on_events").insert({
-        user_id: userId,
-        wig_id: data.wigId,
-        retailer_id: wig?.retailer_id ?? null,
-        source: "app",
-      });
-      if (evErr) throw evErr;
-
-      return {
-        id: stored.id,
-        path: stored.path,
-        signedUrl: stored.signedUrl,
-        expiresIn: SIGNED_URL_TTL_SECONDS,
-        model: stored.model,
-        views,
+      // Any failure past this point refunds the reserved try-on.
+      const refund = async () => {
+        try {
+          await (supabaseAdmin as any).rpc("refund_try_on_as", {
+            _user_id: userId,
+            _source: paidFrom,
+            _credit_id: creditId,
+          });
+        } catch {
+          /* best effort */
+        }
       };
-    } catch (err) {
-      await refund();
-      throw err;
-    }
-  }));
 
+      try {
+        // 1. Fetch every available photograph of this product as reference.
+        const wigImages = await resolveWigReferenceImages(supabase as any, data.wigId);
+
+        // 2. Generate all three camera angles in parallel, so the full set comes
+        //    back in roughly the time one image used to take.
+        const settled = await Promise.allSettled(
+          ALL_VIEWS.map(async (view) => {
+            const generated = await callGeminiImageAPI({
+              prompt: buildTryOnPrompt(view),
+              userPhotoBase64: selfie.base64,
+              userPhotoMimeType: selfie.mimeType,
+              wigImages,
+              models: features.priorityGeneration ? FRONT_MODELS : modelsForView(view),
+            });
+
+            const stored = await storeTryOnResult(supabase, userId, {
+              wigId: data.wigId,
+              imageBase64: generated.imageBase64,
+            });
+            return { view, generated, stored };
+          }),
+        );
+
+        const views: Record<TryOnView, string | null> = { front: null, side: null, back: null };
+        let front: { id: string | null; path: string; signedUrl: string; model: string } | null =
+          null;
+        for (const outcome of settled) {
+          if (outcome.status !== "fulfilled") continue;
+          const { view, stored, generated } = outcome.value;
+          views[view] = stored.signedUrl;
+          if (view === "front") {
+            front = {
+              id: stored.id,
+              path: stored.path,
+              signedUrl: stored.signedUrl,
+              model: generated.model,
+            };
+          }
+        }
+
+        // The front view is the headline result: without it, the try-on failed.
+        if (!front) {
+          const reason = settled.find((s) => s.status === "rejected") as
+            | PromiseRejectedResult
+            | undefined;
+          throw new Error(
+            reason?.reason instanceof Error ? reason.reason.message : "Try-on generation failed.",
+          );
+        }
+        const stored = front;
+
+        // 4. Record the single analytics event for this try-on.
+        const { data: wig } = await supabase
+          .from("wigs")
+          .select("retailer_id")
+          .eq("id", data.wigId)
+          .maybeSingle();
+        const { error: evErr } = await supabase.from("try_on_events").insert({
+          user_id: userId,
+          wig_id: data.wigId,
+          retailer_id: wig?.retailer_id ?? null,
+          source: "app",
+        });
+        if (evErr) throw evErr;
+
+        return {
+          id: stored.id,
+          path: stored.path,
+          signedUrl: stored.signedUrl,
+          expiresIn: SIGNED_URL_TTL_SECONDS,
+          model: stored.model,
+          views,
+        };
+      } catch (err) {
+        await refund();
+        throw err;
+      }
+    }),
+  );
 
 export const recordTryOn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { wigId: string }) =>
-    z.object({ wigId: z.string().uuid() }).parse(d),
-  )
+  .inputValidator((d: { wigId: string }) => z.object({ wigId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -674,9 +672,10 @@ export const recordTryOn = createServerFn({ method: "POST" })
 
     let count = 0;
     if (prof) {
-      count = prof.try_on_month_reset && prof.try_on_month_reset >= monthStart
-        ? prof.try_on_count_this_month
-        : 0;
+      count =
+        prof.try_on_month_reset && prof.try_on_month_reset >= monthStart
+          ? prof.try_on_count_this_month
+          : 0;
     }
 
     const cap = planFeatures(await getConsumerTier(supabase, userId)).monthlyTryOns;
@@ -695,7 +694,6 @@ export const recordTryOn = createServerFn({ method: "POST" })
       allowed: true as const,
       remaining: Math.max(0, cap - (count + 1)) + credits,
     };
-
   });
 
 export const getTryOnQuota = createServerFn({ method: "GET" })
@@ -795,7 +793,9 @@ async function countAnonymousTryOnsByIp(
   return count;
 }
 
-async function countAnonymousTryOnsToday(supabaseAdmin: { from: (t: string) => any }): Promise<number> {
+async function countAnonymousTryOnsToday(supabaseAdmin: {
+  from: (t: string) => any;
+}): Promise<number> {
   const dayStart = `${new Date().toISOString().slice(0, 10)}T00:00:00Z`;
   const { count, error } = await supabaseAdmin
     .from("anonymous_tryons")
@@ -858,7 +858,6 @@ export const getAnonymousTryOnStatus = createServerFn({ method: "POST" })
     };
   });
 
-
 export const generateAnonymousTryOn = createServerFn({ method: "POST" })
   .inputValidator(
     (d: {
@@ -891,162 +890,165 @@ export const generateAnonymousTryOn = createServerFn({ method: "POST" })
         })
         .parse(d),
   )
-  .handler(safeGeneration("anonymous", async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const admin = supabaseAdmin as any;
-    const selfie = checkedSelfie(data.userPhotoBase64);
+  .handler(
+    safeGeneration("anonymous", async ({ data }) => {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const admin = supabaseAdmin as any;
+      const selfie = checkedSelfie(data.userPhotoBase64);
 
-    // 1. Refuse once this device/fingerprint has used its monthly free sets,
-    //    once this network has hit the monthly abuse cap, or once the day's
-    //    ceiling across all visitors is reached.
-    const usedCount = await countAnonymousTryOns(admin, data.deviceId, data.fingerprintHash);
-    if (usedCount >= ANON_FREE_QUOTA) {
-      return { alreadyUsed: true as const, reason: "device" as const };
-    }
-    const ipHash = await hashedClientIp();
-    if ((await countAnonymousTryOnsByIp(admin, ipHash)) >= ANON_IP_MONTHLY_CAP) {
-      return { alreadyUsed: true as const, reason: "network" as const };
-    }
-    if ((await countAnonymousTryOnsToday(admin)) >= ANON_GLOBAL_DAILY_CAP) {
-      return { alreadyUsed: true as const, reason: "network" as const };
-    }
-
-    // 2. Reserve the try-on BEFORE spending anything on generation. The unique
-    //    index on (device_id, month_start, seq) makes two concurrent attempts
-    //    from one device collide.
-    const request = getRequest();
-    const { data: reservation, error: reserveErr } = await admin
-      .from("anonymous_tryons")
-      .insert({
-        device_id: data.deviceId,
-        fingerprint_hash: data.fingerprintHash,
-        ip_hash: ipHash,
-        wig_id: data.wigId,
-        result_path: ANON_PENDING_PATH,
-        user_agent: request?.headers?.get("user-agent")?.slice(0, 300) ?? null,
-        seq: usedCount + 1,
-        ...utmFromCookieHeader(request?.headers?.get("cookie")),
-      })
-      .select("id")
-      .single();
-    if (reserveErr || !reservation) {
-      // Race lost - treat as already used.
-      return { alreadyUsed: true as const, reason: "device" as const };
-    }
-    const release = async () => {
-      try {
-        await admin.from("anonymous_tryons").delete().eq("id", reservation.id);
-      } catch {
-        /* best effort */
+      // 1. Refuse once this device/fingerprint has used its monthly free sets,
+      //    once this network has hit the monthly abuse cap, or once the day's
+      //    ceiling across all visitors is reached.
+      const usedCount = await countAnonymousTryOns(admin, data.deviceId, data.fingerprintHash);
+      if (usedCount >= ANON_FREE_QUOTA) {
+        return { alreadyUsed: true as const, reason: "device" as const };
       }
-    };
-
-    try {
-      // Requests racing in parallel all pass the checks above. Count again now
-      // that this one is recorded, and back out if the caps were overshot.
-      if (
-        (await countAnonymousTryOns(admin, data.deviceId, data.fingerprintHash)) > ANON_FREE_QUOTA ||
-        (await countAnonymousTryOnsByIp(admin, ipHash)) > ANON_IP_MONTHLY_CAP ||
-        (await countAnonymousTryOnsToday(admin)) > ANON_GLOBAL_DAILY_CAP
-      ) {
-        await release();
+      const ipHash = await hashedClientIp();
+      if ((await countAnonymousTryOnsByIp(admin, ipHash)) >= ANON_IP_MONTHLY_CAP) {
+        return { alreadyUsed: true as const, reason: "network" as const };
+      }
+      if ((await countAnonymousTryOnsToday(admin)) >= ANON_GLOBAL_DAILY_CAP) {
         return { alreadyUsed: true as const, reason: "network" as const };
       }
 
-      // 3. Fetch the product's own photographs as reference (published only).
-      const wigImages = await resolveWigReferenceImages(admin, data.wigId, true);
-
-      // 4. Generate all three angles in parallel and upload each to the anon
-      //    folder in the `tryons` bucket via the service-role client.
-      const settled = await Promise.allSettled(
-        ALL_VIEWS.map(async (view) => {
-          const generated = await callGeminiImageAPI({
-            prompt: buildTryOnPrompt(view),
-            userPhotoBase64: selfie.base64,
-            userPhotoMimeType: selfie.mimeType,
-            wigImages,
-            models: modelsForView(view),
-          });
-
-          const bytes = decodeBase64Image(generated.imageBase64);
-          const contentType = sniffImageMime(bytes);
-          if (!contentType || bytes.length > MAX_IMAGE_BYTES) {
-            throw new Error("The generated image could not be stored.");
-          }
-          const viewPath = `anon/${crypto.randomUUID()}.png`;
-          const { error: upErr } = await supabaseAdmin.storage
-            .from(TRYONS_BUCKET)
-            .upload(viewPath, bytes, { contentType, upsert: false });
-          if (upErr) throw upErr;
-          return { view, viewPath, model: generated.model };
-        }),
-      );
-
-      const viewPaths: Record<TryOnView, string | null> = { front: null, side: null, back: null };
-      let model = "";
-      for (const outcome of settled) {
-        if (outcome.status !== "fulfilled") continue;
-        viewPaths[outcome.value.view] = outcome.value.viewPath;
-        if (outcome.value.view === "front") model = outcome.value.model;
-      }
-      if (!viewPaths.front) {
-        // Do not leave side or back images behind for a try-on that failed.
-        const orphans = Object.values(viewPaths).filter((p): p is string => !!p);
-        if (orphans.length) await supabaseAdmin.storage.from(TRYONS_BUCKET).remove(orphans);
-        const reason = settled.find((s) => s.status === "rejected") as
-          | PromiseRejectedResult
-          | undefined;
-        throw new Error(
-          reason?.reason instanceof Error ? reason.reason.message : "Try-on generation failed.",
-        );
-      }
-      const path = viewPaths.front;
-
-      // 5. Complete the reservation with every stored image, so the retention
-      //    job can find and delete all of them.
-      const extraPaths = [viewPaths.side, viewPaths.back].filter((p): p is string => !!p);
-      const { error: finishErr } = await admin
+      // 2. Reserve the try-on BEFORE spending anything on generation. The unique
+      //    index on (device_id, month_start, seq) makes two concurrent attempts
+      //    from one device collide.
+      const request = getRequest();
+      const { data: reservation, error: reserveErr } = await admin
         .from("anonymous_tryons")
-        .update({ result_path: [path, ...extraPaths].join(",") })
-        .eq("id", reservation.id);
-      if (finishErr) throw finishErr;
-
-      // 6. Analytics event (mirrors recordTryOn shape, source = "anon").
-      const { data: wig } = await supabaseAdmin
-        .from("wigs")
-        .select("retailer_id")
-        .eq("id", data.wigId)
-        .maybeSingle();
-      await supabaseAdmin.from("try_on_events").insert({
-        user_id: null,
-        wig_id: data.wigId,
-        retailer_id: wig?.retailer_id ?? null,
-        source: "anon",
-      });
-
-      // 7. Signed URLs for every angle that generated.
-      const views: Record<TryOnView, string | null> = { front: null, side: null, back: null };
-      for (const view of ALL_VIEWS) {
-        const p = viewPaths[view];
-        if (!p) continue;
-        const { data: signed } = await supabaseAdmin.storage
-          .from(TRYONS_BUCKET)
-          .createSignedUrl(p, SIGNED_URL_TTL_SECONDS);
-        views[view] = signed?.signedUrl ?? null;
+        .insert({
+          device_id: data.deviceId,
+          fingerprint_hash: data.fingerprintHash,
+          ip_hash: ipHash,
+          wig_id: data.wigId,
+          result_path: ANON_PENDING_PATH,
+          user_agent: request?.headers?.get("user-agent")?.slice(0, 300) ?? null,
+          seq: usedCount + 1,
+          ...utmFromCookieHeader(request?.headers?.get("cookie")),
+        })
+        .select("id")
+        .single();
+      if (reserveErr || !reservation) {
+        // Race lost - treat as already used.
+        return { alreadyUsed: true as const, reason: "device" as const };
       }
-      if (!views.front) throw new Error("Could not sign the try-on result.");
-
-      return {
-        alreadyUsed: false as const,
-        path,
-        signedUrl: views.front,
-        expiresIn: SIGNED_URL_TTL_SECONDS,
-        model,
-        views,
-        remaining: Math.max(0, ANON_FREE_QUOTA - (usedCount + 1)),
+      const release = async () => {
+        try {
+          await admin.from("anonymous_tryons").delete().eq("id", reservation.id);
+        } catch {
+          /* best effort */
+        }
       };
-    } catch (err) {
-      await release();
-      throw err;
-    }
-  }));
+
+      try {
+        // Requests racing in parallel all pass the checks above. Count again now
+        // that this one is recorded, and back out if the caps were overshot.
+        if (
+          (await countAnonymousTryOns(admin, data.deviceId, data.fingerprintHash)) >
+            ANON_FREE_QUOTA ||
+          (await countAnonymousTryOnsByIp(admin, ipHash)) > ANON_IP_MONTHLY_CAP ||
+          (await countAnonymousTryOnsToday(admin)) > ANON_GLOBAL_DAILY_CAP
+        ) {
+          await release();
+          return { alreadyUsed: true as const, reason: "network" as const };
+        }
+
+        // 3. Fetch the product's own photographs as reference (published only).
+        const wigImages = await resolveWigReferenceImages(admin, data.wigId, true);
+
+        // 4. Generate all three angles in parallel and upload each to the anon
+        //    folder in the `tryons` bucket via the service-role client.
+        const settled = await Promise.allSettled(
+          ALL_VIEWS.map(async (view) => {
+            const generated = await callGeminiImageAPI({
+              prompt: buildTryOnPrompt(view),
+              userPhotoBase64: selfie.base64,
+              userPhotoMimeType: selfie.mimeType,
+              wigImages,
+              models: modelsForView(view),
+            });
+
+            const bytes = decodeBase64Image(generated.imageBase64);
+            const contentType = sniffImageMime(bytes);
+            if (!contentType || bytes.length > MAX_IMAGE_BYTES) {
+              throw new Error("The generated image could not be stored.");
+            }
+            const viewPath = `anon/${crypto.randomUUID()}.png`;
+            const { error: upErr } = await supabaseAdmin.storage
+              .from(TRYONS_BUCKET)
+              .upload(viewPath, bytes, { contentType, upsert: false });
+            if (upErr) throw upErr;
+            return { view, viewPath, model: generated.model };
+          }),
+        );
+
+        const viewPaths: Record<TryOnView, string | null> = { front: null, side: null, back: null };
+        let model = "";
+        for (const outcome of settled) {
+          if (outcome.status !== "fulfilled") continue;
+          viewPaths[outcome.value.view] = outcome.value.viewPath;
+          if (outcome.value.view === "front") model = outcome.value.model;
+        }
+        if (!viewPaths.front) {
+          // Do not leave side or back images behind for a try-on that failed.
+          const orphans = Object.values(viewPaths).filter((p): p is string => !!p);
+          if (orphans.length) await supabaseAdmin.storage.from(TRYONS_BUCKET).remove(orphans);
+          const reason = settled.find((s) => s.status === "rejected") as
+            | PromiseRejectedResult
+            | undefined;
+          throw new Error(
+            reason?.reason instanceof Error ? reason.reason.message : "Try-on generation failed.",
+          );
+        }
+        const path = viewPaths.front;
+
+        // 5. Complete the reservation with every stored image, so the retention
+        //    job can find and delete all of them.
+        const extraPaths = [viewPaths.side, viewPaths.back].filter((p): p is string => !!p);
+        const { error: finishErr } = await admin
+          .from("anonymous_tryons")
+          .update({ result_path: [path, ...extraPaths].join(",") })
+          .eq("id", reservation.id);
+        if (finishErr) throw finishErr;
+
+        // 6. Analytics event (mirrors recordTryOn shape, source = "anon").
+        const { data: wig } = await supabaseAdmin
+          .from("wigs")
+          .select("retailer_id")
+          .eq("id", data.wigId)
+          .maybeSingle();
+        await supabaseAdmin.from("try_on_events").insert({
+          user_id: null,
+          wig_id: data.wigId,
+          retailer_id: wig?.retailer_id ?? null,
+          source: "anon",
+        });
+
+        // 7. Signed URLs for every angle that generated.
+        const views: Record<TryOnView, string | null> = { front: null, side: null, back: null };
+        for (const view of ALL_VIEWS) {
+          const p = viewPaths[view];
+          if (!p) continue;
+          const { data: signed } = await supabaseAdmin.storage
+            .from(TRYONS_BUCKET)
+            .createSignedUrl(p, SIGNED_URL_TTL_SECONDS);
+          views[view] = signed?.signedUrl ?? null;
+        }
+        if (!views.front) throw new Error("Could not sign the try-on result.");
+
+        return {
+          alreadyUsed: false as const,
+          path,
+          signedUrl: views.front,
+          expiresIn: SIGNED_URL_TTL_SECONDS,
+          model,
+          views,
+          remaining: Math.max(0, ANON_FREE_QUOTA - (usedCount + 1)),
+        };
+      } catch (err) {
+        await release();
+        throw err;
+      }
+    }),
+  );

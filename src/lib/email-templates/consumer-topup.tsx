@@ -1,5 +1,15 @@
 import React from "react";
-import { Body, Container, Head, Heading, Html, Preview, Text, Button, Section } from "@react-email/components";
+import {
+  Body,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Preview,
+  Text,
+  Button,
+  Section,
+} from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 import { main, outer, container, h1, text, muted, button, divider, Wordmark } from "./_styles";
 
@@ -21,13 +31,14 @@ const ConsumerTopUpEmail = ({ name, credits, priceGbp, expiresOn, appUrl }: Prop
           <Wordmark />
           <Heading style={h1}>{credits ?? 10} more try-ons, added.</Heading>
           <Text style={text}>
-            Hi{name ? ` ${name}` : ""}, thanks for your {typeof priceGbp === "number" ? `£${priceGbp.toFixed(2)}` : "£2.99"}
-            payment. We've added {credits ?? 10} try-ons to your account on top of whatever
-            your plan already gives you each month.
+            Hi{name ? ` ${name}` : ""}, thanks for your{" "}
+            {typeof priceGbp === "number" ? `£${priceGbp.toFixed(2)}` : "£2.99"}
+            payment. We've added {credits ?? 10} try-ons to your account on top of whatever your
+            plan already gives you each month.
           </Text>
           <Text style={text}>
-            Your monthly allowance is always used first, so these extras are waiting for
-            whenever you need them{expiresOn ? ` - until ${expiresOn}` : ""}.
+            Your monthly allowance is always used first, so these extras are waiting for whenever
+            you need them{expiresOn ? ` - until ${expiresOn}` : ""}.
           </Text>
           <Button style={button} href={appUrl ?? "https://wigsmi.com/app/try-on"}>
             Use them now

@@ -21,7 +21,10 @@ export interface CallbackDeps {
 }
 
 /** Sends the welcome email once per user; never throws. */
-export async function maybeSendWelcome(userId: string, deps: Pick<CallbackDeps, "sendWelcome" | "local">) {
+export async function maybeSendWelcome(
+  userId: string,
+  deps: Pick<CallbackDeps, "sendWelcome" | "local">,
+) {
   try {
     const key = welcomedKey(userId);
     if (deps.local.getItem(key)) return false;

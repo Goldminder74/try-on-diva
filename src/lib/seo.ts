@@ -14,7 +14,10 @@ export function productShareImage(image: string | undefined) {
   if (!image?.startsWith("https://")) return undefined;
   const url = new URL(image);
   if (url.pathname.includes("/storage/v1/object/public/")) {
-    url.pathname = url.pathname.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/");
+    url.pathname = url.pathname.replace(
+      "/storage/v1/object/public/",
+      "/storage/v1/render/image/public/",
+    );
     url.searchParams.set("width", "1200");
     url.searchParams.set("height", "630");
     url.searchParams.set("resize", "cover");

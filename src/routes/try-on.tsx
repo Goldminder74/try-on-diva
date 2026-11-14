@@ -13,19 +13,12 @@ import {
   fetchRetailerBySlug,
   fetchWigsByRetailerId,
   fetchWigById,
-
   type Wig,
 } from "@/lib/wigs";
 import { stashSelfie } from "@/lib/selfie-handoff";
 import { getPublicWidgetData } from "@/lib/widget-public.functions";
-import {
-  generateAnonymousTryOn,
-  getAnonymousTryOnStatus,
-} from "@/lib/try-on.functions";
-import {
-  getOrCreateDeviceId,
-  computeFingerprint,
-} from "@/lib/anon-fingerprint";
+import { generateAnonymousTryOn, getAnonymousTryOnStatus } from "@/lib/try-on.functions";
+import { getOrCreateDeviceId, computeFingerprint } from "@/lib/anon-fingerprint";
 import { blobToBase64 } from "@/hooks/useApplyWig";
 import { useAuth } from "@/contexts/auth-context";
 import {
@@ -55,7 +48,11 @@ export const Route = createFileRoute("/try-on")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://wigsmi.com/try-on" },
       { title: "Try a wig on - Wigsmi" },
-      { name: "description", content: "Upload a selfie and see any wig on your skin in seconds. Free to try, no account needed." },
+      {
+        name: "description",
+        content:
+          "Upload a selfie and see any wig on your skin in seconds. Free to try, no account needed.",
+      },
       { property: "og:title", content: "Try a wig on - Wigsmi" },
       { property: "og:description", content: "Free virtual wig try-on built for Black women." },
     ],
@@ -167,7 +164,6 @@ function TryOn() {
     };
   }, [resultUrl, user]);
 
-
   // Load catalogue based on URL scope (widget token, retailer slug, or full).
   useEffect(() => {
     let cancelled = false;
@@ -263,7 +259,6 @@ function TryOn() {
     };
   }, [initialWigId, wig, desiredWig]);
 
-
   // Choosing a style. When a selfie is already uploaded, this is the trigger
   // that starts generation.
   const onSelectWig = (w: Wig) => {
@@ -273,11 +268,16 @@ function TryOn() {
     if (photo && !applying) setPendingAuto(true);
   };
 
-
   const onFile = (f: File | undefined) => {
     if (!f) return;
-    if (f.size > 10 * 1024 * 1024) { setError("File too large - max 10MB."); return; }
-    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) { setError("Use JPEG, PNG or WebP."); return; }
+    if (f.size > 10 * 1024 * 1024) {
+      setError("File too large - max 10MB.");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) {
+      setError("Use JPEG, PNG or WebP.");
+      return;
+    }
     setError(null);
     setResultUrl(null);
     setViews({ front: null, side: null, back: null });
@@ -288,8 +288,14 @@ function TryOn() {
   };
 
   const runAnonymousTryOn = async () => {
-    if (!wig?.images?.[0]) { setError("This wig has no product image."); return; }
-    if (!photo) { setError("Upload a selfie first."); return; }
+    if (!wig?.images?.[0]) {
+      setError("This wig has no product image.");
+      return;
+    }
+    if (!photo) {
+      setError("Upload a selfie first.");
+      return;
+    }
     setError(null);
     setApplying(true);
     try {
@@ -330,15 +336,25 @@ function TryOn() {
       // Don't open the prompt immediately - let the user see their result first.
       // The prompt is opened by a 4s timer or any user interaction (see effect below).
     } catch (err) {
-      setError(err instanceof Error && /limit reached/i.test(err.message) ? err.message : "Something went wrong generating your try-on. Please try again in a moment.");
+      setError(
+        err instanceof Error && /limit reached/i.test(err.message)
+          ? err.message
+          : "Something went wrong generating your try-on. Please try again in a moment.",
+      );
     } finally {
       setApplying(false);
     }
   };
 
   const onApply = async () => {
-    if (!wig) { setError("Pick a wig first."); return; }
-    if (!photo) { setError("Upload a selfie first."); return; }
+    if (!wig) {
+      setError("Pick a wig first.");
+      return;
+    }
+    if (!photo) {
+      setError("Upload a selfie first.");
+      return;
+    }
     setError(null);
     if (authLoading) return;
 
@@ -369,8 +385,6 @@ function TryOn() {
     void onApply();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingAuto, photo, wig, applying, authLoading, user, anonReady]);
-
-
 
   // Preserve wig + scope across the auth round-trip.
   const redirectTarget = (() => {
@@ -405,9 +419,7 @@ function TryOn() {
                 <p className="font-mono text-[11px] uppercase tracking-wider text-gold-dark">
                   Try on by
                 </p>
-                <p className="font-display text-lg text-mahogany">
-                  {retailerScope.display_name}
-                </p>
+                <p className="font-display text-lg text-mahogany">{retailerScope.display_name}</p>
               </div>
             </div>
             <button
@@ -442,7 +454,6 @@ function TryOn() {
           <div>
             <SelectedWigBanner wig={wig} hasResult={Boolean(resultUrl)} hasPhoto={Boolean(photo)} />
             {resultUrl ? (
-
               <>
                 <div className="relative overflow-hidden rounded-xl border border-border bg-card">
                   <img
@@ -488,7 +499,12 @@ function TryOn() {
               </button>
               {(photo || resultUrl) && (
                 <button
-                  onClick={() => { setPhoto(null); setResultUrl(null); setViews({ front: null, side: null, back: null }); setError(null); }}
+                  onClick={() => {
+                    setPhoto(null);
+                    setResultUrl(null);
+                    setViews({ front: null, side: null, back: null });
+                    setError(null);
+                  }}
                   disabled={applying}
                   className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm text-muted-foreground hover:border-mahogany disabled:opacity-50"
                 >
@@ -502,9 +518,13 @@ function TryOn() {
                 style={accent && scoped ? { backgroundColor: accent, color: "#fff" } : undefined}
               >
                 {applying ? (
-                  <><RefreshCw className="h-4 w-4 animate-spin" /> Generating…</>
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" /> Generating…
+                  </>
                 ) : (
-                  <><Sparkles className="h-4 w-4" /> Apply wig</>
+                  <>
+                    <Sparkles className="h-4 w-4" /> Apply wig
+                  </>
                 )}
               </button>
               <input
@@ -565,14 +585,24 @@ function TryOn() {
                     key={w.id}
                     onClick={() => onSelectWig(w)}
                     className={`group overflow-hidden rounded-md border-2 text-left transition-all ${
-                      wig?.id === w.id ? "border-gold" : "border-transparent hover:border-mahogany/40"
+                      wig?.id === w.id
+                        ? "border-gold"
+                        : "border-transparent hover:border-mahogany/40"
                     }`}
                   >
-                    <img src={w.images[0]} alt={w.name} className="aspect-square w-full object-cover" />
+                    <img
+                      src={w.images[0]}
+                      alt={w.name}
+                      className="aspect-square w-full object-cover"
+                    />
                     <div className="px-1 py-1.5">
-                      <p className="text-[11px] leading-tight break-words text-foreground">{w.name}</p>
+                      <p className="text-[11px] leading-tight break-words text-foreground">
+                        {w.name}
+                      </p>
                       {!scoped && (
-                        <p className="mt-0.5 text-[10px] leading-tight break-words text-muted-foreground">{w.retailer}</p>
+                        <p className="mt-0.5 text-[10px] leading-tight break-words text-muted-foreground">
+                          {w.retailer}
+                        </p>
                       )}
                     </div>
                   </button>
@@ -595,11 +625,11 @@ function TryOn() {
             <p className="mt-5 rounded-md border border-gold/30 bg-gold/10 p-3 font-mono text-[11px] leading-relaxed text-gold-dark">
               {user
                 ? "Tap Apply wig to generate your AI try-on."
-                  : anonUsed
-                    ? "Create a free account to keep trying - 5 free try-ons every month."
-                    : anonRemaining !== null && anonRemaining < 2
-                      ? `You have ${anonRemaining} free try-on${anonRemaining === 1 ? "" : "s"} left, no signup needed. After that, create a free account for 5 free try-ons every month.`
-                      : "Your first 2 try-ons are free, no signup needed. After that, create a free account for 5 free try-ons every month."}
+                : anonUsed
+                  ? "Create a free account to keep trying - 5 free try-ons every month."
+                  : anonRemaining !== null && anonRemaining < 2
+                    ? `You have ${anonRemaining} free try-on${anonRemaining === 1 ? "" : "s"} left, no signup needed. After that, create a free account for 5 free try-ons every month.`
+                    : "Your first 2 try-ons are free, no signup needed. After that, create a free account for 5 free try-ons every month."}
             </p>
           </aside>
         </div>
@@ -639,7 +669,6 @@ function TryOn() {
         </div>
       )}
 
-
       {/* Hard wall on second anonymous attempt */}
       <AlertDialog open={wallPromptOpen} onOpenChange={setWallPromptOpen}>
         <AlertDialogContent className="bg-cream">
@@ -656,17 +685,13 @@ function TryOn() {
           <AlertDialogFooter className="gap-2">
             <AlertDialogCancel className="border-border">Not now</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() =>
-                navigate({ to: "/auth/login", search: { redirect: redirectTarget } })
-              }
+              onClick={() => navigate({ to: "/auth/login", search: { redirect: redirectTarget } })}
               className="border border-mahogany bg-transparent text-mahogany hover:bg-mahogany hover:text-cream"
             >
               Log in
             </AlertDialogAction>
             <AlertDialogAction
-              onClick={() =>
-                navigate({ to: "/auth/signup", search: { redirect: redirectTarget } })
-              }
+              onClick={() => navigate({ to: "/auth/signup", search: { redirect: redirectTarget } })}
               className="bg-mahogany text-cream hover:bg-mahogany-soft"
             >
               Create account

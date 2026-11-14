@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
-import { resolveCallback, maybeSendWelcome, welcomedKey, POST_AUTH_REDIRECT_KEY } from "./auth-callback";
+import {
+  resolveCallback,
+  maybeSendWelcome,
+  welcomedKey,
+  POST_AUTH_REDIRECT_KEY,
+} from "./auth-callback";
 import { buildWelcomeEmail } from "./email/welcome-payload";
 
 function store(init: Record<string, string> = {}) {
@@ -12,7 +17,15 @@ function store(init: Record<string, string> = {}) {
   };
 }
 
-function deps(o: { session?: boolean; roles?: string[]; stashed?: string; welcomed?: boolean; sendFails?: boolean } = {}) {
+function deps(
+  o: {
+    session?: boolean;
+    roles?: string[];
+    stashed?: string;
+    welcomed?: boolean;
+    sendFails?: boolean;
+  } = {},
+) {
   const sendWelcome = vi.fn(async () => {
     if (o.sendFails) throw new Error("smtp down");
     return { ok: true };
@@ -42,7 +55,9 @@ describe("auth callback (email confirmation / Google sign-in)", () => {
 
   it("?next= wins over role default (plan resume)", async () => {
     const d = deps({ roles: ["retailer"] });
-    expect(await resolveCallback("?next=%2Fportal%2Fbilling%3Fplan%3Dgrowth", d)).toBe("/portal/billing?plan=growth");
+    expect(await resolveCallback("?next=%2Fportal%2Fbilling%3Fplan%3Dgrowth", d)).toBe(
+      "/portal/billing?plan=growth",
+    );
   });
 
   it("stashed redirect is honoured and then cleared", async () => {
@@ -91,6 +106,9 @@ describe("welcome email selection", () => {
     const e = buildWelcomeEmail({ ...base, roles: ["retailer"], businessName: "Crown Co" });
     expect(e.templateName).toBe("retailer-welcome");
     expect(e.idempotencyKey).toBe("retailer-welcome-u1");
-    expect(e.templateData).toMatchObject({ businessName: "Crown Co", portalUrl: "https://wigsmi.com/portal" });
+    expect(e.templateData).toMatchObject({
+      businessName: "Crown Co",
+      portalUrl: "https://wigsmi.com/portal",
+    });
   });
 });

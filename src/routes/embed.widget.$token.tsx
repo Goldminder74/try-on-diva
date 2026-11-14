@@ -6,7 +6,18 @@ import { getPublicWidgetData } from "@/lib/widget-public.functions";
 export const Route = createFileRoute("/embed/widget/$token")({
   staticData: { sitemap: false },
   head: () => ({
-    meta: [{ name: "description", content: "Try this retailer's wigs on your own photo with the Wigsmi virtual try-on." }, { property: "og:title", content: "Wigsmi try-on" }, { property: "og:description", content: "Try this retailer's wigs on your own photo with the Wigsmi virtual try-on." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
+    meta: [
+      {
+        name: "description",
+        content: "Try this retailer's wigs on your own photo with the Wigsmi virtual try-on.",
+      },
+      { property: "og:title", content: "Wigsmi try-on" },
+      {
+        property: "og:description",
+        content: "Try this retailer's wigs on your own photo with the Wigsmi virtual try-on.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Wigsmi try-on" },
       { name: "robots", content: "noindex" },
     ],
@@ -40,9 +51,7 @@ function EmbedWidget() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <p className="font-mono text-xs uppercase tracking-wider text-neutral-400">
-          Loading…
-        </p>
+        <p className="font-mono text-xs uppercase tracking-wider text-neutral-400">Loading…</p>
       </div>
     );
   }
@@ -66,12 +75,8 @@ function EmbedWidget() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white px-6 text-center">
         <div>
-          <p className="font-mono text-xs uppercase tracking-wider text-neutral-400">
-            Paused
-          </p>
-          <p className="mt-2 text-sm text-neutral-600">
-            This widget is currently paused.
-          </p>
+          <p className="font-mono text-xs uppercase tracking-wider text-neutral-400">Paused</p>
+          <p className="mt-2 text-sm text-neutral-600">This widget is currently paused.</p>
         </div>
       </div>
     );
@@ -115,16 +120,12 @@ function EmbedWidget() {
           )}
           <span className="font-medium">{data.retailer?.display_name}</span>
         </div>
-        <span className="rounded-full bg-white/15 px-3 py-1 text-xs text-white">
-          {cta}
-        </span>
+        <span className="rounded-full bg-white/15 px-3 py-1 text-xs text-white">{cta}</span>
       </header>
 
       {data.wigs.length === 0 ? (
         <div className="px-6 py-20 text-center">
-          <p className="font-mono text-xs uppercase tracking-wider text-neutral-400">
-            No wigs yet
-          </p>
+          <p className="font-mono text-xs uppercase tracking-wider text-neutral-400">No wigs yet</p>
           <p className="mt-2 text-sm text-neutral-600">
             Add and publish wigs in your catalog to see them here.
           </p>
@@ -150,9 +151,7 @@ function EmbedWidget() {
                 ) : null}
               </div>
               <div className="p-3">
-                <p className="line-clamp-1 text-sm font-medium text-neutral-900">
-                  {w.name}
-                </p>
+                <p className="line-clamp-1 text-sm font-medium text-neutral-900">{w.name}</p>
                 <div className="mt-1 flex items-center justify-between">
                   <span className="text-xs text-neutral-500">
                     {formatPrice(w.price, w.currency)}

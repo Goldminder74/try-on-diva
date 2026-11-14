@@ -51,13 +51,8 @@ async function loadRetailerForUser(supabase: any, userId: string) {
       (sub.status === "canceled" &&
         sub.current_period_end &&
         new Date(sub.current_period_end) > new Date()));
-  const trialActive =
-    !!retailer.trial_ends_at && new Date(retailer.trial_ends_at) > new Date();
-  const effectivePlan = subValid
-    ? sub!.plan
-    : trialActive
-      ? "starter"
-      : retailer.plan || "starter";
+  const trialActive = !!retailer.trial_ends_at && new Date(retailer.trial_ends_at) > new Date();
+  const effectivePlan = subValid ? sub!.plan : trialActive ? "starter" : retailer.plan || "starter";
 
   return { retailerId: retailer.id, effectivePlan };
 }
@@ -70,7 +65,8 @@ export const getRetailerAnalytics = createServerFn({ method: "GET" })
     const { retailerId, effectivePlan } = await loadRetailerForUser(supabase, userId);
 
     const planLimitDays = PLAN_HISTORY_DAYS[effectivePlan] ?? 30;
-    const canExport = effectivePlan === "growth" || effectivePlan === "scale" || effectivePlan === "enterprise";
+    const canExport =
+      effectivePlan === "growth" || effectivePlan === "scale" || effectivePlan === "enterprise";
     const canSeeGeography = effectivePlan === "scale" || effectivePlan === "enterprise";
 
     // Clamp requested range to plan window.
@@ -81,8 +77,7 @@ export const getRetailerAnalytics = createServerFn({ method: "GET" })
 
     const now = new Date();
     const since = days === null ? new Date(0) : new Date(now.getTime() - days * 86400_000);
-    const prevSince =
-      days === null ? null : new Date(since.getTime() - days * 86400_000);
+    const prevSince = days === null ? null : new Date(since.getTime() - days * 86400_000);
 
     // Fetch try-on events for current + previous periods in one query when bounded.
     const tryOnSel = supabase
@@ -133,9 +128,7 @@ export const getRetailerAnalytics = createServerFn({ method: "GET" })
             1,
             Math.ceil(
               (now.getTime() -
-                (curTryOns[0]
-                  ? new Date(curTryOns[0].created_at).getTime()
-                  : now.getTime())) /
+                (curTryOns[0] ? new Date(curTryOns[0].created_at).getTime() : now.getTime())) /
                 86400_000,
             ),
           )
@@ -241,7 +234,9 @@ export const exportRetailerAnalyticsCsv = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { retailerId, effectivePlan } = await loadRetailerForUser(supabase, userId);
-    if (!(effectivePlan === "growth" || effectivePlan === "scale" || effectivePlan === "enterprise")) {
+    if (
+      !(effectivePlan === "growth" || effectivePlan === "scale" || effectivePlan === "enterprise")
+    ) {
       throw new Error("CSV export is available on Growth and Pro plans.");
     }
     const planLimitDays = PLAN_HISTORY_DAYS[effectivePlan] ?? null;
@@ -258,7 +253,15 @@ export const exportRetailerAnalyticsCsv = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(50000);
 
-    const header = ["created_at", "wig_id", "user_id", "anonymous_session", "device", "source", "country"];
+    const header = [
+      "created_at",
+      "wig_id",
+      "user_id",
+      "anonymous_session",
+      "device",
+      "source",
+      "country",
+    ];
     const escape = (v: unknown) => {
       const s = v == null ? "" : String(v);
       return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;

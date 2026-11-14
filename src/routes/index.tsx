@@ -13,19 +13,40 @@ export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
   head: () => ({
     links: [{ rel: "canonical", href: "https://wigsmi.com/" }],
-    scripts: [{ type: "application/ld+json", children: JSON.stringify({
-      "@context": "https://schema.org",
-      "@graph": [
-        { "@type": "Organization", "@id": "https://wigsmi.com/#organization", name: "Wigsmi", legalName: "Sherwood Consulting Services Ltd", url: "https://wigsmi.com/" },
-        { "@type": "WebSite", "@id": "https://wigsmi.com/#website", name: "Wigsmi", url: "https://wigsmi.com/", publisher: { "@id": "https://wigsmi.com/#organization" } },
-      ],
-    }) }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": "https://wigsmi.com/#organization",
+              name: "Wigsmi",
+              legalName: "Sherwood Consulting Services Ltd",
+              url: "https://wigsmi.com/",
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://wigsmi.com/#website",
+              name: "Wigsmi",
+              url: "https://wigsmi.com/",
+              publisher: { "@id": "https://wigsmi.com/#organization" },
+            },
+          ],
+        }),
+      },
+    ],
     meta: [
       { name: "fo-verify", content: "83a758b2-98d4-496d-804d-d390f7045221" },
       { property: "og:url", content: "https://wigsmi.com/" },
       { property: "og:type", content: "website" },
       { title: "Wigsmi - Try every wig before you buy it" },
-      { name: "description", content: "Virtual wig try-on built for Black women. Browse wigs from Wigsmi retail partners and try them on before you buy." },
+      {
+        name: "description",
+        content:
+          "Virtual wig try-on built for Black women. Browse wigs from Wigsmi retail partners and try them on before you buy.",
+      },
       { property: "og:title", content: "Wigsmi - Try every wig before you buy it" },
       { property: "og:description", content: "Virtual wig try-on built for Black women." },
       { name: "twitter:card", content: "summary_large_image" },
@@ -36,7 +57,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
-
 
 function Landing() {
   return (
@@ -55,17 +75,26 @@ function Landing() {
               Try every wig <em className="italic text-sienna">before</em> you buy it.
             </h1>
             <p className="mt-6 max-w-md text-lg text-foreground/75">
-              See how locs, knotless braids, bobs and waves actually look on your skin tone, before you spend a penny.
+              See how locs, knotless braids, bobs and waves actually look on your skin tone, before
+              you spend a penny.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link to="/try-on" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm transition-all hover:bg-mahogany-soft hover:shadow-md">
+              <Link
+                to="/try-on"
+                className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm transition-all hover:bg-mahogany-soft hover:shadow-md"
+              >
                 Explore virtual try-on
               </Link>
-              <Link to="/retailer" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">
+              <Link
+                to="/retailer"
+                className="text-sm font-medium text-mahogany underline-offset-4 hover:underline"
+              >
                 I'm a retailer →
               </Link>
             </div>
-            <p className="mt-4 font-mono text-xs text-muted-foreground">2 free try-ons with no account. 5 every month once you sign up - no card needed.</p>
+            <p className="mt-4 font-mono text-xs text-muted-foreground">
+              2 free try-ons with no account. 5 every month once you sign up - no card needed.
+            </p>
           </div>
 
           <div className="relative">
@@ -87,11 +116,26 @@ function Landing() {
           <h2 className="font-display text-3xl text-mahogany md:text-4xl">How it works</h2>
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
-              { icon: Upload, title: "Upload your selfie", body: "A clear, well-lit photo is all we need." },
-              { icon: Palette, title: "Explore retailer styles", body: "Lace fronts, glueless wigs and bobs from Wigsmi retail partners." },
-              { icon: Heart, title: "Find your perfect wig", body: "See it on you, save your favourites, buy from a retailer you trust." },
+              {
+                icon: Upload,
+                title: "Upload your selfie",
+                body: "A clear, well-lit photo is all we need.",
+              },
+              {
+                icon: Palette,
+                title: "Explore retailer styles",
+                body: "Lace fronts, glueless wigs and bobs from Wigsmi retail partners.",
+              },
+              {
+                icon: Heart,
+                title: "Find your perfect wig",
+                body: "See it on you, save your favourites, buy from a retailer you trust.",
+              },
             ].map((s, i) => (
-              <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+              <div
+                key={i}
+                className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]"
+              >
                 <div className="flex h-10 w-10 items-center justify-center rounded-md bg-mahogany text-cream">
                   <s.icon className="h-5 w-5" />
                 </div>
@@ -109,11 +153,26 @@ function Landing() {
         <h2 className="font-display text-3xl text-mahogany md:text-4xl">Why Wigsmi</h2>
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
           {[
-            { icon: ShieldCheck, title: "Beauty that reflects you", body: "Created with Black women’s wig-shopping experience in mind. AI previews are a guide, not a guarantee of fit or colour." },
-            { icon: Sparkles, title: "Afrocentric styles", body: "From kinky coily afros to knotless braids to body wave - the catalog reflects you." },
-            { icon: Heart, title: "Try before you buy", body: "Save the styles that work. Skip the styles that don't. Reduce returns and regret." },
+            {
+              icon: ShieldCheck,
+              title: "Beauty that reflects you",
+              body: "Created with Black women’s wig-shopping experience in mind. AI previews are a guide, not a guarantee of fit or colour.",
+            },
+            {
+              icon: Sparkles,
+              title: "Afrocentric styles",
+              body: "From kinky coily afros to knotless braids to body wave - the catalog reflects you.",
+            },
+            {
+              icon: Heart,
+              title: "Try before you buy",
+              body: "Save the styles that work. Skip the styles that don't. Reduce returns and regret.",
+            },
           ].map((c, i) => (
-            <div key={i} className="card-hover rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]">
+            <div
+              key={i}
+              className="card-hover rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]"
+            >
               <c.icon className="h-6 w-6 text-gold-dark" />
               <h3 className="mt-4 font-display text-xl text-mahogany">{c.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.body}</p>
@@ -130,7 +189,10 @@ function Landing() {
               <h2 className="font-display text-3xl text-mahogany md:text-4xl">Trending styles</h2>
               <p className="mt-2 text-sm text-muted-foreground">Featured Styles</p>
             </div>
-            <Link to="/catalog" className="hidden text-sm font-medium text-mahogany underline-offset-4 hover:underline md:inline">
+            <Link
+              to="/catalog"
+              className="hidden text-sm font-medium text-mahogany underline-offset-4 hover:underline md:inline"
+            >
               View all →
             </Link>
           </div>
@@ -143,12 +205,26 @@ function Landing() {
         <h2 className="font-display text-3xl text-mahogany md:text-4xl">What we built this for</h2>
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
           {[
-            { quote: "We kept hearing the same story: a wig that looked perfect online, returned because it didn't match the wearer's skin or face shape." },
-            { quote: "Most try-on tools were built for lighter skin tones. The colour matching came out washed out or completely off." },
-            { quote: "Returns cost everyone - the buyer who waited weeks, the retailer who eats the cost, and the product that ends up in landfill." },
+            {
+              quote:
+                "We kept hearing the same story: a wig that looked perfect online, returned because it didn't match the wearer's skin or face shape.",
+            },
+            {
+              quote:
+                "Most try-on tools were built for lighter skin tones. The colour matching came out washed out or completely off.",
+            },
+            {
+              quote:
+                "Returns cost everyone - the buyer who waited weeks, the retailer who eats the cost, and the product that ends up in landfill.",
+            },
           ].map((t, i) => (
-            <figure key={i} className="rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]">
-              <blockquote className="font-display text-lg italic leading-snug text-foreground">{t.quote}</blockquote>
+            <figure
+              key={i}
+              className="rounded-xl border border-border bg-card p-7 shadow-[var(--shadow-card)]"
+            >
+              <blockquote className="font-display text-lg italic leading-snug text-foreground">
+                {t.quote}
+              </blockquote>
             </figure>
           ))}
         </div>
@@ -157,22 +233,48 @@ function Landing() {
       {/* Pricing preview */}
       <section className="border-t border-border bg-mahogany text-cream">
         <div className="mx-auto w-full max-w-7xl px-5 py-20 text-center">
-          <h2 className="font-display text-4xl md:text-5xl">Start free.<br/>Upgrade when you fall in love.</h2>
+          <h2 className="font-display text-4xl md:text-5xl">
+            Start free.
+            <br />
+            Upgrade when you fall in love.
+          </h2>
           <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-4 text-left md:grid-cols-3">
             {[
               { name: "Free", price: "£0", desc: "5 try-ons / month. Browse the full catalog." },
-              { name: "Plus", price: "£4.99", desc: "35 try-ons / month. Save your photo. Style quiz." , badge: true },
-              { name: "Pro", price: "£9.99", desc: "100 try-ons / month, no watermark, priority quality." },
+              {
+                name: "Plus",
+                price: "£4.99",
+                desc: "35 try-ons / month. Save your photo. Style quiz.",
+                badge: true,
+              },
+              {
+                name: "Pro",
+                price: "£9.99",
+                desc: "100 try-ons / month, no watermark, priority quality.",
+              },
             ].map((p) => (
-              <div key={p.name} className={`rounded-xl border p-6 ${p.badge ? "border-gold bg-cream/5" : "border-cream/15"}`}>
-                {p.badge && <span className="font-mono text-[10px] uppercase tracking-wider text-gold">Most popular</span>}
+              <div
+                key={p.name}
+                className={`rounded-xl border p-6 ${p.badge ? "border-gold bg-cream/5" : "border-cream/15"}`}
+              >
+                {p.badge && (
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-gold">
+                    Most popular
+                  </span>
+                )}
                 <p className="mt-1 font-display text-2xl">{p.name}</p>
-                <p className="mt-2 font-mono text-3xl text-gold">{p.price}<span className="text-sm text-cream/60">/mo</span></p>
+                <p className="mt-2 font-mono text-3xl text-gold">
+                  {p.price}
+                  <span className="text-sm text-cream/60">/mo</span>
+                </p>
                 <p className="mt-3 text-sm text-cream/75">{p.desc}</p>
               </div>
             ))}
           </div>
-          <Link to="/try-on" className="mt-10 inline-flex rounded-md bg-gold px-7 py-3 text-sm font-medium text-mahogany shadow-sm hover:bg-gold-dark hover:text-cream">
+          <Link
+            to="/try-on"
+            className="mt-10 inline-flex rounded-md bg-gold px-7 py-3 text-sm font-medium text-mahogany shadow-sm hover:bg-gold-dark hover:text-cream"
+          >
             Start free
           </Link>
         </div>
@@ -188,14 +290,23 @@ function FeaturedRow() {
   if (loading) {
     return (
       <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-        {Array.from({ length: 5 }).map((_, i) => <WigCardSkeleton key={i} />)}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <WigCardSkeleton key={i} />
+        ))}
       </div>
     );
   }
-  if (!data?.length) return <p className="mt-8 text-sm text-muted-foreground">New retailer collections coming soon. No styles are available to try on right now.</p>;
+  if (!data?.length)
+    return (
+      <p className="mt-8 text-sm text-muted-foreground">
+        New retailer collections coming soon. No styles are available to try on right now.
+      </p>
+    );
   return (
     <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-      {(data ?? []).map((w) => <WigCard key={w.id} wig={w} />)}
+      {(data ?? []).map((w) => (
+        <WigCard key={w.id} wig={w} />
+      ))}
     </div>
   );
 }

@@ -6,7 +6,15 @@ export const Route = createFileRoute("/retailer_/login")({
   staticData: { sitemap: false },
   head: () => ({
     links: [{ rel: "canonical", href: "https://wigsmi.com/retailer/login" }],
-    meta: [{ name: "robots", content: "noindex, follow" }, { property: "og:title", content: "Retailer login - Wigsmi" }, { property: "og:description", content: "Sign in to the Wigsmi retailer portal to manage your catalogue and widget." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, 
+    meta: [
+      { name: "robots", content: "noindex, follow" },
+      { property: "og:title", content: "Retailer login - Wigsmi" },
+      {
+        property: "og:description",
+        content: "Sign in to the Wigsmi retailer portal to manage your catalogue and widget.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Retailer login - Wigsmi" },
       { name: "description", content: "Log in to your Wigsmi retailer dashboard." },
     ],

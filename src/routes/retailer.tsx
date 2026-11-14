@@ -13,9 +13,16 @@ export const Route = createFileRoute("/retailer")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://wigsmi.com/retailer" },
       { title: "For Retailers - Wigsmi" },
-      { name: "description", content: "Add Wigsmi virtual wig try-on to your store. Help shoppers explore your collection with a free 1-month retailer trial." },
+      {
+        name: "description",
+        content:
+          "Add Wigsmi virtual wig try-on to your store. Help shoppers explore your collection with a free 1-month retailer trial.",
+      },
       { property: "og:title", content: "Wigsmi for Retailers" },
-      { property: "og:description", content: "Virtual try-on for wig retailers. Free 1-month trial." },
+      {
+        property: "og:description",
+        content: "Virtual try-on for wig retailers. Free 1-month trial.",
+      },
     ],
   }),
   component: RetailerLanding,
@@ -36,18 +43,32 @@ function RetailerLanding() {
             Your collection. A more personal shopping experience.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-foreground/75">
-            Help shoppers preview your wigs on their own selfie before visiting your shop to buy. AI previews are illustrative, not a guarantee of fit or colour.
+            Help shoppers preview your wigs on their own selfie before visiting your shop to buy. AI
+            previews are illustrative, not a guarantee of fit or colour.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Link to="/retailer/signup" className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft">
+            <Link
+              to="/retailer/signup"
+              className="rounded-md bg-mahogany px-6 py-3 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
+            >
               Start 1-month free trial
             </Link>
-            <Link to="/retailer/login" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">
+            <Link
+              to="/retailer/login"
+              className="text-sm font-medium text-mahogany underline-offset-4 hover:underline"
+            >
               Retailer login →
             </Link>
-            <a href="#pricing" className="text-sm font-medium text-mahogany underline-offset-4 hover:underline">See pricing →</a>
+            <a
+              href="#pricing"
+              className="text-sm font-medium text-mahogany underline-offset-4 hover:underline"
+            >
+              See pricing →
+            </a>
           </div>
-          <p className="mt-3 font-mono text-xs text-muted-foreground">No card needed. Cancel any time.</p>
+          <p className="mt-3 font-mono text-xs text-muted-foreground">
+            No card needed. Cancel any time.
+          </p>
         </div>
       </section>
 
@@ -68,7 +89,10 @@ function RetailerLanding() {
               body: "A wig-shopping experience created with Black women in mind.",
             },
           ].map((item, i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+            <div
+              key={i}
+              className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]"
+            >
               <h2 className="font-display text-xl text-mahogany">{item.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{item.body}</p>
             </div>
@@ -98,10 +122,21 @@ function RetailerLanding() {
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
           {[
             { icon: Sparkles, title: "Sign up", body: "Create a retailer account in 60 seconds." },
-            { icon: TrendingUp, title: "Upload your wigs", body: "Add permission-cleared product photos, descriptions, prices and exact buying links." },
-            { icon: Code2, title: "Paste one line of code", body: "Drop the embed snippet into Shopify, WooCommerce or any HTML. Done." },
+            {
+              icon: TrendingUp,
+              title: "Upload your wigs",
+              body: "Add permission-cleared product photos, descriptions, prices and exact buying links.",
+            },
+            {
+              icon: Code2,
+              title: "Paste one line of code",
+              body: "Drop the embed snippet into Shopify, WooCommerce or any HTML. Done.",
+            },
           ].map((s, i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+            <div
+              key={i}
+              className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]"
+            >
               <div className="flex h-10 w-10 items-center justify-center rounded-md bg-mahogany text-cream">
                 <s.icon className="h-5 w-5" />
               </div>
@@ -117,14 +152,18 @@ function RetailerLanding() {
       <section id="pricing" className="border-y border-border bg-sand/40">
         <div className="mx-auto w-full max-w-7xl px-5 py-20">
           <h2 className="font-display text-3xl text-mahogany md:text-4xl">Retailer pricing.</h2>
-          <p className="mt-2 max-w-md text-sm text-muted-foreground">All plans start with a 1-month free trial. No card required.</p>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            All plans start with a 1-month free trial. No card required.
+          </p>
           <div className="mt-10">
             <RetailerPlanCards requireSignup />
           </div>
           <div className="mt-8 rounded-xl border border-border bg-card p-6 md:flex md:items-center md:justify-between">
             <div>
               <p className="font-display text-xl text-mahogany">Enterprise</p>
-              <p className="mt-1 text-sm text-muted-foreground">Multi-region, white-label, custom integrations.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Multi-region, white-label, custom integrations.
+              </p>
             </div>
             <a
               href="mailto:hello@wigsmi.com"
@@ -135,7 +174,6 @@ function RetailerLanding() {
           </div>
         </div>
       </section>
-
 
       {/* FAQ teaser */}
       <section className="border-y border-border bg-sand/40">
@@ -161,7 +199,10 @@ function RetailerLanding() {
             Join the virtual try-on built for Black wig buyers.
           </h2>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/retailer/signup" className="inline-flex rounded-md bg-gold px-7 py-3 text-sm font-medium text-mahogany hover:bg-cream">
+            <Link
+              to="/retailer/signup"
+              className="inline-flex rounded-md bg-gold px-7 py-3 text-sm font-medium text-mahogany hover:bg-cream"
+            >
               Create retailer account
             </Link>
             <a

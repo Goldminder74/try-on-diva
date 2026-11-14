@@ -34,11 +34,21 @@ export function Header() {
           <Wordmark size="md" />
         </Link>
         <nav className="hidden items-center gap-8 md:flex">
-          <Link to="/catalog" className="text-sm text-foreground/80 hover:text-mahogany">Catalog</Link>
-          <Link to="/try-on" className="text-sm text-foreground/80 hover:text-mahogany">Try on</Link>
-          <Link to="/pricing" className="text-sm text-foreground/80 hover:text-mahogany">Pricing</Link>
-          <Link to="/guides" className="text-sm text-foreground/80 hover:text-mahogany">Guides</Link>
-          <Link to="/retailer" className="text-sm text-foreground/80 hover:text-mahogany">For retailers</Link>
+          <Link to="/catalog" className="text-sm text-foreground/80 hover:text-mahogany">
+            Catalog
+          </Link>
+          <Link to="/try-on" className="text-sm text-foreground/80 hover:text-mahogany">
+            Try on
+          </Link>
+          <Link to="/pricing" className="text-sm text-foreground/80 hover:text-mahogany">
+            Pricing
+          </Link>
+          <Link to="/guides" className="text-sm text-foreground/80 hover:text-mahogany">
+            Guides
+          </Link>
+          <Link to="/retailer" className="text-sm text-foreground/80 hover:text-mahogany">
+            For retailers
+          </Link>
         </nav>
         <div className="flex items-center gap-3">
           {loading ? null : user ? (

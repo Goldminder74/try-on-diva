@@ -15,7 +15,16 @@ import { getAdminContext } from "@/lib/admin.functions";
 import { LayoutDashboard, Users, Store, Package, Star, LogOut, Percent } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin - Wigsmi" }, { name: "description", content: "Wigsmi platform administration." }, { property: "og:title", content: "Admin - Wigsmi" }, { property: "og:description", content: "Wigsmi platform administration." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Admin - Wigsmi" },
+      { name: "description", content: "Wigsmi platform administration." },
+      { property: "og:title", content: "Admin - Wigsmi" },
+      { property: "og:description", content: "Wigsmi platform administration." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   staticData: { sitemap: "exclude-subtree" },
   ssr: false,
   beforeLoad: async ({ location }) => {
@@ -53,7 +62,11 @@ function AdminLayout() {
   }, [ctxFn, navigate]);
 
   if (!checked) {
-    return <div className="flex min-h-screen items-center justify-center bg-cream text-sm text-muted-foreground">Checking access…</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-cream text-sm text-muted-foreground">
+        Checking access…
+      </div>
+    );
   }
   if (!isAdmin) return null;
 
@@ -62,7 +75,10 @@ function AdminLayout() {
     navigate({ to: "/" });
   };
 
-  const initial = (user?.user_metadata?.display_name || user?.email || "?").toString().charAt(0).toUpperCase();
+  const initial = (user?.user_metadata?.display_name || user?.email || "?")
+    .toString()
+    .charAt(0)
+    .toUpperCase();
 
   return (
     <div className="min-h-screen bg-cream">
@@ -91,12 +107,42 @@ function AdminLayout() {
       <div className="mx-auto flex w-full max-w-7xl gap-8 px-5 py-8">
         <aside className="hidden w-56 shrink-0 md:block">
           <nav className="sticky top-24 space-y-1">
-            <SideLink to="/admin" icon={<LayoutDashboard className="h-4 w-4" />} label="Overview" active={pathname === "/admin"} />
-            <SideLink to="/admin/retailers" icon={<Store className="h-4 w-4" />} label="Retailers" active={pathname.startsWith("/admin/retailers")} />
-            <SideLink to="/admin/consumers" icon={<Users className="h-4 w-4" />} label="Consumers" active={pathname.startsWith("/admin/consumers")} />
-            <SideLink to="/admin/catalog" icon={<Package className="h-4 w-4" />} label="Catalog" active={pathname.startsWith("/admin/catalog")} />
-            <SideLink to="/admin/featured" icon={<Star className="h-4 w-4" />} label="Featured" active={pathname.startsWith("/admin/featured")} />
-            <SideLink to="/admin/commission" icon={<Percent className="h-4 w-4" />} label="Commission" active={pathname.startsWith("/admin/commission")} />
+            <SideLink
+              to="/admin"
+              icon={<LayoutDashboard className="h-4 w-4" />}
+              label="Overview"
+              active={pathname === "/admin"}
+            />
+            <SideLink
+              to="/admin/retailers"
+              icon={<Store className="h-4 w-4" />}
+              label="Retailers"
+              active={pathname.startsWith("/admin/retailers")}
+            />
+            <SideLink
+              to="/admin/consumers"
+              icon={<Users className="h-4 w-4" />}
+              label="Consumers"
+              active={pathname.startsWith("/admin/consumers")}
+            />
+            <SideLink
+              to="/admin/catalog"
+              icon={<Package className="h-4 w-4" />}
+              label="Catalog"
+              active={pathname.startsWith("/admin/catalog")}
+            />
+            <SideLink
+              to="/admin/featured"
+              icon={<Star className="h-4 w-4" />}
+              label="Featured"
+              active={pathname.startsWith("/admin/featured")}
+            />
+            <SideLink
+              to="/admin/commission"
+              icon={<Percent className="h-4 w-4" />}
+              label="Commission"
+              active={pathname.startsWith("/admin/commission")}
+            />
           </nav>
         </aside>
         <main className="flex-1 min-w-0">
@@ -107,12 +153,24 @@ function AdminLayout() {
   );
 }
 
-function SideLink({ to, icon, label, active }: { to: string; icon: React.ReactNode; label: string; active: boolean }) {
+function SideLink({
+  to,
+  icon,
+  label,
+  active,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+}) {
   return (
     <Link
       to={to}
       className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors ${
-        active ? "bg-mahogany text-cream" : "text-foreground/80 hover:bg-sand/60 hover:text-mahogany"
+        active
+          ? "bg-mahogany text-cream"
+          : "text-foreground/80 hover:bg-sand/60 hover:text-mahogany"
       }`}
     >
       {icon}

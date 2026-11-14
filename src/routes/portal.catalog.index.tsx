@@ -8,7 +8,22 @@ type Wig = Awaited<ReturnType<typeof listMyWigs>>["wigs"][number];
 
 export const Route = createFileRoute("/portal/catalog/")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "View, publish and organise every wig in your retailer catalogue." }, { property: "og:title", content: "Catalog - Wigsmi Retailer" }, { property: "og:description", content: "View, publish and organise every wig in your retailer catalogue." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Catalog - Wigsmi Retailer" }] }),
+  head: () => ({
+    meta: [
+      {
+        name: "description",
+        content: "View, publish and organise every wig in your retailer catalogue.",
+      },
+      { property: "og:title", content: "Catalog - Wigsmi Retailer" },
+      {
+        property: "og:description",
+        content: "View, publish and organise every wig in your retailer catalogue.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Catalog - Wigsmi Retailer" },
+    ],
+  }),
   component: CatalogList,
 });
 
@@ -34,13 +49,12 @@ function CatalogList() {
     <div>
       <div className="flex items-end justify-between">
         <div>
-          <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
-            Catalog
-          </p>
+          <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Catalog</p>
           <h1 className="mt-1 font-display text-4xl text-mahogany">Your wigs.</h1>
         </div>
         <Link
-          to="/portal/catalog/$wigId" params={{ wigId: "new" }}
+          to="/portal/catalog/$wigId"
+          params={{ wigId: "new" }}
           className="inline-flex items-center gap-1.5 rounded-md bg-mahogany px-4 py-2 text-sm text-cream hover:bg-mahogany-soft"
         >
           <Plus className="h-4 w-4" /> Add wig
@@ -58,7 +72,8 @@ function CatalogList() {
             Add your first wig and we'll help shoppers try it on.
           </p>
           <Link
-            to="/portal/catalog/$wigId" params={{ wigId: "new" }}
+            to="/portal/catalog/$wigId"
+            params={{ wigId: "new" }}
             className="mt-6 inline-flex items-center gap-1.5 rounded-md bg-mahogany px-5 py-2.5 text-sm text-cream hover:bg-mahogany-soft"
           >
             <Plus className="h-4 w-4" /> Add your first wig
@@ -84,11 +99,7 @@ function CatalogList() {
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 overflow-hidden rounded-md bg-sand">
                         {w.images?.[0] && (
-                          <img
-                            src={w.images[0]}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
+                          <img src={w.images[0]} alt="" className="h-full w-full object-cover" />
                         )}
                       </div>
                       <span className="font-medium">{w.name}</span>

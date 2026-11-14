@@ -19,9 +19,17 @@ export const Route = createFileRoute("/catalog")({
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://wigsmi.com/catalog" },
       { title: "Wig Catalog - Wigsmi" },
-      { name: "description", content: "Browse wigs from Wigsmi retail partners and try each one on your own photo before you buy." },
+      {
+        name: "description",
+        content:
+          "Browse wigs from Wigsmi retail partners and try each one on your own photo before you buy.",
+      },
       { property: "og:title", content: "Wig Catalog - Wigsmi" },
-      { property: "og:description", content: "Browse wigs from Wigsmi retail partners and try each one on your own photo before you buy." },
+      {
+        property: "og:description",
+        content:
+          "Browse wigs from Wigsmi retail partners and try each one on your own photo before you buy.",
+      },
     ],
   }),
   component: Catalog,
@@ -31,27 +39,45 @@ function Catalog() {
   const [query, setQuery] = useState("");
   const [styles, setStyles] = useState<string[]>([]);
   const [textures, setTextures] = useState<string[]>([]);
-  const [sort, setSort] = useState<"featured" | "newest" | "popular" | "price-asc" | "price-desc">("featured");
+  const [sort, setSort] = useState<"featured" | "newest" | "popular" | "price-asc" | "price-desc">(
+    "featured",
+  );
   const [showFilters, setShowFilters] = useState(false);
 
-  const toggle = (arr: string[], v: string) => arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
+  const toggle = (arr: string[], v: string) =>
+    arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
 
   const { data: wigs, loading, error } = useAsync<Wig[]>(() => fetchWigs(), []);
 
   const filtered = useMemo(() => {
     const source = wigs ?? [];
     let out = source.filter((w: Wig) => {
-      if (query && !w.name.toLowerCase().includes(query.toLowerCase()) && !w.retailer.toLowerCase().includes(query.toLowerCase())) return false;
+      if (
+        query &&
+        !w.name.toLowerCase().includes(query.toLowerCase()) &&
+        !w.retailer.toLowerCase().includes(query.toLowerCase())
+      )
+        return false;
       if (styles.length && !styles.includes(w.style_type)) return false;
       if (textures.length && !textures.includes(w.hair_texture)) return false;
       return true;
     });
     switch (sort) {
-      case "newest": out = [...out].sort((a, b) => b.created_at.localeCompare(a.created_at)); break;
-      case "popular": out = [...out].sort((a, b) => b.try_on_count - a.try_on_count); break;
-      case "price-asc": out = [...out].sort((a, b) => a.price - b.price); break;
-      case "price-desc": out = [...out].sort((a, b) => b.price - a.price); break;
-      case "featured": out = [...out].sort((a, b) => Number(b.is_featured) - Number(a.is_featured)); break;
+      case "newest":
+        out = [...out].sort((a, b) => b.created_at.localeCompare(a.created_at));
+        break;
+      case "popular":
+        out = [...out].sort((a, b) => b.try_on_count - a.try_on_count);
+        break;
+      case "price-asc":
+        out = [...out].sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        out = [...out].sort((a, b) => b.price - a.price);
+        break;
+      case "featured":
+        out = [...out].sort((a, b) => Number(b.is_featured) - Number(a.is_featured));
+        break;
     }
     return out;
   }, [query, styles, textures, sort, wigs]);
@@ -64,9 +90,13 @@ function Catalog() {
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Catalog</p>
-            <h1 className="mt-1 font-display text-4xl text-mahogany md:text-5xl">Find your next look.</h1>
+            <h1 className="mt-1 font-display text-4xl text-mahogany md:text-5xl">
+              Find your next look.
+            </h1>
           </div>
-          <p className="hidden text-sm text-muted-foreground md:block">{loading ? "Loading wigs…" : `${filtered.length} wigs`}</p>
+          <p className="hidden text-sm text-muted-foreground md:block">
+            {loading ? "Loading wigs…" : `${filtered.length} wigs`}
+          </p>
         </div>
 
         {/* Search + sort */}
@@ -83,7 +113,7 @@ function Catalog() {
             />
           </div>
           <button
-            onClick={() => setShowFilters(s => !s)}
+            onClick={() => setShowFilters((s) => !s)}
             className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2.5 text-sm font-medium hover:border-mahogany md:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" /> Filters
@@ -106,20 +136,38 @@ function Catalog() {
           {/* Filters */}
           <aside className={`${showFilters ? "block" : "hidden"} space-y-7 md:block`}>
             <FilterGroup label="Style">
-              {STYLE_TYPES.map(s => (
-                <FilterChip key={s} active={styles.includes(s)} onClick={() => setStyles(toggle(styles, s))}>{s}</FilterChip>
+              {STYLE_TYPES.map((s) => (
+                <FilterChip
+                  key={s}
+                  active={styles.includes(s)}
+                  onClick={() => setStyles(toggle(styles, s))}
+                >
+                  {s}
+                </FilterChip>
               ))}
             </FilterGroup>
             <FilterGroup label="Texture">
-              {HAIR_TEXTURES.map(t => (
-                <FilterChip key={t} active={textures.includes(t)} onClick={() => setTextures(toggle(textures, t))}>{t}</FilterChip>
+              {HAIR_TEXTURES.map((t) => (
+                <FilterChip
+                  key={t}
+                  active={textures.includes(t)}
+                  onClick={() => setTextures(toggle(textures, t))}
+                >
+                  {t}
+                </FilterChip>
               ))}
             </FilterGroup>
-            {(styles.length || textures.length || query) ? (
+            {styles.length || textures.length || query ? (
               <button
-                onClick={() => { setStyles([]); setTextures([]); setQuery(""); }}
+                onClick={() => {
+                  setStyles([]);
+                  setTextures([]);
+                  setQuery("");
+                }}
                 className="text-sm text-mahogany underline-offset-4 hover:underline"
-              >Clear all filters</button>
+              >
+                Clear all filters
+              </button>
             ) : null}
           </aside>
 
@@ -130,7 +178,9 @@ function Catalog() {
             )}
             {loading ? (
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {Array.from({ length: 9 }).map((_, i) => <WigCardSkeleton key={i} />)}
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <WigCardSkeleton key={i} />
+                ))}
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-sand/40 px-6 py-20 text-center">
@@ -139,20 +189,49 @@ function Catalog() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-sand/40 px-6 py-20 text-center">
-                <p className="font-display text-2xl text-mahogany">{wigs?.length ? "No wigs match those filters." : "New retailer collections coming soon."}</p>
-                <p className="mt-2 text-sm text-muted-foreground">{wigs?.length ? "Try clearing a filter or two." : "There are no styles available to try on right now."}</p>
-                {wigs?.length ? <Button onClick={() => { setStyles([]); setTextures([]); setQuery(""); }} className="mt-5">Clear filters</Button> : <Button asChild className="mt-5"><Link to="/retailer">Become a retailer partner</Link></Button>}
+                <p className="font-display text-2xl text-mahogany">
+                  {wigs?.length
+                    ? "No wigs match those filters."
+                    : "New retailer collections coming soon."}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {wigs?.length
+                    ? "Try clearing a filter or two."
+                    : "There are no styles available to try on right now."}
+                </p>
+                {wigs?.length ? (
+                  <Button
+                    onClick={() => {
+                      setStyles([]);
+                      setTextures([]);
+                      setQuery("");
+                    }}
+                    className="mt-5"
+                  >
+                    Clear filters
+                  </Button>
+                ) : (
+                  <Button asChild className="mt-5">
+                    <Link to="/retailer">Become a retailer partner</Link>
+                  </Button>
+                )}
               </div>
             ) : (
               <>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {filtered.slice(0, count).map(w => <WigCard key={w.id} wig={w} />)}
-              </div>
-              <ShowMore shown={count} total={filtered.length} onMore={more} />
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                  {filtered.slice(0, count).map((w) => (
+                    <WigCard key={w.id} wig={w} />
+                  ))}
+                </div>
+                <ShowMore shown={count} total={filtered.length} onMore={more} />
               </>
             )}
             <p className="mt-8 text-center text-xs text-muted-foreground">
-              Want personalised picks? <Link to="/try-on" className="text-mahogany underline">Take the style quiz</Link>.
+              Want personalised picks?{" "}
+              <Link to="/try-on" className="text-mahogany underline">
+                Take the style quiz
+              </Link>
+              .
             </p>
           </div>
         </div>
@@ -171,7 +250,15 @@ function FilterGroup({ label, children }: { label: string; children: React.React
   );
 }
 
-function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function FilterChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}

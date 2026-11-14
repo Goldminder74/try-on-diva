@@ -46,8 +46,7 @@ export function TryOnResultActions({ resultUrl, wigName, watermark = true }: Pro
       // On mobile with native share-sheet support, "Save to device" is best
       // served by the OS share sheet (which includes "Save Image").
       const isCoarse =
-        typeof window !== "undefined" &&
-        window.matchMedia?.("(pointer: coarse)").matches;
+        typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches;
       if (isCoarse && canNativeShareFiles()) {
         try {
           await (navigator as any).share({
@@ -104,12 +103,8 @@ export function TryOnResultActions({ resultUrl, wigName, watermark = true }: Pro
     }
   };
 
-  const shareText = encodeURIComponent(
-    `Tried this wig on with Wigsmi: ${resultUrl}`,
-  );
-  const mailHref = `mailto:?subject=${encodeURIComponent(
-    "My Wigsmi try-on",
-  )}&body=${shareText}`;
+  const shareText = encodeURIComponent(`Tried this wig on with Wigsmi: ${resultUrl}`);
+  const mailHref = `mailto:?subject=${encodeURIComponent("My Wigsmi try-on")}&body=${shareText}`;
   const waHref = `https://wa.me/?text=${shareText}`;
 
   return (

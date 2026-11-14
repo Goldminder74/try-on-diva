@@ -8,10 +8,7 @@ import { subscriptionIsValid } from "@/lib/entitlements";
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase(): any {
   if (!_supabase) {
-    _supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    );
+    _supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
   }
   return _supabase;
 }
@@ -125,30 +122,30 @@ export const Route = createFileRoute("/api/public/hooks/trials-tick")({
 
           // Inactive rows remain eligible for a failed trial-ended email retry.
           if (r.is_active) {
-          // Suspend the retailer (hides from public reads via RLS).
-          await sb
-            .from("retailers")
-            .update({ is_active: false, updated_at: now.toISOString() })
-            .eq("id", r.id);
+            // Suspend the retailer (hides from public reads via RLS).
+            await sb
+              .from("retailers")
+              .update({ is_active: false, updated_at: now.toISOString() })
+              .eq("id", r.id);
 
-          // Auto-unpublish all currently published wigs; record marker so
-          // we know which to republish on subscription.
-          await sb
-            .from("wigs")
-            .update({
-              is_published: false,
-              auto_unpublished_at: now.toISOString(),
-              updated_at: now.toISOString(),
-            })
-            .eq("retailer_id", r.id)
-            .eq("is_published", true);
+            // Auto-unpublish all currently published wigs; record marker so
+            // we know which to republish on subscription.
+            await sb
+              .from("wigs")
+              .update({
+                is_published: false,
+                auto_unpublished_at: now.toISOString(),
+                updated_at: now.toISOString(),
+              })
+              .eq("retailer_id", r.id)
+              .eq("is_published", true);
 
-          // Analytics breadcrumb.
-          await sb.from("analytics_events").insert({
-            retailer_id: r.id,
-            event_type: "trial_expired",
-            payload: { trial_ends_at: r.trial_ends_at },
-          });
+            // Analytics breadcrumb.
+            await sb.from("analytics_events").insert({
+              retailer_id: r.id,
+              event_type: "trial_expired",
+              payload: { trial_ends_at: r.trial_ends_at },
+            });
           }
 
           const inserted = await recordEvent(r.id, "trial_ended");

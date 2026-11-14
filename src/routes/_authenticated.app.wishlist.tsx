@@ -8,7 +8,16 @@ import { ShowMore, useVisibleCount } from "@/components/wigsmi/ShowMore";
 
 export const Route = createFileRoute("/_authenticated/app/wishlist")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "The wigs you've saved to try on or buy later." }, { property: "og:title", content: "Wishlist - Wigsmi" }, { property: "og:description", content: "The wigs you've saved to try on or buy later." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Wishlist - Wigsmi" }] }),
+  head: () => ({
+    meta: [
+      { name: "description", content: "The wigs you've saved to try on or buy later." },
+      { property: "og:title", content: "Wishlist - Wigsmi" },
+      { property: "og:description", content: "The wigs you've saved to try on or buy later." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Wishlist - Wigsmi" },
+    ],
+  }),
   component: Wishlist,
 });
 
@@ -32,7 +41,9 @@ function Wishlist() {
   const { count, more } = useVisibleCount("wishlist");
 
   const refresh = () => list().then((r) => setItems(r.items as unknown as Item[]));
-  useEffect(() => { refresh(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    refresh();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const remove = async (wigId: string) => {
     await toggle({ data: { wigId } });
@@ -40,7 +51,11 @@ function Wishlist() {
   };
 
   if (!items) {
-    return <div className="mx-auto max-w-7xl px-5 py-10"><p className="text-sm text-muted-foreground">Loading wishlist…</p></div>;
+    return (
+      <div className="mx-auto max-w-7xl px-5 py-10">
+        <p className="text-sm text-muted-foreground">Loading wishlist…</p>
+      </div>
+    );
   }
 
   return (
@@ -51,37 +66,64 @@ function Wishlist() {
       {items.length === 0 ? (
         <div className="mt-10 rounded-xl border border-dashed border-border bg-sand/40 px-6 py-20 text-center">
           <p className="font-display text-2xl text-mahogany">No saved wigs yet.</p>
-          <p className="mt-2 text-sm text-muted-foreground">Tap the heart on any wig to save it here.</p>
-          <Link to="/app/catalog" className="mt-5 inline-flex rounded-md bg-mahogany px-5 py-2 text-sm text-cream">Browse catalog</Link>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Tap the heart on any wig to save it here.
+          </p>
+          <Link
+            to="/app/catalog"
+            className="mt-5 inline-flex rounded-md bg-mahogany px-5 py-2 text-sm text-cream"
+          >
+            Browse catalog
+          </Link>
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-          {items.filter((i) => i.wigs).slice(0, count).map((i) => {
-            const w = i.wigs!;
-            const ret = Array.isArray(w.retailers) ? w.retailers[0] : w.retailers;
-            return (
-              <div key={i.wig_id} className="group overflow-hidden rounded-lg border border-border bg-card">
-                <Link to="/wig/$id" params={{ id: w.id }} className="block">
-                  <div className="aspect-[4/5] overflow-hidden bg-sand">
-                    <img src={w.images[0]} alt={w.name} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
-                  </div>
-                </Link>
-                <div className="p-3">
-                  <p className="font-mono text-[10px] uppercase tracking-wider text-gold-dark">{ret?.display_name ?? ""}</p>
-                  <p className="mt-1 line-clamp-1 text-sm text-foreground">{w.name}</p>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="font-mono text-sm">{formatPrice(Number(w.price), w.currency)}</span>
-                    <button onClick={() => remove(i.wig_id)} aria-label="Remove" className="text-mahogany hover:text-mahogany-soft">
-                      <Heart className="h-4 w-4 fill-current" />
-                    </button>
+          {items
+            .filter((i) => i.wigs)
+            .slice(0, count)
+            .map((i) => {
+              const w = i.wigs!;
+              const ret = Array.isArray(w.retailers) ? w.retailers[0] : w.retailers;
+              return (
+                <div
+                  key={i.wig_id}
+                  className="group overflow-hidden rounded-lg border border-border bg-card"
+                >
+                  <Link to="/wig/$id" params={{ id: w.id }} className="block">
+                    <div className="aspect-[4/5] overflow-hidden bg-sand">
+                      <img
+                        src={w.images[0]}
+                        alt={w.name}
+                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                      />
+                    </div>
+                  </Link>
+                  <div className="p-3">
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-gold-dark">
+                      {ret?.display_name ?? ""}
+                    </p>
+                    <p className="mt-1 line-clamp-1 text-sm text-foreground">{w.name}</p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="font-mono text-sm">
+                        {formatPrice(Number(w.price), w.currency)}
+                      </span>
+                      <button
+                        onClick={() => remove(i.wig_id)}
+                        aria-label="Remove"
+                        className="text-mahogany hover:text-mahogany-soft"
+                      >
+                        <Heart className="h-4 w-4 fill-current" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       )}
-      {items.length > 0 && <ShowMore shown={count} total={items.filter((i) => i.wigs).length} onMore={more} />}
+      {items.length > 0 && (
+        <ShowMore shown={count} total={items.filter((i) => i.wigs).length} onMore={more} />
+      )}
     </div>
   );
 }

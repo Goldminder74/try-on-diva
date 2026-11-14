@@ -11,7 +11,22 @@ import { Copy, Check, RefreshCw, AlertTriangle, X } from "lucide-react";
 
 export const Route = createFileRoute("/portal/widget")({
   staticData: { sitemap: false },
-  head: () => ({ meta: [{ name: "description", content: "Customise and install the Wigsmi try-on widget on your shop." }, { property: "og:title", content: "Widget - Wigsmi Retailer" }, { property: "og:description", content: "Customise and install the Wigsmi try-on widget on your shop." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { title: "Widget - Wigsmi Retailer" }] }),
+  head: () => ({
+    meta: [
+      {
+        name: "description",
+        content: "Customise and install the Wigsmi try-on widget on your shop.",
+      },
+      { property: "og:title", content: "Widget - Wigsmi Retailer" },
+      {
+        property: "og:description",
+        content: "Customise and install the Wigsmi try-on widget on your shop.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { title: "Widget - Wigsmi Retailer" },
+    ],
+  }),
   component: WidgetPage,
 });
 
@@ -55,9 +70,7 @@ function WidgetPage() {
       setWidgetType((w.widget_type as "full" | "button") || "full");
       setIsActive(w.is_active);
       setDomains(w.allowed_domains || []);
-      setAccent(
-        w.config?.accent_color || r.retailer?.brand_primary || "#3D1C02",
-      );
+      setAccent(w.config?.accent_color || r.retailer?.brand_primary || "#3D1C02");
     } else {
       setWidget(null);
     }
@@ -156,12 +169,10 @@ function WidgetPage() {
       <div>
         <Header />
         <div className="mt-8 rounded-2xl border border-border bg-card p-10 text-center">
-          <h2 className="font-display text-2xl text-mahogany">
-            Create your widget
-          </h2>
+          <h2 className="font-display text-2xl text-mahogany">Create your widget</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            Generate an embed token, configure how it appears, and copy a
-            single line of HTML into your store.
+            Generate an embed token, configure how it appears, and copy a single line of HTML into
+            your store.
           </p>
           {error && <p className="mt-3 text-sm text-error">{error}</p>}
           <button
@@ -178,8 +189,7 @@ function WidgetPage() {
   }
 
   const previewSrc = `/embed/widget/${widget.embed_token}`;
-  const origin =
-    typeof window !== "undefined" ? window.location.origin : "https://wigsmi.app";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://wigsmi.app";
   const snippet = `<script async src="${origin}/embed/widget.js" data-wigsmi-token="${widget.embed_token}"></script>\n<div data-wigsmi-widget></div>`;
 
   return (
@@ -188,10 +198,7 @@ function WidgetPage() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         {/* LEFT: Config */}
-        <form
-          onSubmit={onSave}
-          className="space-y-6 rounded-2xl border border-border bg-card p-6"
-        >
+        <form onSubmit={onSave} className="space-y-6 rounded-2xl border border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-xl text-mahogany">Configuration</h2>
             <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
@@ -222,9 +229,7 @@ function WidgetPage() {
                     {t === "full" ? "Full gallery" : "Button only"}
                   </span>
                   <span className="block text-xs text-muted-foreground">
-                    {t === "full"
-                      ? "Gallery + try-on launcher"
-                      : "Single CTA button"}
+                    {t === "full" ? "Gallery + try-on launcher" : "Single CTA button"}
                   </span>
                 </button>
               ))}
@@ -314,8 +319,8 @@ function WidgetPage() {
                 </button>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Restrict where the widget can load. Leave empty to allow any
-                domain (not recommended for production).
+                Restrict where the widget can load. Leave empty to allow any domain (not recommended
+                for production).
               </p>
             </div>
           </Field>
@@ -343,9 +348,8 @@ function WidgetPage() {
           <div className="rounded-2xl border border-border bg-card p-6">
             <h2 className="font-display text-xl text-mahogany">Install</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Paste this anywhere on your store - product pages, home page, or
-              a dedicated try-on page. Works with Shopify, WooCommerce, and
-              static HTML.
+              Paste this anywhere on your store - product pages, home page, or a dedicated try-on
+              page. Works with Shopify, WooCommerce, and static HTML.
             </p>
 
             <div className="mt-4">
@@ -353,7 +357,7 @@ function WidgetPage() {
                 Embed snippet
               </p>
               <pre className="overflow-x-auto rounded-md border border-border bg-mahogany/5 p-3 font-mono text-[11px] leading-relaxed text-foreground">
-{snippet}
+                {snippet}
               </pre>
               <button
                 type="button"
@@ -394,8 +398,8 @@ function WidgetPage() {
                 </button>
               </div>
               <p className="mt-1.5 text-[11px] text-muted-foreground">
-                Rotating invalidates the current snippet. Update your store
-                with the new one immediately.
+                Rotating invalidates the current snippet. Update your store with the new one
+                immediately.
               </p>
             </div>
           </div>
@@ -429,12 +433,8 @@ function Header() {
   return (
     <div className="flex items-end justify-between">
       <div>
-        <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
-          Widget
-        </p>
-        <h1 className="mt-1 font-display text-4xl text-mahogany">
-          Embed Wigsmi on your store.
-        </h1>
+        <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Widget</p>
+        <h1 className="mt-1 font-display text-4xl text-mahogany">Embed Wigsmi on your store.</h1>
       </div>
     </div>
   );
