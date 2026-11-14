@@ -71,6 +71,13 @@
       "when": 1794674177417,
       "tag": "0009_signup_role_allowlist",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794675170972,
+      "tag": "0010_harden_client_writes",
+      "breakpoints": true
     }
   ]
 }
