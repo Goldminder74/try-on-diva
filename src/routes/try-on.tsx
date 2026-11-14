@@ -79,6 +79,9 @@ function TryOn() {
   const fetchAnonStatus = useServerFn(getAnonymousTryOnStatus);
 
   const [list, setList] = useState<Wig[]>([]);
+  // The picker has three states so a slow or failed load never reads as an
+  // empty catalogue.
+  const [listStatus, setListStatus] = useState<"loading" | "ready" | "error">("loading");
   const [retailerScope, setRetailerScope] = useState<RetailerScope | null>(null);
   const [showAll, setShowAll] = useState(false);
 
@@ -169,7 +172,7 @@ function TryOn() {
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
+    async function loadList() {
       if (search.widget && !showAll) {
         try {
           const data = await fetchWidget({ data: { token: search.widget } });
@@ -208,6 +211,19 @@ function TryOn() {
       setRetailerScope(null);
       const wigs = await fetchFeaturedWigs(9);
       if (!cancelled) setList(wigs);
+    }
+
+    async function load() {
+      setListStatus("loading");
+      try {
+        await loadList();
+        if (!cancelled) setListStatus("ready");
+      } catch {
+        if (!cancelled) {
+          setList([]);
+          setListStatus("error");
+        }
+      }
     }
 
     load();
@@ -524,7 +540,21 @@ function TryOn() {
                 </button>
               )}
             </div>
-            {list.length === 0 ? (
+            {listStatus === "loading" ? (
+              <p
+                role="status"
+                className="rounded-md border border-border bg-card p-4 text-xs text-muted-foreground"
+              >
+                Loading styles...
+              </p>
+            ) : listStatus === "error" ? (
+              <p
+                role="alert"
+                className="rounded-md border border-border bg-card p-4 text-xs text-muted-foreground"
+              >
+                Styles could not be loaded. Refresh the page or browse the catalogue.
+              </p>
+            ) : list.length === 0 ? (
               <p className="rounded-md border border-border bg-card p-4 text-xs text-muted-foreground">
                 No published styles yet.
               </p>

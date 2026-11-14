@@ -29,6 +29,8 @@ export const Route = createFileRoute("/_authenticated/app/try-on")({
 function AppTryOn() {
   const search = Route.useSearch();
   const [list, setList] = useState<Wig[]>([]);
+  // Three states so a slow or failed load never reads as an empty catalogue.
+  const [listStatus, setListStatus] = useState<"loading" | "ready" | "error">("loading");
   const [wig, setWig] = useState<Wig | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
   const [pendingAuto, setPendingAuto] = useState(false);
@@ -75,27 +77,35 @@ function AppTryOn() {
 
 
   useEffect(() => {
-    fetchFeaturedWigs(9).then(async (items) => {
-      setList(items);
-      // No default hair selection. Only select a wig when the URL explicitly
-      // names one; otherwise the user must tap a style deliberately.
-      if (!search.wig) {
-        setWig(null);
-        return;
-      }
-      const inList = items.find((w) => w.id === search.wig) ?? null;
-      if (inList) {
-        setWig(inList);
-        return;
-      }
-      // Arrived from the catalogue with a style outside this shortlist: fetch
-      // it so it is already selected, waiting only for a selfie.
-      const fetched = await fetchWigById(search.wig);
-      if (fetched) {
-        setWig(fetched);
-        setList((prev) => (prev.some((p) => p.id === fetched.id) ? prev : [fetched, ...prev]));
-      }
-    });
+    setListStatus("loading");
+    fetchFeaturedWigs(9)
+      .then(async (items) => {
+        setList(items);
+        setListStatus("ready");
+        // No default hair selection. Only select a wig when the URL explicitly
+        // names one; otherwise the user must tap a style deliberately.
+        if (!search.wig) {
+          setWig(null);
+          return;
+        }
+        const inList = items.find((w) => w.id === search.wig) ?? null;
+        if (inList) {
+          setWig(inList);
+          return;
+        }
+        // Arrived from the catalogue with a style outside this shortlist: fetch
+        // it so it is already selected, waiting only for a selfie.
+        const fetched = await fetchWigById(search.wig);
+        if (fetched) {
+          setWig(fetched);
+          setList((prev) => (prev.some((p) => p.id === fetched.id) ? prev : [fetched, ...prev]));
+        }
+      })
+      .catch(() => {
+        // Only a failed shortlist load empties the picker; a failed lookup of
+        // the single wig named in the URL leaves the loaded shortlist in place.
+        setListStatus((status) => (status === "loading" ? "error" : status));
+      });
     fetchQuota({ data: {} }).then((q) => setQuota({ remaining: q.remaining, isPaid: q.isPaid }));
   }, [fetchQuota, search.wig]);
 
@@ -272,7 +282,21 @@ function AppTryOn() {
 
         <aside>
           <p className="mb-3 font-mono text-xs uppercase tracking-wider text-gold-dark">Choose a wig</p>
-          {list.length === 0 ? (
+          {listStatus === "loading" ? (
+            <p
+              role="status"
+              className="rounded-md border border-border bg-card p-4 text-xs text-muted-foreground"
+            >
+              Loading styles...
+            </p>
+          ) : listStatus === "error" ? (
+            <p
+              role="alert"
+              className="rounded-md border border-border bg-card p-4 text-xs text-muted-foreground"
+            >
+              Styles could not be loaded. Refresh the page or browse the catalogue.
+            </p>
+          ) : list.length === 0 ? (
             <p className="rounded-md border border-border bg-card p-4 text-xs text-muted-foreground">
               No published styles yet.
             </p>
