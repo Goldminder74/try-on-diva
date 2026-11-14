@@ -751,7 +751,7 @@ const ANON_IP_MONTHLY_CAP = 8;
 // fingerprint are made up by the browser and an address can be rotated, so this
 // is what bounds the generation bill if someone scripts the endpoint. Raise it
 // with the ANON_TRYON_DAILY_CAP setting as real traffic grows.
-const ANON_GLOBAL_DAILY_CAP = Number(process.env.ANON_TRYON_DAILY_CAP) || 150;
+const ANON_GLOBAL_DAILY_CAP = Number(process.env.ANON_TRYON_DAILY_CAP) || 60;
 // Placeholder stored while a reserved try-on is still generating.
 const ANON_PENDING_PATH = "pending";
 

@@ -85,6 +85,13 @@
       "when": 1794676931830,
       "tag": "0011_close_legacy_functions_and_defaults",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794679032470,
+      "tag": "0012_single_admin_account",
+      "breakpoints": true
     }
   ]
 }

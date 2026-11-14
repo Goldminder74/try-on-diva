@@ -2,6 +2,7 @@
 
 - Existing protected shopper, retailer and admin layouts are client-only (`ssr: false`), because their sign-in session lives in browser storage; retain server-side authorization on every private server function.
 - Sign-up metadata is browser-written, so the new-user trigger only accepts consumer or retailer; admin is never granted at sign-up.
+- There is one administrator, info@wigsmi.com; a database trigger (drizzle/migrations/0012) refuses the admin role for any other account, so the admin area at /admin stays owner-only.
 - Rules about plans, quotas, counters and commission live in database guard triggers (drizzle/migrations/0010) as well as server functions, because signed-in users can call the data API directly; a new protected column needs adding to its guard.
 - Retailer login uses router navigation with `href` for the shared safe return-destination URL, so query strings and checkout selections are parsed without a full-page reload.
 
@@ -28,7 +29,7 @@
 # Try-on safety
 
 - Product photos for generation are read from the catalogue by wig id; addresses supplied by the browser are never fetched.
-- Anonymous try-ons are reserved before generation and capped per device, per network and per day across all visitors (ANON_TRYON_DAILY_CAP), because browser-issued identifiers can be invented.
+- Anonymous try-ons are reserved before generation and capped per device, per network and per day across all visitors (60 a day unless ANON_TRYON_DAILY_CAP is set), because browser-issued identifiers can be invented.
 - Anonymous try-on images and records are deleted after ANON_RETENTION_DAYS by the daily trials-tick hook (src/lib/retention.ts); keep the privacy page in step with that number.
 - Buy links go through /go, which does not count automated visitors; keep rel="nofollow sponsored" on them and /go disallowed in robots.txt.
 - Framing rules are set in src/lib/security-headers.ts: pages are frameable by Wigsmi and the Lovable editor only, and a widget with allowed domains only by those sites.

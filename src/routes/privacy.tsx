@@ -23,7 +23,7 @@ export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
 });
 
-const UPDATED = "11 November 2026";
+const UPDATED = "14 November 2026";
 
 function PrivacyPage() {
   return (
@@ -72,8 +72,8 @@ function PrivacyPage() {
                 not save the selfie itself. If you are signed in, each try-on result is saved to
                 your account history. You can delete any saved try-on, or your whole history, from
                 your account at any time. If you do not have an account, the try-on result is stored
-                with the record of your no-account try-on. These results have no automatic expiry
-                and are kept until deleted on request. A profile photo you add to your account is
+                with the record of your no-account try-on. These results and records are deleted
+                automatically 30 days after the try-on. A profile photo you add to your account is
                 stored until you replace it or ask us to delete it.
               </li>
               <li>
@@ -81,7 +81,8 @@ function PrivacyPage() {
                 To apply the free try-on limit for visitors without an account, Wigsmi stores a
                 random device identifier in your browser's local storage and keeps a one-way hashed
                 (scrambled) version of your browser's characteristics and of your IP address, not
-                the raw IP address.
+                the raw IP address. These are deleted with the no-account try-on record, 30 days
+                after the try-on.
               </li>
               <li>
                 <strong>How you found us:</strong> when you arrive from a link carrying campaign
@@ -174,8 +175,8 @@ function PrivacyPage() {
               required by law. You can delete your account at any time from Account settings. We
               then delete your personal data straight away, except payment records we must keep by
               law, which are anonymised. Saved try-on history is kept until you delete it or delete
-              your account. No-account try-on records and results have no automatic expiry and are
-              kept until deleted on request.
+              your account. No-account try-on records and results are deleted automatically 30 days
+              after the try-on; you can also ask us to delete them sooner.
             </p>
           </section>
 
