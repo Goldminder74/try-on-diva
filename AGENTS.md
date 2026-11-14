@@ -9,7 +9,8 @@
 
 - Shared billing rules define plan-family validation, published catalogue caps and payment-settlement recovery so previews, switches and webhook recovery agree.
 - Retailer VAT details live in owner-only retailer_billing_details, never public retailer rows, because catalogue visitors must not read billing information.
-- Scheduled HTTP hooks require CRON_SECRET; pg_cron job commands currently still send a compatibility apikey header literal, to be replaced by a private service-role-only credential row.
+- Scheduled HTTP hooks require CRON_SECRET; the pg_cron jobs read the matching key from the vault secret wigsmi_cron_hook_key (never a table or a literal), and still send the public apikey header for compatibility.
+- New tables, sequences and functions are closed to anon and authenticated by default (drizzle/migrations/0011); every migration that adds one must GRANT exactly what the app needs.
 - Keep existing cron cadences: daily trial handling and monthly quota reset; new polling jobs are unnecessary.
 - Stripe tax codes are assigned upfront per offering and environment, never patched during checkout; eligible consumer AI service and retailer SaaS remain distinct classifications.
 - The payment mode comes from the build's publishable key (deploymentStripeEnv), never from the browser; subscriptions and try-on packs only count in the mode they were bought in.
