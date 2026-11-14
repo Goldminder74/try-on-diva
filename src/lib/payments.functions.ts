@@ -63,7 +63,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           priceId: z
             .string()
             .max(120)
-            .refine(isCheckoutPriceId, () => ({ message: "Unknown plan or pack." })),
+            .refine(isCheckoutPriceId, { message: "Unknown plan or pack." }),
           currency: z.enum(["GBP", "USD"]).default("GBP"),
           customerEmail: z.string().email().max(254).optional(),
           userId: z.string().uuid().optional(),
