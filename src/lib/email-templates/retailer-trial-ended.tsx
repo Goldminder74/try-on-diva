@@ -31,7 +31,7 @@ const RetailerTrialEndedEmail = ({ name, businessName, upgradeUrl }: Props) => (
           <Text style={text}>
             Hi{name ? ` ${name}` : ""}, the free trial for
             {businessName ? ` ${businessName}` : " your store"} has wrapped up. Your widget and
-            catalog are paused for now.
+            catalogue are paused for now.
           </Text>
           <Text style={text}>
             Pick a plan and we'll republish your wigs automatically - no re-uploading, no
@@ -42,7 +42,7 @@ const RetailerTrialEndedEmail = ({ name, businessName, upgradeUrl }: Props) => (
           </Button>
           <div style={divider} />
           <Text style={muted}>
-            Not ready yet? Your catalog stays safe in your account. Sign back in any time.
+            Not ready yet? Your catalogue stays safe in your account. Sign back in any time.
           </Text>
         </Container>
       </Section>

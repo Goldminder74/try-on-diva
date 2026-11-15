@@ -437,7 +437,8 @@ async function handleOneOffPurchase(session: any, env: StripeEnv) {
     templateData: {
       name: profile.display_name,
       credits: pack.credits,
-      priceGbp: pack.amountGbp,
+      priceGbp: full.amount_total ? full.amount_total / 100 : pack.amountGbp,
+      currency: (full.currency ?? "gbp").toUpperCase(),
       expiresOn: expires.toLocaleDateString("en-GB", {
         day: "numeric",
         month: "long",

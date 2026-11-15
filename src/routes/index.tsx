@@ -75,7 +75,7 @@ function Landing() {
               Try every wig <em className="italic text-sienna">before</em> you buy it.
             </h1>
             <p className="mt-6 max-w-md text-lg text-foreground/75">
-              See how locs, knotless braids, bobs and waves actually look on your skin tone, before
+              See how lace fronts, glueless wigs and bobs actually look on your skin tone, before
               you spend a penny.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -161,7 +161,7 @@ function Landing() {
             {
               icon: Sparkles,
               title: "Afrocentric styles",
-              body: "From kinky coily afros to knotless braids to body wave - the catalog reflects you.",
+              body: "Lace fronts, glueless wigs and bobs chosen for Black women, with more styles on the way.",
             },
             {
               icon: Heart,

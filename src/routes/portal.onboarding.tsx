@@ -216,7 +216,7 @@ function Onboarding() {
         {step === 4 && (
           <>
             <Heading kicker="Brand" title="Add a touch of your brand." />
-            <Field label="Primary brand color">
+            <Field label="Primary brand colour">
               <div className="flex items-center gap-3">
                 <input
                   type="color"

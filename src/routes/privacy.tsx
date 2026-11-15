@@ -97,7 +97,7 @@ function PrivacyPage() {
               </li>
               <li>
                 <strong>Retailer data:</strong> business name, optional VAT number, contact details,
-                catalog content, payment metadata (handled by our payment processor - we do not
+                catalogue content, payment metadata (handled by our payment processor - we do not
                 store card numbers).
               </li>
             </ul>

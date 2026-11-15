@@ -81,7 +81,7 @@ function AuthenticatedLayout() {
           <nav className="hidden items-center gap-7 md:flex">
             <NavLink to="/app" label="For You" />
             <NavLink to="/app/try-on" label="Try on" />
-            <NavLink to="/app/catalog" label="Catalog" />
+            <NavLink to="/app/catalog" label="Catalogue" />
             <NavLink to="/app/wishlist" label="Wishlist" />
           </nav>
           <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ function AuthenticatedLayout() {
           <BottomLink
             to="/app/catalog"
             icon={<Sparkles className="h-5 w-5" />}
-            label="Catalog"
+            label="Catalogue"
             active={location.pathname.startsWith("/app/catalog")}
           />
           <BottomLink

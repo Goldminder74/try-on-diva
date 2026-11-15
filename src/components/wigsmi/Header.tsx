@@ -35,7 +35,7 @@ export function Header() {
         </Link>
         <nav className="hidden items-center gap-8 md:flex">
           <Link to="/catalog" className="text-sm text-foreground/80 hover:text-mahogany">
-            Catalog
+            Catalogue
           </Link>
           <Link to="/try-on" className="text-sm text-foreground/80 hover:text-mahogany">
             Try on

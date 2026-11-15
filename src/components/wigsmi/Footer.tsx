@@ -25,7 +25,7 @@ export function Footer() {
           <ul className="space-y-2 text-sm">
             <li>
               <Link to="/catalog" className="hover:text-mahogany">
-                Catalog
+                Catalogue
               </Link>
             </li>
             <li>

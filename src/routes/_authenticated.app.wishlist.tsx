@@ -73,7 +73,7 @@ function Wishlist() {
             to="/app/catalog"
             className="mt-5 inline-flex rounded-md bg-mahogany px-5 py-2 text-sm text-cream"
           >
-            Browse catalog
+            Browse catalogue
           </Link>
         </div>
       ) : (

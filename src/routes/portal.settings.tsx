@@ -153,7 +153,7 @@ function Settings() {
         </Section>
 
         <Section title="Branding">
-          <Field label="Primary color">
+          <Field label="Primary colour">
             <div className="flex items-center gap-3">
               <input
                 type="color"

@@ -52,7 +52,7 @@ const RetailerTrialEndingEmail = ({ name, businessName, trialEndsAt, upgradeUrl 
           </Button>
           <div style={divider} />
           <Text style={muted}>
-            If you do nothing, your widget and catalog will be paused when the trial ends. You can
+            If you do nothing, your widget and catalogue will be paused when the trial ends. You can
             resubscribe any time to bring them back.
           </Text>
         </Container>

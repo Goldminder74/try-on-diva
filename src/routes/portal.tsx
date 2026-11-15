@@ -136,7 +136,7 @@ function PortalLayout() {
             <SideLink
               to="/portal/catalog"
               icon={<Package className="h-4 w-4" />}
-              label="Catalog"
+              label="Catalogue"
               active={pathname.startsWith("/portal/catalog")}
             />
             <SideLink

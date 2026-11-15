@@ -68,7 +68,7 @@ function TermsPage() {
           <section>
             <h2 className="font-display text-2xl text-mahogany">3. Consumer service</h2>
             <p>
-              The consumer Service includes browsing the wig catalog, uploading selfies for AI
+              The consumer Service includes browsing the wig catalogue, uploading selfies for AI
               try-on, and saving favourites. Free accounts have a monthly try-on quota; paid tiers
               (Plus and Pro) lift the quota. Try-on results are AI-generated previews and may not
               exactly match the physical product.
@@ -139,7 +139,7 @@ function TermsPage() {
             <p>
               You keep ownership of the photos and content you upload. You grant us a worldwide,
               royalty-free licence to host, process, and display that content solely to operate and
-              improve the Service. Retailers grant us the additional right to display their catalog
+              improve the Service. Retailers grant us the additional right to display their catalogue
               content to consumers browsing the Service. We may remove content that violates these
               Terms.
             </p>

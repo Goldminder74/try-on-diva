@@ -56,7 +56,7 @@ export function TrialExpiredPaywall() {
       </div>
 
       <p className="mt-6 text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-        Your catalog is safe - nothing is deleted.{" "}
+        Your catalogue is safe - nothing is deleted.{" "}
         <Link to="/portal/billing" className="text-mahogany underline">
           Manage billing
         </Link>

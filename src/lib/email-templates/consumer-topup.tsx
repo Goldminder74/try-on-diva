@@ -17,11 +17,12 @@ interface Props {
   name?: string;
   credits?: number;
   priceGbp?: number;
+  currency?: string;
   expiresOn?: string;
   appUrl?: string;
 }
 
-const ConsumerTopUpEmail = ({ name, credits, priceGbp, expiresOn, appUrl }: Props) => (
+const ConsumerTopUpEmail = ({ name, credits, priceGbp, currency, expiresOn, appUrl }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>{`${credits ?? 10} extra try-ons are on your account.`}</Preview>
@@ -32,7 +33,7 @@ const ConsumerTopUpEmail = ({ name, credits, priceGbp, expiresOn, appUrl }: Prop
           <Heading style={h1}>{credits ?? 10} more try-ons, added.</Heading>
           <Text style={text}>
             Hi{name ? ` ${name}` : ""}, thanks for your{" "}
-            {typeof priceGbp === "number" ? `£${priceGbp.toFixed(2)}` : "£2.99"}
+            {typeof priceGbp === "number" ? `${currency === "USD" ? "$" : "£"}${priceGbp.toFixed(2)}` : "£2.99"}{" "}
             payment. We've added {credits ?? 10} try-ons to your account on top of whatever your
             plan already gives you each month.
           </Text>

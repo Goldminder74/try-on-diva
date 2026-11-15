@@ -127,7 +127,7 @@ function EmbedWidget() {
         <div className="px-6 py-20 text-center">
           <p className="font-mono text-xs uppercase tracking-wider text-neutral-400">No wigs yet</p>
           <p className="mt-2 text-sm text-neutral-600">
-            Add and publish wigs in your catalog to see them here.
+            Add and publish wigs in your catalogue to see them here.
           </p>
         </div>
       ) : (

@@ -110,7 +110,7 @@ const RETAILER_QA: QA[] = [
   },
   {
     q: "What happens when my trial ends?",
-    a: "You'll get reminder emails before it ends. If you don't subscribe to a plan, your wigs are automatically unpublished from the widget until you do. Your data and catalog are kept, nothing is deleted.",
+    a: "You'll get reminder emails before it ends. If you don't subscribe to a plan, your wigs are automatically unpublished from the widget until you do. Your data and catalogue are kept, nothing is deleted.",
   },
   {
     q: "What are the paid plans?",
@@ -122,7 +122,7 @@ const RETAILER_QA: QA[] = [
   },
   {
     q: "Do I keep ownership of my product images and descriptions?",
-    a: "Yes, completely. You grant Wigsmi only the licence needed to display your catalog to shoppers browsing the platform.",
+    a: "Yes, completely. You grant Wigsmi only the licence needed to display your catalogue to shoppers browsing the platform.",
   },
   {
     q: "How does Wigsmi help reduce returns?",

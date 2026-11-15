@@ -5,7 +5,7 @@
 ## Pages
 
 - [Home](/): Discover and try on wigs virtually before you buy.
-- [Catalog](/catalog): Browse the full wig catalog with filters and styles.
+- [Catalogue](/catalog): Browse the full wig catalogue with filters and styles.
 - [Try On](/try-on): Upload a photo and see how a wig looks on you.
 - [Pricing](/pricing): Consumer and retailer subscription plans.
 - [Retailers](/retailer): Information for wig retailers and salon owners.

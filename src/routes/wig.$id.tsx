@@ -82,7 +82,7 @@ export const Route = createFileRoute("/wig/$id")({
           to="/catalog"
           className="mt-6 inline-flex rounded-md bg-mahogany px-5 py-2 text-sm text-cream"
         >
-          Back to catalog
+          Back to catalogue
         </Link>
       </div>
       <Footer />

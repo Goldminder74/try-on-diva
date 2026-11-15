@@ -85,12 +85,12 @@ const PLANS: {
 }[] = [
   {
     name: "Free",
-    desc: "Browse the full catalog and try out the AI.",
+    desc: "Browse the full catalogue and try out the AI.",
     priceIds: { monthly: null, yearly: null },
     planKey: "free",
     features: [
       [true, "5 try-ons per month (2 without an account)"],
-      [true, "Full catalog access"],
+      [true, "Full catalogue access"],
       [true, "Save up to 10 wigs"],
       [false, "35+ try-ons per month"],
       [false, "Style quiz personalisation"],
@@ -105,7 +105,7 @@ const PLANS: {
     planKey: "plus",
     features: [
       [true, "35 try-ons per month"],
-      [true, "Full catalog access"],
+      [true, "Full catalogue access"],
       [true, "Unlimited wishlist"],
       [true, "Style quiz personalisation"],
       [true, "Save your selfie"],

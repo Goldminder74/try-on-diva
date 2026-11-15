@@ -214,7 +214,7 @@ function WidgetPage() {
 
           <Field label="Widget type">
             <div className="grid grid-cols-2 gap-2">
-              {(["full", "button"] as const).map((t) => (
+              {(["full"] as const).map((t) => (
                 <button
                   type="button"
                   key={t}
@@ -246,7 +246,7 @@ function WidgetPage() {
             />
           </Field>
 
-          <Field label="Accent color">
+          <Field label="Accent colour">
             <div className="flex items-center gap-3">
               <input
                 type="color"
@@ -319,8 +319,8 @@ function WidgetPage() {
                 </button>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Restrict where the widget can load. Leave empty to allow any domain (not recommended
-                for production).
+                Coming soon: this list is saved but not yet enforced, so the widget currently loads on
+                any site.
               </p>
             </div>
           </Field>

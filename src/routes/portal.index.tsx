@@ -104,7 +104,7 @@ function PortalIndex() {
 
       <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat
-          label="Wigs in catalog"
+          label="Wigs in catalogue"
           value={metrics?.wigs ?? 0}
           icon={<Package className="h-4 w-4" />}
         />
@@ -136,7 +136,7 @@ function ActivationCard({ activation }: { activation: Activation }) {
       key: "profile",
       done: activation.profileDone,
       title: "Finish your profile",
-      helper: "Brand name, currency, primary color.",
+      helper: "Brand name, currency, primary colour.",
       to: "/portal/settings",
       cta: "Edit profile",
     },
@@ -155,7 +155,7 @@ function ActivationCard({ activation }: { activation: Activation }) {
       title: "Publish a wig",
       helper: "Toggle a wig to published so shoppers can see it.",
       to: "/portal/catalog",
-      cta: "Open catalog",
+      cta: "Open catalogue",
     },
     {
       key: "widget",
