@@ -102,7 +102,7 @@ const RETAILER_QA: QA[] = [
   },
   {
     q: "What platforms does the widget work on?",
-    a: "Currently optimised for Shopify. If you use a different platform, contact us at support@wigsmi.com to check compatibility.",
+    a: "Any website that lets you add your own HTML code, including Shopify, WooCommerce (WordPress), Wix and Squarespace. You paste two short lines of code where you want the try-on to appear. Squarespace needs a Business plan or above to allow custom code. If you are unsure about your platform, contact us at support@wigsmi.com.",
   },
   {
     q: "Do I need a credit card to start the free trial?",
