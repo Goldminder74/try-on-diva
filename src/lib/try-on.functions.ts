@@ -199,8 +199,12 @@ async function fetchWigReferenceImages(
 
   const settled = await Promise.allSettled(
     unique.map(async (url) => {
-      const res = await fetch(url, { redirect: "error" });
-      if (!res.ok) throw new Error(`Could not fetch wig image (${res.status}).`);
+      // Redirects are not followed, so a product photo can never bounce the
+      // server to another address. The edge runtime rejects redirect: "error"
+      // outright (that broke every try-on from 14 Nov), so use "manual": a
+      // redirect then comes back as a 3xx response, which is not ok and is refused.
+      const res = await fetch(url, { redirect: "manual" });
+      if (res.status !== 200) throw new Error(`Could not fetch wig image (${res.status}).`);
       if (Number(res.headers.get("content-length") ?? 0) > MAX_IMAGE_BYTES) {
         throw new Error("Wig image is too large.");
       }
