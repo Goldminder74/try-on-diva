@@ -11,7 +11,7 @@ export function OnyxHome({ notice }: { notice?: React.ReactNode }) {
       <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-6 py-6 md:px-12">
         <span className="font-couture text-2xl tracking-[0.2em]">WIGSMI</span>
         <nav className="hidden gap-10 md:flex">
-          {([["Collection", "/catalog"], ["Try on", "/try-on"], ["Journal", "/guides/"], ["Retailers", "/retailer"]] as const).map(([n, to]) => (
+          {([["Collection", "/catalog"], ["Try on", "/try-on"], ["Journal", "/guides"], ["Retailers", "/retailer"]] as const).map(([n, to]) => (
             <Link key={n} to={to} className={`${label} transition-colors hover:text-champagne`}>{n}</Link>
           ))}
         </nav>
