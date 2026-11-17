@@ -1,3 +1,4 @@
+import { OnyxHome } from "@/components/wigsmi/OnyxHome";
 import { AccountDeletedNotice } from "@/components/account/ShopperDeleteControls";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Upload, Heart, ShieldCheck, Palette } from "lucide-react";
@@ -12,7 +13,10 @@ import { useAsync } from "@/lib/use-async";
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
   head: () => ({
-    links: [{ rel: "canonical", href: "https://wigsmi.com/" }],
+    links: [
+      { rel: "canonical", href: "https://wigsmi.com/" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Manrope:wght@300;400;500;600&display=swap" },
+    ],
     scripts: [
       {
         type: "application/ld+json",
@@ -55,7 +59,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:description", content: "Virtual wig try-on built for Black women." },
     ],
   }),
-  component: Landing,
+  component: () => <OnyxHome notice={<AccountDeletedNotice />} />,
 });
 
 function Landing() {
