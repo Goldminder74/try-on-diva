@@ -7,14 +7,26 @@ import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const NAV = [
-  { to: "/catalog", label: "Catalogue" },
+  { to: "/catalog", label: "Collection" },
   { to: "/try-on", label: "Try on" },
   { to: "/pricing", label: "Pricing" },
-  { to: "/guides", label: "Guides" },
-  { to: "/retailer", label: "For retailers" },
+  { to: "/guides", label: "Journal" },
+  { to: "/retailer", label: "Retailers" },
 ] as const;
 
-export function Header() {
+// Onyx Couture navigation label: small capitals, set wide.
+const navLabel =
+  "text-[11px] uppercase tracking-[0.35em] text-foreground/70 transition-colors hover:text-foreground";
+const primaryButton =
+  "inline-flex items-center border border-bordeaux bg-bordeaux px-5 py-2.5 text-[11px] uppercase tracking-[0.3em] text-champagne transition-opacity hover:opacity-85";
+const outlineButton =
+  "inline-flex items-center border border-champagne/40 px-5 py-2.5 text-[11px] uppercase tracking-[0.3em] text-champagne transition-colors hover:border-champagne";
+
+/**
+ * The site header. `overlay` lays it over a full-bleed hero (the home page)
+ * instead of sitting in its own bar.
+ */
+export function Header({ overlay = false }: { overlay?: boolean } = {}) {
   const { user, loading } = useAuth();
   const [isRetailer, setIsRetailer] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -39,57 +51,39 @@ export function Header() {
   }, [user]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-cream/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5">
-        <Link to="/" className="flex items-center">
+    <header
+      className={
+        overlay
+          ? "absolute inset-x-0 top-0 z-40"
+          : "sticky top-0 z-40 border-b border-border bg-cream/90 backdrop-blur-md"
+      }
+    >
+      <div
+        className={`mx-auto flex w-full items-center justify-between px-6 md:px-12 ${
+          overlay ? "py-6" : "h-16 max-w-7xl md:h-20"
+        }`}
+      >
+        <Link to="/" className="flex items-center" aria-label="Wigsmi home">
           <Wordmark size="md" />
         </Link>
-        <nav className="hidden items-center gap-8 md:flex">
-          <Link to="/catalog" className="text-sm text-foreground/80 hover:text-mahogany">
-            Catalogue
-          </Link>
-          <Link to="/try-on" className="text-sm text-foreground/80 hover:text-mahogany">
-            Try on
-          </Link>
-          <Link to="/pricing" className="text-sm text-foreground/80 hover:text-mahogany">
-            Pricing
-          </Link>
-          <Link to="/guides" className="text-sm text-foreground/80 hover:text-mahogany">
-            Guides
-          </Link>
-          <Link to="/retailer" className="text-sm text-foreground/80 hover:text-mahogany">
-            For retailers
-          </Link>
+        <nav className="hidden items-center gap-10 lg:flex">
+          {NAV.map((n) => (
+            <Link key={n.to} to={n.to} className={navLabel}>
+              {n.label}
+            </Link>
+          ))}
         </nav>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-5">
           {loading ? null : user ? (
-            isRetailer ? (
-              <Link
-                to="/portal"
-                className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
-              >
-                Retailer Portal
-              </Link>
-            ) : (
-              <Link
-                to="/app"
-                className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
-              >
-                My Wigsmi
-              </Link>
-            )
+            <Link to={isRetailer ? "/portal" : "/app"} className={outlineButton}>
+              {isRetailer ? "Retailer portal" : "My Wigsmi"}
+            </Link>
           ) : (
             <>
-              <Link
-                to="/auth/login"
-                className="hidden rounded-md border border-mahogany px-4 py-2 text-sm font-medium text-mahogany hover:bg-mahogany hover:text-cream sm:inline-flex"
-              >
-                Log in
+              <Link to="/auth/login" className={`${navLabel} hidden sm:inline`}>
+                Sign in
               </Link>
-              <Link
-                to="/try-on"
-                className="rounded-md bg-mahogany px-4 py-2 text-sm font-medium text-cream shadow-sm hover:bg-mahogany-soft"
-              >
+              <Link to="/try-on" className={primaryButton}>
                 Try free
               </Link>
             </>
@@ -97,19 +91,19 @@ export function Header() {
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger
               aria-label="Open menu"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border text-mahogany md:hidden"
+              className="inline-flex h-10 w-10 items-center justify-center border border-champagne/30 text-champagne lg:hidden"
             >
               <Menu className="h-5 w-5" />
             </SheetTrigger>
-            <SheetContent side="right" className="w-72 bg-cream">
-              <SheetTitle className="font-display text-2xl text-mahogany">Menu</SheetTitle>
-              <nav className="mt-8 flex flex-col">
+            <SheetContent side="right" className="w-80 border-l border-border bg-cream">
+              <SheetTitle className="wordmark text-2xl text-mahogany">Wigsmi</SheetTitle>
+              <nav className="mt-10 flex flex-col">
                 {NAV.map((n) => (
                   <Link
                     key={n.to}
                     to={n.to}
                     onClick={() => setMenuOpen(false)}
-                    className="border-b border-border py-4 text-base text-mahogany"
+                    className="border-b border-border py-5 font-display text-2xl text-mahogany"
                   >
                     {n.label}
                   </Link>
@@ -118,9 +112,18 @@ export function Header() {
                   <Link
                     to="/auth/login"
                     onClick={() => setMenuOpen(false)}
-                    className="py-4 text-base text-gold-dark"
+                    className="py-5 text-[11px] uppercase tracking-[0.35em] text-gold"
                   >
-                    Log in
+                    Sign in
+                  </Link>
+                )}
+                {!user && (
+                  <Link
+                    to="/try-on"
+                    onClick={() => setMenuOpen(false)}
+                    className={`${primaryButton} mt-4 justify-center`}
+                  >
+                    Try free
                   </Link>
                 )}
               </nav>

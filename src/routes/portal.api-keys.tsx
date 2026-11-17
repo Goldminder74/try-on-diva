@@ -216,7 +216,7 @@ function ApiKeysPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="rounded-md border border-border bg-sand/40 p-3">
-            <code className="block break-all font-mono text-xs text-foreground">
+            <code className="block break-all font-code text-xs text-foreground">
               {reveal?.plain}
             </code>
             <button

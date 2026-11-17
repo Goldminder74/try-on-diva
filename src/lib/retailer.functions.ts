@@ -93,7 +93,7 @@ export const saveRetailerOnboarding = createServerFn({ method: "POST" })
       country: data.country || null,
       contact_name: data.contact_name || null,
       currency: data.currency,
-      brand_primary: data.brand_primary || "#3D1C02",
+      brand_primary: data.brand_primary || "#5E1020",
       referral_source: data.referral_source || null,
       onboarding_completed: true,
     };
@@ -465,7 +465,7 @@ export const createMyWidget = createServerFn({ method: "POST" })
         widget_type: "full",
         is_active: true,
         allowed_domains: [],
-        config: { accent_color: retailer.brand_primary || "#3D1C02" },
+        config: { accent_color: retailer.brand_primary || "#5E1020" },
       })
       .select("id")
       .single();

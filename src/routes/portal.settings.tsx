@@ -36,7 +36,7 @@ function Settings() {
     country: "",
     contact_name: "",
     currency: "GBP",
-    brand_primary: "#3D1C02",
+    brand_primary: "#5E1020",
     widget_cta_text: "Try it on with Wigsmi",
   });
 
@@ -55,7 +55,7 @@ function Settings() {
         country: ctx.retailer.country ?? "",
         contact_name: ctx.retailer.contact_name ?? "",
         currency: ctx.retailer.currency ?? "GBP",
-        brand_primary: ctx.retailer.brand_primary ?? "#3D1C02",
+        brand_primary: ctx.retailer.brand_primary ?? "#5E1020",
         widget_cta_text: ctx.retailer.widget_cta_text ?? "Try it on with Wigsmi",
       });
     });

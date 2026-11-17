@@ -170,8 +170,8 @@ function EmbedWidget() {
       )}
 
       <footer className="border-t border-neutral-100 px-5 py-3 text-center">
-        <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-400">
-          Powered by Wigsmi
+        <span className="text-[10px] uppercase tracking-[0.3em] text-neutral-400">
+          Powered by <span className="font-display tracking-[0.2em] text-neutral-700">Wigsmi</span>
         </span>
       </footer>
     </div>

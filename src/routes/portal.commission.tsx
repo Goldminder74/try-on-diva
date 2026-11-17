@@ -317,7 +317,7 @@ function PortalCommission() {
           <p className="font-display text-xl text-mahogany">Log an order</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Add the order once your shop confirms it. The reference code is the
-            <code className="mx-1 rounded bg-sand px-1 py-0.5 font-mono text-xs">wigsmi_ref</code>
+            <code className="mx-1 rounded bg-sand px-1 py-0.5 font-code text-xs">wigsmi_ref</code>
             value on the link the shopper arrived on.
           </p>
 
@@ -486,7 +486,7 @@ function PortalCommission() {
                 key={c.id}
                 className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border bg-sand/40 px-4 py-2.5 text-xs"
               >
-                <span className="font-mono text-mahogany">{c.token}</span>
+                <span className="font-code text-mahogany">{c.token}</span>
                 <span className="text-muted-foreground">
                   {c.wig_name ? `${c.wig_name} · ` : ""}
                   {new Date(c.created_at).toLocaleDateString("en-GB", {

@@ -84,10 +84,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Wigsmi" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@wigsmi" },
+      { name: "theme-color", content: "#090706" },
       // Default share image, on the address the site is served from. Pages
       // with their own image (a wig's photo) replace it.
-      { property: "og:image", content: "https://wigsmi.com/og-image.jpg" },
-      { name: "twitter:image", content: "https://wigsmi.com/og-image.jpg" },
+      { property: "og:image", content: "https://wigsmi.com/og-image.jpg?v=onyx" },
+      { name: "twitter:image", content: "https://wigsmi.com/og-image.jpg?v=onyx" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

@@ -52,13 +52,13 @@ function WidgetPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [widget, setWidget] = useState<WidgetRow | null>(null);
-  const [retailerBrand, setRetailerBrand] = useState("#3D1C02");
+  const [retailerBrand, setRetailerBrand] = useState("#5E1020");
 
   // form state
   const [widgetType, setWidgetType] = useState<"full" | "button">("full");
   const [isActive, setIsActive] = useState(true);
   const [ctaText, setCtaText] = useState("Try it on with Wigsmi");
-  const [accent, setAccent] = useState("#3D1C02");
+  const [accent, setAccent] = useState("#5E1020");
   const [domains, setDomains] = useState<string[]>([]);
   const [newDomain, setNewDomain] = useState("");
 
@@ -70,12 +70,12 @@ function WidgetPage() {
       setWidgetType((w.widget_type as "full" | "button") || "full");
       setIsActive(w.is_active);
       setDomains(w.allowed_domains || []);
-      setAccent(w.config?.accent_color || r.retailer?.brand_primary || "#3D1C02");
+      setAccent(w.config?.accent_color || r.retailer?.brand_primary || "#5E1020");
     } else {
       setWidget(null);
     }
     if (r.retailer) {
-      setRetailerBrand(r.retailer.brand_primary || "#3D1C02");
+      setRetailerBrand(r.retailer.brand_primary || "#5E1020");
       setCtaText(r.retailer.widget_cta_text || "Try it on with Wigsmi");
     }
     setLoading(false);
@@ -319,8 +319,8 @@ function WidgetPage() {
                 </button>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Coming soon: this list is saved but not yet enforced, so the widget currently loads on
-                any site.
+                Coming soon: this list is saved but not yet enforced, so the widget currently loads
+                on any site.
               </p>
             </div>
           </Field>
@@ -356,7 +356,7 @@ function WidgetPage() {
               <p className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-gold-dark">
                 Embed snippet
               </p>
-              <pre className="overflow-x-auto rounded-md border border-border bg-mahogany/5 p-3 font-mono text-[11px] leading-relaxed text-foreground">
+              <pre className="overflow-x-auto rounded-md border border-border bg-mahogany/5 p-3 font-code text-[11px] leading-relaxed text-foreground">
                 {snippet}
               </pre>
               <button
@@ -385,7 +385,7 @@ function WidgetPage() {
                 Embed token
               </p>
               <div className="flex items-center gap-2">
-                <code className="flex-1 truncate rounded-md border border-border bg-input px-2.5 py-1.5 font-mono text-[11px]">
+                <code className="flex-1 truncate rounded-md border border-border bg-input px-2.5 py-1.5 font-code text-[11px]">
                   {widget.embed_token}
                 </code>
                 <button

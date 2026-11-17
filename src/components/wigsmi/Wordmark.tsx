@@ -1,3 +1,4 @@
+/** The WIGSMI wordmark: Bodoni capitals, set wide, in champagne. */
 export function Wordmark({
   className = "",
   size = "md",
@@ -5,10 +6,10 @@ export function Wordmark({
   className?: string;
   size?: "sm" | "md" | "lg";
 }) {
-  const sizes = { sm: "text-xl", md: "text-2xl", lg: "text-4xl" };
+  const sizes = { sm: "text-lg", md: "text-2xl", lg: "text-3xl" };
   return (
-    <span className={`wordmark text-mahogany ${sizes[size]} ${className}`}>
-      wigsmi<span className="text-gold">.</span>
+    <span className={`wordmark text-mahogany ${sizes[size]} ${className}`} aria-label="Wigsmi">
+      Wigsmi
     </span>
   );
 }

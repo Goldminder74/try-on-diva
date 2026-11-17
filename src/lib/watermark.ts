@@ -54,10 +54,17 @@ export async function watermarkImage(
   // Prefer the brighter corner (background, not hair). Bias toward BR.
   const position: "br" | "bl" = opts.position ?? (blBrightness - brBrightness > 25 ? "bl" : "br");
   const targetW = w * 0.13;
-  const fontFamily = `Georgia, "Times New Roman", serif`;
+  // The WIGSMI wordmark: Bodoni capitals, set wide (the site's own font is
+  // already loaded on the page that downloads).
+  const fontFamily = `"Bodoni Moda", "Bodoni 72", Didot, Georgia, serif`;
+  const tracked = ctx as CanvasRenderingContext2D & { letterSpacing?: string };
+  const setFont = (size: number) => {
+    ctx.font = `400 ${size}px ${fontFamily}`;
+    tracked.letterSpacing = `${Math.round(size * 0.2)}px`;
+  };
   const measure = (size: number) => {
-    ctx.font = `500 ${size}px ${fontFamily}`;
-    return ctx.measureText("wigsmi.").width;
+    setFont(size);
+    return ctx.measureText("WIGSMI").width;
   };
   let lo = 8,
     hi = 200;
@@ -67,14 +74,11 @@ export async function watermarkImage(
     else hi = mid - 1;
   }
   const fontSize = lo;
-  ctx.font = `500 ${fontSize}px ${fontFamily}`;
+  setFont(fontSize);
   ctx.textBaseline = "alphabetic";
 
-  const text = "wigsmi";
-  const dot = ".";
-  const textMetrics = ctx.measureText(text);
-  const dotMetrics = ctx.measureText(dot);
-  const totalW = textMetrics.width + dotMetrics.width;
+  const text = "WIGSMI";
+  const totalW = ctx.measureText(text).width;
 
   const x = position === "br" ? w - padding - totalW : padding;
   const y = h - padding;
@@ -86,11 +90,9 @@ export async function watermarkImage(
   ctx.shadowOffsetY = Math.max(1, Math.round(fontSize * 0.04));
 
   ctx.globalAlpha = 0.88;
-  ctx.fillStyle = "#FAF5EE"; // cream
+  ctx.fillStyle = "#EADDC1"; // champagne
   ctx.fillText(text, x, y);
-
-  ctx.fillStyle = "#C8A95B"; // gold accent dot
-  ctx.fillText(dot, x + textMetrics.width, y);
+  tracked.letterSpacing = "0px";
 
   ctx.shadowColor = "transparent";
   ctx.globalAlpha = 1;

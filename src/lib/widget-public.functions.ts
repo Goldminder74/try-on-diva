@@ -83,7 +83,7 @@ export const getPublicWidgetData = createServerFn({ method: "GET" })
         accent_color:
           (widget.config as { accent_color?: string } | null)?.accent_color ||
           retailer?.brand_primary ||
-          "#3D1C02",
+          "#5E1020",
       },
       retailer: retailer
         ? {

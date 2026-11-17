@@ -1,30 +1,36 @@
 import React from "react";
 
-// Shared Wigsmi email styling - mahogany + cream palette, serif headings,
-// matches the in-app brand. Inline styles (React Email requirement).
+// Shared Wigsmi email styling - Onyx Couture: an ivory card on a jet-black
+// field, Bodoni-style capitals, bordeaux buttons. Inline styles (React Email
+// requirement). Email clients cannot load the site's web fonts, so headings
+// fall back through the closest installed Didone faces to Georgia.
+
+const display = "'Bodoni Moda', 'Bodoni 72', Didot, 'Bodoni MT', Georgia, 'Times New Roman', serif";
 
 export const brand = {
-  bg: "#FAF5EE", // cream
-  surface: "#ffffff",
-  ink: "#3D1C02", // mahogany
-  inkSoft: "#5A2E08",
-  body: "#3A2A1F",
-  muted: "#7A6A5E",
-  gold: "#C8A95B",
-  border: "#E9DFD2",
+  bg: "#090706", // onyx
+  surface: "#F7F2E8", // ivory paper
+  ink: "#171310", // onyx soft
+  inkSoft: "#2D2824",
+  body: "#2D2824",
+  muted: "#6E6457",
+  gold: "#B77D56", // bronze
+  bordeaux: "#5E1020",
+  champagne: "#EADDC1",
+  border: "#E3D9C6",
 };
 
 export const main = {
-  backgroundColor: "#ffffff",
+  backgroundColor: brand.bg,
   fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    "Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
   margin: 0,
   padding: 0,
 };
 
 export const outer = {
   backgroundColor: brand.bg,
-  padding: "32px 16px",
+  padding: "40px 16px",
 };
 
 export const container = {
@@ -32,21 +38,22 @@ export const container = {
   maxWidth: "560px",
   backgroundColor: brand.surface,
   border: `1px solid ${brand.border}`,
-  borderRadius: "12px",
-  padding: "40px 36px",
+  borderRadius: "2px",
+  padding: "44px 40px",
 };
 
 export const wordmark = {
-  fontFamily: "Georgia, 'Times New Roman', serif",
-  fontSize: "20px",
-  letterSpacing: "0.02em",
+  fontFamily: display,
+  fontSize: "22px",
+  letterSpacing: "0.2em",
+  textTransform: "uppercase" as const,
   color: brand.ink,
   margin: "0 0 32px",
-  fontWeight: 500,
+  fontWeight: 400,
 };
 
 export const h1 = {
-  fontFamily: "Georgia, 'Times New Roman', serif",
+  fontFamily: display,
   fontSize: "28px",
   lineHeight: 1.2,
   color: brand.ink,
@@ -70,20 +77,22 @@ export const muted = {
 
 export const button = {
   display: "inline-block",
-  backgroundColor: brand.ink,
-  color: brand.bg,
-  fontSize: "14px",
+  backgroundColor: brand.bordeaux,
+  color: brand.champagne,
+  fontSize: "12px",
   fontWeight: 500,
-  padding: "12px 22px",
-  borderRadius: "8px",
+  letterSpacing: "0.25em",
+  textTransform: "uppercase" as const,
+  padding: "14px 26px",
+  borderRadius: "0px",
   textDecoration: "none",
   margin: "8px 0 8px",
 };
 
 export const buttonGold = {
   ...button,
-  backgroundColor: brand.gold,
-  color: brand.ink,
+  backgroundColor: brand.ink,
+  color: brand.champagne,
 };
 
 export const divider = {

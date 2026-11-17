@@ -51,7 +51,7 @@ function Onboarding() {
     country: "",
     contact_name: "",
     currency: "GBP",
-    brand_primary: "#3D1C02",
+    brand_primary: "#5E1020",
     referral_source: "",
   });
 
@@ -70,7 +70,7 @@ function Onboarding() {
           country: retailer.country ?? "",
           contact_name: retailer.contact_name ?? "",
           currency: (retailer.currency as Form["currency"]) ?? "GBP",
-          brand_primary: retailer.brand_primary ?? "#3D1C02",
+          brand_primary: retailer.brand_primary ?? "#5E1020",
         }));
         if (ctx.retailer.onboarding_completed) {
           navigate({ to: "/portal" });

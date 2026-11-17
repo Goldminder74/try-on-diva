@@ -34,3 +34,6 @@
 - Buy links go through /go, which does not count automated visitors; keep rel="nofollow sponsored" on them and /go disallowed in robots.txt.
 - Framing rules are set in src/lib/security-headers.ts: pages are frameable by Wigsmi and the Lovable editor only, and a widget with allowed domains only by those sites.
 - Legacy colour token names (mahogany, gold, cream, sand) in src/styles.css are remapped to the current palette rather than renamed, so the many existing component classes keep working.
+- Brand: Onyx Couture. Jet black (#090706), champagne ink (#EADDC1), bronze accent (#B77D56), bordeaux for the main call to action (#5E1020); Bodoni Moda for display and the WIGSMI wordmark (capitals, letter-spacing 0.2em), Manrope for text; square corners. Every page uses the shared Header and Footer (the home page uses Header overlay).
+- `font-mono` is Manrope: in capitals it is the wide-set eyebrow label style; actual code (embed snippets, keys, tokens) uses `font-code` (DM Mono).
+- Brand colours also live outside the tokens: email templates (src/lib/email-templates/_styles.tsx), the error page (src/lib/error-page.ts), the download watermark (src/lib/watermark.ts), public/og-image.jpg and the favicons. Change them together.
