@@ -76,7 +76,7 @@ export function OnyxHome({ notice }: { notice?: React.ReactNode }) {
 
       <footer className="bg-onyx-soft px-6 py-16 text-center md:px-12">
         <span className="font-couture text-3xl tracking-[0.2em]">WIGSMI</span>
-        <p className={`${label} mt-6`}>© 2026 Wigsmi. Sherwood Consulting Services Ltd.</p>
+        <p className={`${label} mt-6`}>© 2026 Wigsmi</p>
       </footer>
     </div>
   );
