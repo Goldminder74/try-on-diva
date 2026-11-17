@@ -33,3 +33,4 @@
 - Anonymous try-on images and records are deleted after ANON_RETENTION_DAYS by the daily trials-tick hook (src/lib/retention.ts); keep the privacy page in step with that number.
 - Buy links go through /go, which does not count automated visitors; keep rel="nofollow sponsored" on them and /go disallowed in robots.txt.
 - Framing rules are set in src/lib/security-headers.ts: pages are frameable by Wigsmi and the Lovable editor only, and a widget with allowed domains only by those sites.
+- Legacy colour token names (mahogany, gold, cream, sand) in src/styles.css are remapped to the current palette rather than renamed, so the many existing component classes keep working.

@@ -3,10 +3,21 @@ import { Link } from "@tanstack/react-router";
 import { Wordmark } from "./Wordmark";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+
+const NAV = [
+  { to: "/catalog", label: "Catalogue" },
+  { to: "/try-on", label: "Try on" },
+  { to: "/pricing", label: "Pricing" },
+  { to: "/guides", label: "Guides" },
+  { to: "/retailer", label: "For retailers" },
+] as const;
 
 export function Header() {
   const { user, loading } = useAuth();
   const [isRetailer, setIsRetailer] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -83,6 +94,38 @@ export function Header() {
               </Link>
             </>
           )}
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger
+              aria-label="Open menu"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border text-mahogany md:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </SheetTrigger>
+            <SheetContent side="right" className="w-72 bg-cream">
+              <SheetTitle className="font-display text-2xl text-mahogany">Menu</SheetTitle>
+              <nav className="mt-8 flex flex-col">
+                {NAV.map((n) => (
+                  <Link
+                    key={n.to}
+                    to={n.to}
+                    onClick={() => setMenuOpen(false)}
+                    className="border-b border-border py-4 text-base text-mahogany"
+                  >
+                    {n.label}
+                  </Link>
+                ))}
+                {!user && (
+                  <Link
+                    to="/auth/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="py-4 text-base text-gold-dark"
+                  >
+                    Log in
+                  </Link>
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
