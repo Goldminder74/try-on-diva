@@ -12,6 +12,8 @@ function TikTokMark({ className }: { className?: string }) {
 
 const heading = "mb-5 text-[11px] uppercase tracking-[0.35em] text-champagne/50";
 const link = "text-sm font-light text-champagne/75 transition-colors hover:text-champagne";
+const social =
+  "inline-flex items-center gap-2 text-sm font-light text-champagne/75 transition-colors hover:text-champagne focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
 
 const SHOP = [
   { to: "/catalog", label: "Collection" },
@@ -74,36 +76,33 @@ export function Footer() {
           <span className="text-[11px] uppercase tracking-[0.35em] text-champagne/50">
             © {new Date().getFullYear()} Wigsmi
           </span>
-          <div className="flex items-center gap-1">
-            <a
-              href="https://www.facebook.com/profile.php?id=61590950803900"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Wigsmi on Facebook (opens in a new tab)"
-              title="Wigsmi on Facebook"
-              className="inline-flex h-10 w-10 items-center justify-center text-champagne/60 transition-colors hover:text-champagne focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              <Facebook className="h-5 w-5" aria-hidden="true" />
-            </a>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <a
               href="https://www.instagram.com/wigsmi/"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Wigsmi on Instagram (opens in a new tab)"
-              title="Wigsmi on Instagram"
-              className="inline-flex h-10 w-10 items-center justify-center text-champagne/60 transition-colors hover:text-champagne focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className={social}
             >
-              <Instagram className="h-5 w-5" aria-hidden="true" />
+              <Instagram className="h-4 w-4" aria-hidden="true" />
+              Instagram
             </a>
             <a
               href="https://www.tiktok.com/@wigsmi"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Wigsmi on TikTok (opens in a new tab)"
-              title="Wigsmi on TikTok"
-              className="inline-flex h-10 w-10 items-center justify-center text-champagne/60 transition-colors hover:text-champagne focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className={social}
             >
-              <TikTokMark className="h-5 w-5" />
+              <TikTokMark className="h-4 w-4" />
+              TikTok
+            </a>
+            <a
+              href="https://www.facebook.com/profile.php?id=61590950803900"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={social}
+            >
+              <Facebook className="h-4 w-4" aria-hidden="true" />
+              Facebook
             </a>
           </div>
         </div>

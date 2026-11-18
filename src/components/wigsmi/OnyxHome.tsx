@@ -15,14 +15,12 @@ export function OnyxHome({ notice }: { notice?: React.ReactNode }) {
       <section className="relative grid min-h-screen md:grid-cols-2">
         <div className="flex flex-col justify-end px-6 pb-20 pt-32 md:px-12">
           <p className={label}>The try-on atelier</p>
-          <h1 className="mt-6 font-couture text-6xl leading-[0.95] md:text-8xl">
-            Wear it
-            <br />
-            <em className="text-bronze">first.</em>
+          <h1 className="mt-6 max-w-xl font-couture text-5xl leading-[1.02] md:text-7xl">
+            Virtual wig <span className="whitespace-nowrap">try-on</span> for{" "}
+            <em className="text-bronze">Black women.</em>
           </h1>
-          <p className="mt-8 max-w-sm text-base font-light leading-relaxed text-champagne/75">
-            See every lace front, glueless unit and bob on your own face before you buy. Made for
-            the women who set the standard.
+          <p className="mt-8 max-w-md text-base font-light leading-relaxed text-champagne/75">
+            Wear it first. See lace fronts, glueless wigs and bobs on your own face before you buy.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link

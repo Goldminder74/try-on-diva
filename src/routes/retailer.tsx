@@ -12,11 +12,11 @@ export const Route = createFileRoute("/retailer")({
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://wigsmi.com/retailer" },
-      { title: "For Retailers - Wigsmi" },
+      { title: "Virtual wig try-on for retailers | Wigsmi" },
       {
         name: "description",
         content:
-          "Add Wigsmi virtual wig try-on to your store. Help shoppers explore your collection with a free 1-month retailer trial.",
+          "Add Wigsmi's virtual wig try-on, built for Black wig buyers, to your store. One line of code. 1-month free trial, no card required.",
       },
       { property: "og:title", content: "Wigsmi for Retailers" },
       {
@@ -40,7 +40,7 @@ function RetailerLanding() {
             For wig retailers
           </span>
           <h1 className="mt-5 max-w-3xl font-display text-5xl leading-[1.05] text-mahogany md:text-6xl">
-            Your collection. A more personal shopping experience.
+            Add a virtual wig <span className="whitespace-nowrap">try-on</span> to your online shop.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-foreground/75">
             Help shoppers preview your wigs on their own selfie before visiting your shop to buy. AI
