@@ -87,7 +87,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         {mode === "login" ? "Welcome back" : "Create your account"}
       </p>
       <h1 className="mt-1 font-display text-4xl text-mahogany">
-        {mode === "login" ? "Log in to Wigsmi." : "Join Wigsmi."}
+        {mode === "login" ? "Log in to Wigsmi." : "Create your Wigsmi account."}
       </h1>
       <p className="mt-3 text-sm text-muted-foreground">
         {mode === "login"
