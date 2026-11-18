@@ -42,6 +42,7 @@ export function OnyxHome({ notice }: { notice?: React.ReactNode }) {
 
       <section className="border-y border-champagne/10 px-6 py-24 text-center md:px-12">
         <p className={label}>The ritual</p>
+        <h2 className="mt-6 font-couture text-4xl md:text-5xl">Try on a wig in three steps</h2>
         <div className="mx-auto mt-14 grid max-w-5xl gap-14 md:grid-cols-3">
           {[
             ["I", "Your portrait", "One selfie, kept private to you."],
