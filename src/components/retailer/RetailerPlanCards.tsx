@@ -109,6 +109,10 @@ export function RetailerPlanCards({
           const priceId = p.priceIds[interval];
           const busyHere = busy === p.id || (busy === null && checkoutLoading);
           const periodLabel = interval === "monthly" ? "per month" : "per year";
+          // Marketing flow: unauthenticated visitors sign up first, so the action
+          // is a plain anchor with the full signup URL in the server-rendered HTML.
+          const signupFlow = requireSignup || !user;
+          const signupUrl = `${signupHref}?plan=${p.id}&interval=${interval}`;
           return (
             <div
               key={p.id}
@@ -139,6 +143,14 @@ export function RetailerPlanCards({
                 <div className="mt-6 rounded-md border border-mahogany/20 bg-mahogany/5 py-2 text-center font-mono text-xs uppercase tracking-wider text-mahogany">
                   Current plan
                 </div>
+              ) : signupFlow ? (
+                <a
+                  href={signupUrl}
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-mahogany py-2 text-sm font-medium text-cream no-underline hover:bg-mahogany-soft"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  {ctaLabel ? ctaLabel(p.name) : "Start free trial"}
+                </a>
               ) : (
                 <button
                   type="button"
@@ -153,11 +165,9 @@ export function RetailerPlanCards({
                   )}
                   {ctaLabel
                     ? ctaLabel(p.name)
-                    : requireSignup || !user
-                      ? "Start free trial"
-                      : currentPlanId
-                        ? `Switch to ${p.name}`
-                        : `Subscribe - ${p.name}`}
+                    : currentPlanId
+                      ? `Switch to ${p.name}`
+                      : `Subscribe - ${p.name}`}
                 </button>
               )}
             </div>

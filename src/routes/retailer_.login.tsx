@@ -20,7 +20,7 @@ export const Route = createFileRoute("/retailer_/login")({
     ],
   }),
   component: () => (
-    <AuthShell>
+    <AuthShell variant="retailer">
       <RetailerAuthForm mode="login" />
     </AuthShell>
   ),

@@ -66,10 +66,10 @@ export function RetailerAuthForm({ mode }: { mode: Mode }) {
   return (
     <div className="w-full max-w-sm">
       <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
-        {mode === "login" ? "Retailer login" : "Retailer signup"}
+        {mode === "login" ? "Retailer log in" : "Retailer sign-up"}
       </p>
       <h1 className="mt-1 font-display text-4xl text-mahogany">
-        {mode === "login" ? "Log in to your retailer account." : "Create your Wigsmi retailer account."}
+        {mode === "login" ? "Log in to your retailer account." : "Sell more wigs."}
       </h1>
       <p className="mt-3 text-sm text-muted-foreground">
         {mode === "login"

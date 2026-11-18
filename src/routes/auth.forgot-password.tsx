@@ -81,6 +81,12 @@ function ForgotPassword() {
         >
           ← Back to log in
         </Link>
+        <Link
+          to="/retailer/login"
+          className="mt-2 block text-xs text-muted-foreground hover:text-mahogany"
+        >
+          Retailer log in
+        </Link>
       </div>
     </AuthShell>
   );
