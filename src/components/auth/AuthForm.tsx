@@ -13,9 +13,18 @@ function safeRedirect(r: string | undefined): string {
   return r;
 }
 
+// Shopper plan chosen on /pricing before signing up; after sign-up we return to
+// /pricing, which opens the same checkout the signed-in buttons use.
+const SHOPPER_PLANS = ["plus", "pro", "topup"] as const;
+export function planCheckoutPath(plan: string | undefined): string | null {
+  return plan && (SHOPPER_PLANS as readonly string[]).includes(plan)
+    ? `/pricing?checkout=${plan}`
+    : null;
+}
+
 export function AuthForm({ mode }: { mode: Mode }) {
-  const search = useSearch({ strict: false }) as { redirect?: string };
-  const redirectTo = safeRedirect(search.redirect);
+  const search = useSearch({ strict: false }) as { redirect?: string; plan?: string };
+  const redirectTo = planCheckoutPath(search.plan) ?? safeRedirect(search.redirect);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");

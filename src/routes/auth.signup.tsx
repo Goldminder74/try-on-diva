@@ -4,8 +4,10 @@ import { AuthShell } from "@/components/auth/AuthShell";
 
 export const Route = createFileRoute("/auth/signup")({
   staticData: { sitemap: false },
-  validateSearch: (s: Record<string, unknown>): { redirect?: string } =>
-    typeof s.redirect === "string" ? { redirect: s.redirect } : {},
+  validateSearch: (s: Record<string, unknown>): { redirect?: string; plan?: string } => ({
+    ...(typeof s.redirect === "string" ? { redirect: s.redirect } : {}),
+    ...(typeof s.plan === "string" ? { plan: s.plan } : {}),
+  }),
   head: () => ({
     links: [{ rel: "canonical", href: "https://wigsmi.com/auth/signup" }],
     meta: [

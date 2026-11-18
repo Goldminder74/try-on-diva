@@ -37,6 +37,12 @@ export function OnyxHome({ notice }: { notice?: React.ReactNode }) {
             >
               The collection
             </Link>
+            <Link
+              to="/auth/signup"
+              className="border border-champagne/40 px-9 py-4 text-xs uppercase tracking-[0.3em] transition-colors hover:border-champagne"
+            >
+              Create a free account
+            </Link>
           </div>
         </div>
         <img

@@ -629,7 +629,15 @@ function TryOn() {
                   ? "Create a free account to keep trying - 5 free try-ons every month."
                   : anonRemaining !== null && anonRemaining < 2
                     ? `You have ${anonRemaining} free try-on${anonRemaining === 1 ? "" : "s"} left, no signup needed. After that, create a free account for 5 free try-ons every month.`
-                    : "Your first 2 try-ons are free, no signup needed. After that, create a free account for 5 free try-ons every month."}
+                    : (
+                        <>
+                          Your first 2 try-ons are free, no sign-up needed. After that,{" "}
+                          <Link to="/auth/signup" className="underline">
+                            create a free account
+                          </Link>{" "}
+                          for 5 free try-ons every month.
+                        </>
+                      )}
             </p>
           </aside>
         </div>

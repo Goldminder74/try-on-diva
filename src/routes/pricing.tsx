@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, X, Loader2 } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
@@ -70,6 +70,8 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:description", content: "Free, Plus and Pro plans for Wigsmi consumers." },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { checkout?: string } =>
+    typeof s.checkout === "string" ? { checkout: s.checkout } : {},
   component: Pricing,
 });
 
@@ -226,6 +228,22 @@ function Pricing() {
       setBusyId(null);
     }
   };
+
+  // After sign-up with ?plan=…, /auth/signup sends the shopper here with
+  // ?checkout=…; open the same checkout the signed-in buttons use, once.
+  const { checkout } = Route.useSearch();
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!user || !checkout || autoStarted.current) return;
+    autoStarted.current = true;
+    navigate({ to: "/pricing", search: {}, replace: true });
+    if (checkout === "topup") void onBuyPack();
+    else {
+      const plan = PLANS.find((p) => p.planKey === checkout && p.planKey !== "free");
+      if (plan) void onChoose(plan.priceIds.monthly, plan.name, plan.planKey);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, checkout]);
 
   const onConfirmSwitch = async () => {
     if (!previewState) return;
@@ -415,7 +433,19 @@ function Pricing() {
                     </li>
                   ))}
                 </ul>
-                {isCurrent ? (
+                {!user ? (
+                  <Link
+                    to="/auth/signup"
+                    search={p.planKey === "free" ? {} : { plan: p.planKey }}
+                    className={`mt-7 inline-flex w-full items-center justify-center gap-2 rounded-md py-2.5 text-center text-sm font-medium transition-all ${
+                      p.badge
+                        ? "bg-mahogany text-cream hover:bg-mahogany-soft"
+                        : "border border-mahogany text-mahogany hover:bg-mahogany hover:text-cream"
+                    }`}
+                  >
+                    {p.planKey === "free" ? "Start free" : `Choose ${p.name}`}
+                  </Link>
+                ) : isCurrent ? (
                   <div className="mt-7 rounded-md border border-mahogany/20 bg-mahogany/5 py-2 text-center text-xs font-mono uppercase tracking-wider text-mahogany">
                     Current plan
                   </div>
@@ -451,6 +481,15 @@ function Pricing() {
               allowance is always used first.
             </p>
           </div>
+          {!user ? (
+            <Link
+              to="/auth/signup"
+              search={{ plan: "topup" }}
+              className="mt-4 inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-mahogany px-5 py-2.5 text-sm font-medium text-cream hover:bg-mahogany-soft md:mt-0"
+            >
+              Add {TRYON_PACKS[0].credits} try-ons
+            </Link>
+          ) : (
           <button
             onClick={onBuyPack}
             disabled={busyId === "pack"}
@@ -459,6 +498,7 @@ function Pricing() {
             {busyId === "pack" && <Loader2 className="h-4 w-4 animate-spin" />}
             Add {TRYON_PACKS[0].credits} try-ons
           </button>
+          )}
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
