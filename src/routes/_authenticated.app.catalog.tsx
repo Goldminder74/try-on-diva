@@ -54,7 +54,7 @@ function AppCatalog() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-5 py-10">
-      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Catalog</p>
+      <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Catalogue</p>
       <h1 className="mt-1 font-display text-4xl text-mahogany md:text-5xl">Browse every wig.</h1>
 
       <div className="mt-8 flex flex-wrap items-center gap-3">

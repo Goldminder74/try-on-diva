@@ -71,7 +71,7 @@ function CatalogPage() {
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Moderation</p>
-          <h1 className="mt-1 font-display text-3xl text-mahogany">Catalog</h1>
+          <h1 className="mt-1 font-display text-3xl text-mahogany">Catalogue</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <Select

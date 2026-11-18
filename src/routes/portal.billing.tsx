@@ -256,7 +256,7 @@ function BillingPage() {
               {sub?.status && (
                 <>
                   {" "}
-                  · Status: <span className="capitalize">{sub.status}</span>
+                  · Status: <span className="capitalize">{sub.status === "canceled" ? "cancelled" : sub.status}</span>
                 </>
               )}
             </p>

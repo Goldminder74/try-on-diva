@@ -112,7 +112,7 @@ function ApiKeysPage() {
         <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Portal</p>
         <h1 className="mt-1 font-display text-3xl text-mahogany md:text-4xl">API keys</h1>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-          Use API keys to access your Wigsmi catalog programmatically - from a custom storefront, a
+          Use API keys to access your Wigsmi catalogue programmatically - from a custom storefront, a
           Shopify app, or any backend integration.
         </p>
       </header>

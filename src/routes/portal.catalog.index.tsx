@@ -14,14 +14,14 @@ export const Route = createFileRoute("/portal/catalog/")({
         name: "description",
         content: "View, publish and organise every wig in your retailer catalogue.",
       },
-      { property: "og:title", content: "Catalog - Wigsmi Retailer" },
+      { property: "og:title", content: "Catalogue - Wigsmi Retailer" },
       {
         property: "og:description",
         content: "View, publish and organise every wig in your retailer catalogue.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { title: "Catalog - Wigsmi Retailer" },
+      { title: "Catalogue - Wigsmi Retailer" },
     ],
   }),
   component: CatalogList,
@@ -49,7 +49,7 @@ function CatalogList() {
     <div>
       <div className="flex items-end justify-between">
         <div>
-          <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Catalog</p>
+          <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Catalogue</p>
           <h1 className="mt-1 font-display text-4xl text-mahogany">Your wigs.</h1>
         </div>
         <Link

@@ -1,12 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export const PAGE_SIZE = 24;
 
 /** Number of items to show; resets to one page whenever `resetKey` changes. */
-export function useVisibleCount(resetKey: string, step = PAGE_SIZE) {
-  const [count, setCount] = useState(step);
+export function useVisibleCount(resetKey: string, step = PAGE_SIZE, initial = step) {
+  const [count, setCount] = useState(initial);
+  const first = useRef(true);
   useEffect(() => {
+    // Keep the initial count on first render; reset when filters change.
+    if (first.current) {
+      first.current = false;
+      return;
+    }
     setCount(step);
   }, [resetKey, step]);
   return { count, more: () => setCount((c) => c + step) };

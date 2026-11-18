@@ -252,7 +252,7 @@ function Landing() {
           </h2>
           <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-4 text-left md:grid-cols-3">
             {[
-              { name: "Free", price: "£0", desc: "5 try-ons / month. Browse the full catalog." },
+              { name: "Free", price: "£0", desc: "5 try-ons / month. Browse the full catalogue." },
               {
                 name: "Plus",
                 price: "£4.99",

@@ -74,7 +74,7 @@ export function Header({ overlay = false }: { overlay?: boolean } = {}) {
           ))}
         </nav>
         <div className="flex items-center gap-5">
-          {loading ? null : user ? (
+          {user && !loading ? (
             <Link to={isRetailer ? "/portal" : "/app"} className={outlineButton}>
               {isRetailer ? "Retailer portal" : "My Wigsmi"}
             </Link>

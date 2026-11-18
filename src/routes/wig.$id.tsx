@@ -124,7 +124,7 @@ function WigDetail() {
           to="/catalog"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-mahogany"
         >
-          <ArrowLeft className="h-4 w-4" /> Catalog
+          <ArrowLeft className="h-4 w-4" /> Catalogue
         </Link>
 
         <div className="mt-6 grid grid-cols-1 gap-10 md:grid-cols-2">

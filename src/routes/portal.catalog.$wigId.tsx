@@ -161,7 +161,7 @@ function WigEditor() {
         <div>
           <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">
             <Link to="/portal/catalog" className="hover:text-mahogany">
-              ← Catalog
+              ← Catalogue
             </Link>
           </p>
           <h1 className="mt-1 font-display text-4xl text-mahogany">
@@ -285,7 +285,7 @@ function WigEditor() {
                 </select>
               </Field>
             </div>
-            <Field label="Colors">
+            <Field label="Colours">
               <div className="flex flex-wrap gap-2">
                 {form.colors.map((c, i) => (
                   <span
@@ -319,7 +319,7 @@ function WigEditor() {
                       }
                     }
                   }}
-                  placeholder="Type a color, press Enter"
+                  placeholder="Type a colour, press Enter"
                   className={`${inputCls} flex-1 min-w-[160px]`}
                 />
               </div>
@@ -377,7 +377,7 @@ function WigEditor() {
               checked={form.is_published}
               onChange={(v) => setForm({ ...form, is_published: v })}
               label="Published"
-              hint="Visible to shoppers in the catalog."
+              hint="Visible to shoppers in the catalogue."
             />
             <Toggle
               checked={form.in_stock}

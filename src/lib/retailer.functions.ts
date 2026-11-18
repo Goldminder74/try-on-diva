@@ -302,7 +302,7 @@ export const saveMyWig = createServerFn({ method: "POST" })
     const ent = await getRetailerEntitlement(supabase, userId);
 
     if (ent.effectivePlan === "expired") {
-      throw new Error("Your trial has ended. Upgrade to a paid plan to manage your catalog.");
+      throw new Error("Your trial has ended. Upgrade to a paid plan to manage your catalogue.");
     }
 
     // Publishing an existing draft must obey the same cap as a new listing.

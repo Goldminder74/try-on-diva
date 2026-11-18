@@ -130,7 +130,7 @@ function RetailerLanding() {
             {
               icon: Code2,
               title: "Paste one line of code",
-              body: "Drop the embed snippet into Shopify, WooCommerce or any HTML. Done.",
+              body: "Drop the embed snippet into your site. Done.",
             },
           ].map((s, i) => (
             <div

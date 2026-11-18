@@ -5,27 +5,40 @@ import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
 import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig, catalogueDisclosure } from "@/lib/wigs";
-import { ShowMore, useVisibleCount } from "@/components/wigsmi/ShowMore";
+import { ShowMore, useVisibleCount, PAGE_SIZE } from "@/components/wigsmi/ShowMore";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/catalog")({
   staticData: { sitemap: true },
-  loader: () => fetchWigs(),
+  validateSearch: (s: Record<string, unknown>): { page?: number } => {
+    const n = Number(s.page);
+    return Number.isInteger(n) && n > 1 ? { page: n } : {};
+  },
+  loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),
+  loader: async ({ deps }) => ({ wigs: await fetchWigs(), page: deps.page }),
   errorComponent: CatalogError,
   notFoundComponent: CatalogNotFound,
-  head: () => ({
-    links: [{ rel: "canonical", href: "https://wigsmi.com/catalog" }],
+  head: ({ loaderData }) => ({
+    links: [
+      {
+        rel: "canonical",
+        href:
+          loaderData && loaderData.page > 1
+            ? `https://wigsmi.com/catalog?page=${loaderData.page}`
+            : "https://wigsmi.com/catalog",
+      },
+    ],
     meta: [
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://wigsmi.com/catalog" },
-      { title: "Wig Catalog - Wigsmi" },
+      { title: "Wig Catalogue - Wigsmi" },
       {
         name: "description",
         content:
           "Browse wigs from Wigsmi retail partners and try each one on your own photo before you buy.",
       },
-      { property: "og:title", content: "Wig Catalog - Wigsmi" },
+      { property: "og:title", content: "Wig Catalogue - Wigsmi" },
       {
         property: "og:description",
         content:
@@ -48,7 +61,7 @@ function Catalog() {
   const toggle = (arr: string[], v: string) =>
     arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
 
-  const wigs = Route.useLoaderData();
+  const { wigs, page } = Route.useLoaderData();
 
   const filtered = useMemo(() => {
     const source = wigs;
@@ -82,7 +95,12 @@ function Catalog() {
     }
     return out;
   }, [query, styles, textures, sort, wigs]);
-  const { count, more } = useVisibleCount(JSON.stringify([query, styles, textures, sort]));
+  const { count, more } = useVisibleCount(
+    JSON.stringify([query, styles, textures, sort]),
+    PAGE_SIZE,
+    page * PAGE_SIZE,
+  );
+  const pageCount = Math.ceil(wigs.length / PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-cream">
@@ -90,7 +108,7 @@ function Catalog() {
       <div className="mx-auto w-full max-w-7xl px-5 py-10">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Catalog</p>
+            <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Catalogue</p>
             <h1 className="mt-1 font-display text-4xl text-mahogany md:text-5xl">
               Find your next look.
             </h1>
@@ -212,6 +230,20 @@ function Catalog() {
                   ))}
                 </div>
                 <ShowMore shown={count} total={filtered.length} onMore={more} />
+                {pageCount > 1 && (
+                  <nav aria-label="Catalogue pages" className="mt-4 flex justify-center gap-3 text-xs">
+                    {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+                      <Link
+                        key={n}
+                        to="/catalog"
+                        search={n === 1 ? {} : { page: n }}
+                        className={n === page ? "text-mahogany underline" : "text-muted-foreground hover:text-mahogany"}
+                      >
+                        {n}
+                      </Link>
+                    ))}
+                  </nav>
+                )}
               </>
             )}
             <p className="mt-8 text-center text-xs text-muted-foreground">
@@ -235,7 +267,7 @@ function CatalogError() {
     <div className="min-h-screen bg-cream">
       <Header />
       <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
-        <p className="font-display text-2xl text-mahogany">The catalog couldn't load.</p>
+        <p className="font-display text-2xl text-mahogany">The catalogue couldn't load.</p>
         <p className="mt-2 text-sm text-muted-foreground">Refresh the page to try again.</p>
         <Button onClick={() => router.invalidate()} className="mt-5">
           Try again
