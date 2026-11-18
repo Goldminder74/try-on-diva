@@ -66,3 +66,9 @@
 ## Server-rendered discovery (18 Nov)
 - [x] Render catalogue cards, try-on style links and all 23 FAQ answers in the first HTML
 - [x] Add FAQPage JSON-LD using the existing 11 buyer and 12 retailer answers verbatim
+
+## Icons and search metadata (18 Nov)
+- [x] Install the supplied favicon, Apple touch icon and 512-pixel schema logo
+- [x] Expand homepage Organization and WebSite JSON-LD without changing their IDs
+- [x] Use full product names in product title and Open Graph title metadata
+- [x] Add real page-specific and product-specific lastmod dates to every existing sitemap URL

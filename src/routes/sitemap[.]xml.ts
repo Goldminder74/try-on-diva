@@ -7,10 +7,31 @@ import {
   sitemapXML,
   type SitemapEntry,
 } from "@/lib/sitemap";
-import { collectPublishedWigIds } from "@/lib/sitemap-content";
+import { collectPublishedWigEntries } from "@/lib/sitemap-content";
 import { listGuides } from "@/lib/guides";
 
 const BASE_URL = "https://wigsmi.com";
+
+// Real content-change dates from each page's source history. Product dates
+// come from the catalogue rows below instead of a deploy-time fallback.
+const PAGE_LASTMOD: Record<string, string> = {
+  "/": "2026-11-18",
+  "/catalog": "2026-11-18",
+  "/faq": "2026-11-18",
+  "/guides": "2026-11-14",
+  "/guides/lace-front-vs-closure-vs-glueless-wigs": "2026-11-12",
+  "/pricing": "2026-11-18",
+  "/privacy": "2026-11-15",
+  "/retailer": "2026-11-18",
+  "/terms": "2026-11-15",
+  "/try-on": "2026-11-18",
+};
+
+function pageLastmod(path: string): string {
+  const lastmod = PAGE_LASTMOD[path];
+  if (!lastmod) throw new Error(`No page-specific sitemap timestamp for ${path}`);
+  return lastmod;
+}
 
 export const Route = createFileRoute("/sitemap.xml")({
   staticData: { sitemap: false },
@@ -19,7 +40,10 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         try {
           const router = await getRouterInstance();
-          const entries: SitemapEntry[] = sitemapStaticPaths(router).map((path) => ({ path }));
+          const entries: SitemapEntry[] = sitemapStaticPaths(router).map((path) => ({
+            path,
+            lastmod: pageLastmod(path),
+          }));
           const guideRouteId = "/guides/$slug";
           if (isSitemapRouteIncluded(router.routesById[guideRouteId])) {
             for (const g of listGuides()) {
@@ -30,7 +54,7 @@ export const Route = createFileRoute("/sitemap.xml")({
                 hash: "",
               });
               const path = sitemapPathForLocation(router, location, guideRouteId);
-              if (path) entries.push({ path });
+              if (path) entries.push({ path, lastmod: pageLastmod(path) });
             }
           }
           const routeId = "/wig/$id";
@@ -51,16 +75,16 @@ export const Route = createFileRoute("/sitemap.xml")({
                 },
               },
             });
-            const ids = await collectPublishedWigIds((offset, pageSize) =>
+            const wigs = await collectPublishedWigEntries((offset, pageSize) =>
               client
                 .from("wigs")
-                .select("id")
+                .select("id, updated_at, created_at")
                 .eq("is_published", true)
                 .is("deleted_at", null)
                 .order("id")
                 .range(offset, offset + pageSize - 1),
             );
-            for (const id of ids) {
+            for (const { id, lastmod } of wigs) {
               const location = router.buildLocation({
                 to: "/wig/$id",
                 params: { id },
@@ -68,7 +92,7 @@ export const Route = createFileRoute("/sitemap.xml")({
                 hash: "",
               });
               const path = sitemapPathForLocation(router, location, routeId);
-              if (path) entries.push({ path });
+              if (path) entries.push({ path, lastmod });
             }
           }
           return new Response(sitemapXML(BASE_URL, entries), {

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/wig/$id")({
       };
     const { wig } = loaderData;
     const url = pageUrl(`/wig/${encodeURIComponent(params.id)}`);
-    const title = `${wig.name.slice(0, 50)} - Wigsmi`;
+    const title = `${wig.name} - Wigsmi`;
     const description =
       wig.description || `Explore ${wig.name} from ${wig.retailer} and try it on with Wigsmi.`;
     const image = productShareImage(wig.images[0]);

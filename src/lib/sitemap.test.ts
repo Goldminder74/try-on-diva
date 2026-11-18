@@ -26,4 +26,10 @@ describe("sitemap discovery boundaries", () => {
     expect(xml.match(/<loc>/g)).toHaveLength(1);
     expect(xml).not.toContain("lastmod");
   });
+  it("emits a supplied page-specific modification date", () => {
+    const xml = sitemapXML("https://wigsmi.com", [
+      { path: "/catalog", lastmod: "2026-11-18" },
+    ]);
+    expect(xml).toContain("<lastmod>2026-11-18</lastmod>");
+  });
 });

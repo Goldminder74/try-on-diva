@@ -29,6 +29,14 @@ export const Route = createFileRoute("/")({
               name: "Wigsmi",
               legalName: "Sherwood Consulting Services Ltd",
               url: "https://wigsmi.com/",
+              description:
+                "Virtual wig try-on built for Black women, and a try-on widget for the retailers who serve them.",
+              logo: "https://wigsmi.com/logo.png",
+              sameAs: [
+                "https://www.instagram.com/wigsmi/",
+                "https://www.tiktok.com/@wigsmi",
+                "https://www.facebook.com/profile.php?id=61590950803900",
+              ],
             },
             {
               "@type": "WebSite",
