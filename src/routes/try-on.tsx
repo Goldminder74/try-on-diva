@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Upload, RefreshCw, Sparkles } from "lucide-react";
@@ -41,6 +41,10 @@ export const Route = createFileRoute("/try-on")({
     widget: typeof s.widget === "string" ? s.widget : undefined,
     r: typeof s.r === "string" ? s.r : undefined,
   }),
+  loaderDeps: ({ search: { widget, r } }) => ({ widget, r }),
+  loader: ({ deps }) => loadInitialTryOnStyles(deps),
+  errorComponent: TryOnError,
+  notFoundComponent: TryOnNotFound,
   head: () => ({
     links: [{ rel: "canonical", href: "https://wigsmi.com/try-on" }],
     meta: [
@@ -67,7 +71,86 @@ type RetailerScope = {
   brand_primary: string | null;
 };
 
+async function loadInitialTryOnStyles(deps: { widget?: string; r?: string }): Promise<{
+  list: Wig[];
+  retailerScope: RetailerScope | null;
+}> {
+  if (deps.widget) {
+    try {
+      const data = await getPublicWidgetData({ data: { token: deps.widget } });
+      if ("ok" in data && data.retailer) {
+        return {
+          retailerScope: {
+            id: data.retailer.id,
+            display_name: data.retailer.display_name,
+            logo_url: data.retailer.logo_url,
+            brand_primary: data.retailer.brand_primary ?? null,
+          },
+          list: data.wigs as unknown as Wig[],
+        };
+      }
+    } catch {
+      // Fall through to the public catalogue if a widget cannot be loaded.
+    }
+  }
+
+  if (deps.r) {
+    const retailer = await fetchRetailerBySlug(deps.r);
+    if (retailer) {
+      return {
+        retailerScope: {
+          id: retailer.id,
+          display_name: retailer.display_name,
+          logo_url: retailer.logo_url,
+          brand_primary: retailer.brand_primary,
+        },
+        list: await fetchWigsByRetailerId(retailer.id, 24),
+      };
+    }
+  }
+
+  return { list: await fetchFeaturedWigs(9), retailerScope: null };
+}
+
+function TryOnError() {
+  const router = useRouter();
+  return (
+    <div className="min-h-screen bg-cream">
+      <Header />
+      <div className="mx-auto max-w-xl px-5 py-20 text-center">
+        <p className="font-display text-2xl text-mahogany">Styles could not be loaded.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Refresh the page or browse the catalogue.
+        </p>
+        <button
+          onClick={() => router.invalidate()}
+          className="mt-5 rounded-md bg-mahogany px-5 py-2 text-sm text-cream"
+        >
+          Try again
+        </button>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+function TryOnNotFound() {
+  return (
+    <div className="min-h-screen bg-cream">
+      <Header />
+      <div className="mx-auto max-w-xl px-5 py-20 text-center">
+        <p className="font-display text-2xl text-mahogany">Try-on page not found.</p>
+        <Link to="/try-on" className="mt-5 inline-block text-mahogany underline">
+          Start a try-on
+        </Link>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
 function TryOn() {
+  const initialData = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -75,12 +158,15 @@ function TryOn() {
   const runAnonGenerate = useServerFn(generateAnonymousTryOn);
   const fetchAnonStatus = useServerFn(getAnonymousTryOnStatus);
 
-  const [list, setList] = useState<Wig[]>([]);
+  const [list, setList] = useState<Wig[]>(initialData.list);
   // The picker has three states so a slow or failed load never reads as an
-  // empty catalogue.
-  const [listStatus, setListStatus] = useState<"loading" | "ready" | "error">("loading");
-  const [retailerScope, setRetailerScope] = useState<RetailerScope | null>(null);
+  // empty catalogue. The initial list is already server-rendered.
+  const [listStatus, setListStatus] = useState<"loading" | "ready" | "error">("ready");
+  const [retailerScope, setRetailerScope] = useState<RetailerScope | null>(
+    initialData.retailerScope,
+  );
   const [showAll, setShowAll] = useState(false);
+  const skipInitialListLoad = useRef(true);
 
   const [photo, setPhoto] = useState<File | null>(null);
   const [wig, setWig] = useState<Wig | null>(null);
@@ -165,7 +251,13 @@ function TryOn() {
   }, [resultUrl, user]);
 
   // Load catalogue based on URL scope (widget token, retailer slug, or full).
+  // The first list already came from the loader, so only later scope changes
+  // need a browser-side request.
   useEffect(() => {
+    if (skipInitialListLoad.current) {
+      skipInitialListLoad.current = false;
+      return;
+    }
     let cancelled = false;
 
     async function loadList() {
@@ -581,9 +673,14 @@ function TryOn() {
             ) : (
               <div className="grid grid-cols-3 gap-3">
                 {list.map((w: Wig) => (
-                  <button
+                  <Link
                     key={w.id}
-                    onClick={() => onSelectWig(w)}
+                    to="/wig/$id"
+                    params={{ id: w.id }}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      onSelectWig(w);
+                    }}
                     className={`group overflow-hidden rounded-md border-2 text-left transition-all ${
                       wig?.id === w.id
                         ? "border-gold"
@@ -605,7 +702,7 @@ function TryOn() {
                         </p>
                       )}
                     </div>
-                  </button>
+                  </Link>
                 ))}
               </div>
             )}

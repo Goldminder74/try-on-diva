@@ -62,3 +62,7 @@
 - [x] Canonicals on remaining public pages; UTM capture on visit, anonymous session, profile, events
 - [x] Shopper delete controls (try-on, all try-ons, account) and tax-inclusive wording (11 Nov 2026)
 - [x] Live Stripe: 11 live prices replaced with tax-inclusive copies (11 Nov 2026)
+
+## Server-rendered discovery (18 Nov)
+- [x] Render catalogue cards, try-on style links and all 23 FAQ answers in the first HTML
+- [x] Add FAQPage JSON-LD using the existing 11 buyer and 12 retailer answers verbatim

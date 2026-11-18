@@ -29,6 +29,20 @@ export const Route = createFileRoute("/faq")({
         content: "Answers to common questions for wig buyers and retailers using Wigsmi.",
       },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [...BUYER_QA, ...RETAILER_QA].map((item) => ({
+            "@type": "Question",
+            name: item.q,
+            acceptedAnswer: { "@type": "Answer", text: item.a },
+          })),
+        }),
+      },
+    ],
   }),
   component: FAQPage,
 });
@@ -138,11 +152,34 @@ const RETAILER_QA: QA[] = [
   },
 ];
 
+function FAQAccordion({ tab, items }: { tab: Tab; items: QA[] }) {
+  return (
+    <Accordion type="single" collapsible className="w-full">
+      {items.map((item, i) => (
+        <AccordionItem
+          key={`${tab}-${i}`}
+          value={`${tab}-${i}`}
+          className="border-b border-border [&>div[data-state=closed]]:hidden"
+        >
+          <AccordionTrigger className="py-4 text-left text-sm font-medium text-mahogany hover:underline">
+            {item.q}
+          </AccordionTrigger>
+          <AccordionContent forceMount className="pb-4 text-sm text-foreground/80">
+            {item.a}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  );
+}
+
 function FAQPage() {
   const [tab, setTab] = useState<Tab>("buyers");
   const [query, setQuery] = useState("");
 
   const activeList = tab === "buyers" ? BUYER_QA : RETAILER_QA;
+  const inactiveTab: Tab = tab === "buyers" ? "retailers" : "buyers";
+  const inactiveList = tab === "buyers" ? RETAILER_QA : BUYER_QA;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -216,22 +253,12 @@ function FAQPage() {
             No questions match your search. Try a different keyword or browse the other tab.
           </p>
         ) : (
-          <Accordion type="single" collapsible className="w-full">
-            {filtered.map((item, i) => (
-              <AccordionItem
-                key={`${tab}-${i}`}
-                value={`${tab}-${i}`}
-                className="border-b border-border"
-              >
-                <AccordionTrigger className="py-4 text-left text-sm font-medium text-mahogany hover:underline">
-                  {item.q}
-                </AccordionTrigger>
-                <AccordionContent className="pb-4 text-sm text-foreground/80">
-                  {item.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <>
+            <FAQAccordion tab={tab} items={filtered} />
+            <div hidden>
+              <FAQAccordion tab={inactiveTab} items={inactiveList} />
+            </div>
+          </>
         )}
 
         {/* Footer CTA */}

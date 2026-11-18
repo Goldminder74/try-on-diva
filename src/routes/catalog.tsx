@@ -1,17 +1,18 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { Header } from "@/components/wigsmi/Header";
 import { Footer } from "@/components/wigsmi/Footer";
 import { WigCard } from "@/components/wigsmi/WigCard";
-import { WigCardSkeleton } from "@/components/wigsmi/WigCardSkeleton";
 import { fetchWigs, STYLE_TYPES, HAIR_TEXTURES, type Wig, catalogueDisclosure } from "@/lib/wigs";
 import { ShowMore, useVisibleCount } from "@/components/wigsmi/ShowMore";
-import { useAsync } from "@/lib/use-async";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/catalog")({
   staticData: { sitemap: true },
+  loader: () => fetchWigs(),
+  errorComponent: CatalogError,
+  notFoundComponent: CatalogNotFound,
   head: () => ({
     links: [{ rel: "canonical", href: "https://wigsmi.com/catalog" }],
     meta: [
@@ -47,10 +48,10 @@ function Catalog() {
   const toggle = (arr: string[], v: string) =>
     arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
 
-  const { data: wigs, loading, error } = useAsync<Wig[]>(() => fetchWigs(), []);
+  const wigs = Route.useLoaderData();
 
   const filtered = useMemo(() => {
-    const source = wigs ?? [];
+    const source = wigs;
     let out = source.filter((w: Wig) => {
       if (
         query &&
@@ -94,9 +95,7 @@ function Catalog() {
               Find your next look.
             </h1>
           </div>
-          <p className="hidden text-sm text-muted-foreground md:block">
-            {loading ? "Loading wigs…" : `${filtered.length} wigs`}
-          </p>
+          <p className="hidden text-sm text-muted-foreground md:block">{filtered.length} wigs</p>
         </div>
 
         {/* Search + sort */}
@@ -173,21 +172,10 @@ function Catalog() {
 
           {/* Grid */}
           <div>
-            {!loading && catalogueDisclosure(wigs) && (
+            {catalogueDisclosure(wigs) && (
               <p className="mb-4 text-xs text-muted-foreground">{catalogueDisclosure(wigs)}</p>
             )}
-            {loading ? (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {Array.from({ length: 9 }).map((_, i) => (
-                  <WigCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : error ? (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-sand/40 px-6 py-20 text-center">
-                <p className="font-display text-2xl text-mahogany">The catalog couldn't load.</p>
-                <p className="mt-2 text-sm text-muted-foreground">Refresh the page to try again.</p>
-              </div>
-            ) : filtered.length === 0 ? (
+            {filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-sand/40 px-6 py-20 text-center">
                 <p className="font-display text-2xl text-mahogany">
                   {wigs?.length
@@ -235,6 +223,38 @@ function Catalog() {
             </p>
           </div>
         </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+function CatalogError() {
+  const router = useRouter();
+  return (
+    <div className="min-h-screen bg-cream">
+      <Header />
+      <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
+        <p className="font-display text-2xl text-mahogany">The catalog couldn't load.</p>
+        <p className="mt-2 text-sm text-muted-foreground">Refresh the page to try again.</p>
+        <Button onClick={() => router.invalidate()} className="mt-5">
+          Try again
+        </Button>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+function CatalogNotFound() {
+  return (
+    <div className="min-h-screen bg-cream">
+      <Header />
+      <div className="px-6 py-20 text-center">
+        <p className="font-display text-2xl text-mahogany">Catalogue not found.</p>
+        <Link to="/catalog" className="mt-5 inline-block text-mahogany underline">
+          Browse the catalogue
+        </Link>
       </div>
       <Footer />
     </div>
