@@ -93,7 +93,7 @@ function OverviewPage() {
 
       <div className="mt-8 rounded-xl border border-border bg-card p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-lg text-mahogany">Recent signups</h2>
+          <h2 className="font-display text-lg text-mahogany">Recent sign-ups</h2>
           <div className="inline-flex rounded-full border border-border p-1 text-xs">
             <button
               onClick={() => setTab("retailers")}

@@ -36,7 +36,9 @@ export function AuthShell({
           <div className="sticky top-24 rounded-2xl border border-border bg-sand/40 p-8">
             <p className="font-mono text-xs uppercase tracking-wider text-gold-dark">Why Wigsmi</p>
             <h2 className="mt-2 font-display text-3xl text-mahogany">
-              Designed for our hair, our skin, our style.
+              {variant === "retailer"
+                ? "Built for wig retailers."
+                : "Designed for our hair, our skin, our style."}
             </h2>
             <ul className="mt-5 space-y-3 text-sm text-foreground/80">
               {points.map((point) => (
