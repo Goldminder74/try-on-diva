@@ -352,3 +352,78 @@ export const searchPublishedWigs = createServerFn({ method: "GET" })
     const { data: rows } = await q;
     return rows ?? [];
   });
+
+// ---------- Retailer outreach sending (Gmail) ----------
+
+export const getOutreachStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { googleClient, outreachSender } = await import("@/lib/outreach-mail.server");
+    const db = supabaseAdmin as any;
+    const since = new Date(Date.now() - 24 * 3600_000).toISOString();
+    const [auth, sent, queued, problems] = await Promise.all([
+      db
+        .from("outreach_gmail_auth")
+        .select("email, refresh_token, updated_at")
+        .eq("id", 1)
+        .maybeSingle(),
+      db
+        .from("outreach_outbox")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "sent")
+        .gte("sent_at", since),
+      db
+        .from("outreach_outbox")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "queued"),
+      db
+        .from("outreach_outbox")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["failed", "rejected"])
+        .gte("created_at", since),
+    ]);
+    return {
+      sender: outreachSender(),
+      clientConfigured: !!googleClient(),
+      connectedEmail: auth.data?.refresh_token ? (auth.data.email as string) : null,
+      connectedAt: auth.data?.refresh_token ? (auth.data.updated_at as string) : null,
+      sent24h: sent.count ?? 0,
+      queued: queued.count ?? 0,
+      problems24h: problems.count ?? 0,
+    };
+  });
+
+export const startGmailConnect = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { GMAIL_REDIRECT_URI, GMAIL_SCOPES, googleClient, outreachSender } =
+      await import("@/lib/outreach-mail.server");
+    const client = googleClient();
+    if (!client) {
+      throw new Error(
+        "Add GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET to the site secrets first.",
+      );
+    }
+    const bytes = crypto.getRandomValues(new Uint8Array(32));
+    const state = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    const { error } = await (supabaseAdmin as any).from("outreach_gmail_auth").upsert({
+      id: 1,
+      oauth_state: state,
+      oauth_state_expires: new Date(Date.now() + 10 * 60_000).toISOString(),
+    });
+    if (error) throw new Error("Could not start the Gmail connection.");
+    const params = new URLSearchParams({
+      client_id: client.id,
+      redirect_uri: GMAIL_REDIRECT_URI,
+      response_type: "code",
+      scope: GMAIL_SCOPES.join(" "),
+      access_type: "offline",
+      prompt: "consent",
+      include_granted_scopes: "false",
+      login_hint: outreachSender(),
+      state,
+    });
+    return { url: `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}` };
+  });

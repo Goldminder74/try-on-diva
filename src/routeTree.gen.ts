@@ -59,6 +59,8 @@ import { Route as EmbedWidgetTokenRouteImport } from './routes/embed.widget.$tok
 import { Route as LovableEmailEventsRouteImport } from './routes/lovable/email/events'
 import { Route as PortalCatalogIndexRouteImport } from './routes/portal.catalog.index'
 import { Route as PortalCatalogWigIdRouteImport } from './routes/portal.catalog.$wigId'
+import { Route as ApiPublicGmailOauthCallbackRouteImport } from './routes/api/public/gmail-oauth/callback'
+import { Route as ApiPublicHooksOutreachSendRouteImport } from './routes/api/public/hooks/outreach-send'
 import { Route as ApiPublicHooksQuotaResetRouteImport } from './routes/api/public/hooks/quota-reset'
 import { Route as ApiPublicHooksTrialsTickRouteImport } from './routes/api/public/hooks/trials-tick'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -316,6 +318,18 @@ const PortalCatalogWigIdRoute = PortalCatalogWigIdRouteImport.update({
   path: '/catalog/$wigId',
   getParentRoute: () => PortalRoute,
 } as any)
+const ApiPublicGmailOauthCallbackRoute =
+  ApiPublicGmailOauthCallbackRouteImport.update({
+    id: '/api/public/gmail-oauth/callback',
+    path: '/api/public/gmail-oauth/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksOutreachSendRoute =
+  ApiPublicHooksOutreachSendRouteImport.update({
+    id: '/api/public/hooks/outreach-send',
+    path: '/api/public/hooks/outreach-send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksQuotaResetRoute =
   ApiPublicHooksQuotaResetRouteImport.update({
     id: '/api/public/hooks/quota-reset',
@@ -391,6 +405,8 @@ export interface FileRoutesByFullPath {
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/portal/catalog/': typeof PortalCatalogIndexRoute
+  '/api/public/gmail-oauth/callback': typeof ApiPublicGmailOauthCallbackRoute
+  '/api/public/hooks/outreach-send': typeof ApiPublicHooksOutreachSendRoute
   '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
   '/api/public/hooks/trials-tick': typeof ApiPublicHooksTrialsTickRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -444,6 +460,8 @@ export interface FileRoutesByTo {
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/portal/catalog': typeof PortalCatalogIndexRoute
+  '/api/public/gmail-oauth/callback': typeof ApiPublicGmailOauthCallbackRoute
+  '/api/public/hooks/outreach-send': typeof ApiPublicHooksOutreachSendRoute
   '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
   '/api/public/hooks/trials-tick': typeof ApiPublicHooksTrialsTickRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -501,6 +519,8 @@ export interface FileRoutesById {
   '/portal/catalog/$wigId': typeof PortalCatalogWigIdRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/portal/catalog/': typeof PortalCatalogIndexRoute
+  '/api/public/gmail-oauth/callback': typeof ApiPublicGmailOauthCallbackRoute
+  '/api/public/hooks/outreach-send': typeof ApiPublicHooksOutreachSendRoute
   '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
   '/api/public/hooks/trials-tick': typeof ApiPublicHooksTrialsTickRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -558,6 +578,8 @@ export interface FileRouteTypes {
     | '/portal/catalog/$wigId'
     | '/app/'
     | '/portal/catalog/'
+    | '/api/public/gmail-oauth/callback'
+    | '/api/public/hooks/outreach-send'
     | '/api/public/hooks/quota-reset'
     | '/api/public/hooks/trials-tick'
     | '/api/public/payments/webhook'
@@ -611,6 +633,8 @@ export interface FileRouteTypes {
     | '/portal/catalog/$wigId'
     | '/app'
     | '/portal/catalog'
+    | '/api/public/gmail-oauth/callback'
+    | '/api/public/hooks/outreach-send'
     | '/api/public/hooks/quota-reset'
     | '/api/public/hooks/trials-tick'
     | '/api/public/payments/webhook'
@@ -667,6 +691,8 @@ export interface FileRouteTypes {
     | '/portal/catalog/$wigId'
     | '/_authenticated/app/'
     | '/portal/catalog/'
+    | '/api/public/gmail-oauth/callback'
+    | '/api/public/hooks/outreach-send'
     | '/api/public/hooks/quota-reset'
     | '/api/public/hooks/trials-tick'
     | '/api/public/payments/webhook'
@@ -701,6 +727,8 @@ export interface RootRouteChildren {
   GuidesIndexRoute: typeof GuidesIndexRoute
   EmbedWidgetTokenRoute: typeof EmbedWidgetTokenRoute
   LovableEmailEventsRoute: typeof LovableEmailEventsRoute
+  ApiPublicGmailOauthCallbackRoute: typeof ApiPublicGmailOauthCallbackRoute
+  ApiPublicHooksOutreachSendRoute: typeof ApiPublicHooksOutreachSendRoute
   ApiPublicHooksQuotaResetRoute: typeof ApiPublicHooksQuotaResetRoute
   ApiPublicHooksTrialsTickRoute: typeof ApiPublicHooksTrialsTickRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -1059,6 +1087,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalCatalogWigIdRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/api/public/gmail-oauth/callback': {
+      id: '/api/public/gmail-oauth/callback'
+      path: '/api/public/gmail-oauth/callback'
+      fullPath: '/api/public/gmail-oauth/callback'
+      preLoaderRoute: typeof ApiPublicGmailOauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/outreach-send': {
+      id: '/api/public/hooks/outreach-send'
+      path: '/api/public/hooks/outreach-send'
+      fullPath: '/api/public/hooks/outreach-send'
+      preLoaderRoute: typeof ApiPublicHooksOutreachSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/quota-reset': {
       id: '/api/public/hooks/quota-reset'
       path: '/api/public/hooks/quota-reset'
@@ -1191,6 +1233,8 @@ const rootRouteChildren: RootRouteChildren = {
   GuidesIndexRoute: GuidesIndexRoute,
   EmbedWidgetTokenRoute: EmbedWidgetTokenRoute,
   LovableEmailEventsRoute: LovableEmailEventsRoute,
+  ApiPublicGmailOauthCallbackRoute: ApiPublicGmailOauthCallbackRoute,
+  ApiPublicHooksOutreachSendRoute: ApiPublicHooksOutreachSendRoute,
   ApiPublicHooksQuotaResetRoute: ApiPublicHooksQuotaResetRoute,
   ApiPublicHooksTrialsTickRoute: ApiPublicHooksTrialsTickRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
