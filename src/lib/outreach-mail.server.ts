@@ -23,7 +23,7 @@ export function outreachSender(): string {
 }
 
 function fromName(): string {
-  return process.env.OUTREACH_FROM_NAME || "Ayo Ayeni, Wigsmi";
+  return process.env.OUTREACH_FROM_NAME || "Wigsmi Try-On Studio";
 }
 
 function dailyCap(): number {
