@@ -365,7 +365,7 @@ export const getOutreachStatus = createServerFn({ method: "GET" })
     const [auth, sent, queued, problems] = await Promise.all([
       db
         .from("outreach_gmail_auth")
-        .select("email, refresh_token, updated_at")
+        .select("email, refresh_token, updated_at, last_result")
         .eq("id", 1)
         .maybeSingle(),
       db
@@ -391,6 +391,7 @@ export const getOutreachStatus = createServerFn({ method: "GET" })
       sent24h: sent.count ?? 0,
       queued: queued.count ?? 0,
       problems24h: problems.count ?? 0,
+      lastResult: (auth.data?.last_result as string | null) ?? null,
     };
   });
 

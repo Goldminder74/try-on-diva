@@ -226,6 +226,7 @@ function OutreachSending() {
             Sent in the last 24 hours: {status.sent24h}. Waiting to send: {status.queued}. Rejected
             or failed in the last 24 hours: {status.problems24h}.
           </p>
+          {status.lastResult && <p>Last connection attempt: {status.lastResult}</p>}
           {!status.clientConfigured && (
             <p>
               Add GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET to the site secrets first.

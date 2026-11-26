@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS public.outreach_gmail_auth (
   refresh_token text,
   oauth_state text,
   oauth_state_expires timestamptz,
+  last_result text,
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE public.outreach_gmail_auth ENABLE ROW LEVEL SECURITY;

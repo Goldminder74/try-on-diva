@@ -8,6 +8,15 @@ import {
   outreachSender,
 } from "@/lib/outreach-mail.server";
 
+async function note(result: string) {
+  // Record the outcome (never a token) so the owner and Claude can see why a
+  // connection failed.
+  await (supabaseAdmin as any)
+    .from("outreach_gmail_auth")
+    .update({ last_result: `${new Date().toISOString()} ${result}`.slice(0, 500) })
+    .eq("id", 1);
+}
+
 function back(result: string) {
   return new Response(null, {
     status: 302,
@@ -37,7 +46,10 @@ export const Route = createFileRoute("/api/public/gmail-oauth/callback")({
         const url = new URL(request.url);
         const code = url.searchParams.get("code");
         const state = url.searchParams.get("state");
-        if (!code || !state) return back("cancelled");
+        if (!code || !state) {
+          await note(`cancelled: ${url.searchParams.get("error") ?? "no code"}`);
+          return back("cancelled");
+        }
 
         const db = supabaseAdmin as any;
         const { data: row } = await db
@@ -52,10 +64,16 @@ export const Route = createFileRoute("/api/public/gmail-oauth/callback")({
           .from("outreach_gmail_auth")
           .update({ oauth_state: null, oauth_state_expires: null })
           .eq("id", 1);
-        if (!expected || !fresh || !sameText(expected, state)) return back("expired");
+        if (!expected || !fresh || !sameText(expected, state)) {
+          await note("expired");
+          return back("expired");
+        }
 
         const client = googleClient();
-        if (!client) return back("not-configured");
+        if (!client) {
+          await note("not-configured");
+          return back("not-configured");
+        }
         try {
           const token = await exchangeGoogleToken({
             code,
@@ -66,8 +84,14 @@ export const Route = createFileRoute("/api/public/gmail-oauth/callback")({
           });
           const profile = await gmailFetch(token.access_token, "profile");
           const email = String(profile.emailAddress ?? "").toLowerCase();
-          if (email !== outreachSender()) return back("wrong-account");
-          if (!token.refresh_token) return back("no-refresh-token");
+          if (email !== outreachSender()) {
+            await note(`wrong-account (${email || "unknown"})`);
+            return back("wrong-account");
+          }
+          if (!token.refresh_token) {
+            await note("no-refresh-token");
+            return back("no-refresh-token");
+          }
           await db
             .from("outreach_gmail_auth")
             .update({
@@ -78,7 +102,9 @@ export const Route = createFileRoute("/api/public/gmail-oauth/callback")({
             .eq("id", 1);
           return back("connected");
         } catch (err) {
-          console.error("[gmail-oauth] callback failed", err instanceof Error ? err.message : err);
+          const message = err instanceof Error ? err.message : String(err);
+          console.error("[gmail-oauth] callback failed", message);
+          await note(`error: ${message}`);
           return back("error");
         }
       },
