@@ -16,10 +16,14 @@ export interface OutboxRow {
   thread_id: string | null;
 }
 
-// Every outreach email must carry the company line and the opt-out line
+// Every outreach email must carry the company line, the opt-out line and the
+// correspondence address
 // (Rules v2 section 6); a row without them is rejected, never sent.
 export const REQUIRED_COMPANY_TEXT = "company number 13972872";
 export const REQUIRED_OPT_OUT_TEXT = "no thanks";
+// Correspondence address (Ayo, 26 November 2026), required on commercial email
+// to the USA (CAN-SPAM) and Canada (CASL); carried on every outreach email.
+export const REQUIRED_ADDRESS_TEXT = "78 york street";
 
 const EMAIL_RE = /^[^@\s<>,;"']+@[^@\s<>,;"']+\.[A-Za-z]{2,}$/;
 
@@ -43,6 +47,9 @@ export function rejectionReason(row: OutboxRow, sender: string): string | null {
     const lower = body.toLowerCase();
     if (!lower.includes(REQUIRED_COMPANY_TEXT)) return `${name} is missing the company line`;
     if (!lower.includes(REQUIRED_OPT_OUT_TEXT)) return `${name} is missing the opt-out line`;
+    if (!lower.includes(REQUIRED_ADDRESS_TEXT)) {
+      return `${name} is missing the correspondence address`;
+    }
     if (lower.includes("google.com/url")) return `${name} contains a google.com redirect link`;
   }
   if (/<\s*(script|iframe|object|embed|form)\b/i.test(row.body_html)) {

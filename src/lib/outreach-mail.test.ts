@@ -10,7 +10,7 @@ import {
 } from "./outreach-mail";
 
 const small =
-  "Wigsmi is a trading name of Sherwood Consulting Services Ltd, registered in England and Wales, company number 13972872. If you'd rather not hear from me, reply \"no thanks\" and I won't contact you again.";
+  "Wigsmi is a trading name of Sherwood Consulting Services Ltd, registered in England and Wales, company number 13972872. If you'd rather not hear from me, reply \"no thanks\" and I won't contact you again. Correspondence address: 78 York Street, London W1H 1DP, United Kingdom.";
 
 function row(over: Partial<OutboxRow> = {}): OutboxRow {
   return {
@@ -43,6 +43,10 @@ describe("rejectionReason", () => {
     expect(
       rejectionReason(row({ body_html: "<p>company number 13972872</p>" }), "info@wigsmi.com"),
     ).toMatch(/opt-out/);
+  });
+  it("requires the correspondence address", () => {
+    const noAddress = row({ body_text: row().body_text.replace(/Correspondence address.*$/, "") });
+    expect(rejectionReason(noAddress, "info@wigsmi.com")).toMatch(/address/);
   });
   it("rejects several recipients, header injection and missing threads", () => {
     expect(
