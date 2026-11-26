@@ -167,7 +167,7 @@ export async function processOutbox(limit = 20): Promise<OutboxResult> {
 
     const { data: rows } = await db()
       .from("outreach_outbox")
-      .select("id, kind, to_email, subject, body_html, body_text, thread_id, attempts")
+      .select("id, kind, to_email, subject, body_html, body_text, thread_id, country, attempts")
       .eq("status", "queued")
       .order("created_at", { ascending: true })
       .limit(Math.min(limit, remaining));

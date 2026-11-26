@@ -10,7 +10,8 @@ import {
 } from "./outreach-mail";
 
 const small =
-  "Wigsmi is a trading name of Sherwood Consulting Services Ltd, registered in England and Wales, company number 13972872. If you'd rather not hear from me, reply \"no thanks\" and I won't contact you again. Correspondence address: 78 York Street, London W1H 1DP, United Kingdom.";
+  "Wigsmi is a trading name of Sherwood Consulting Services Ltd, registered in England and Wales, company number 13972872. If you'd rather not hear from me, reply \"no thanks\" and I won't contact you again.";
+const address = " Correspondence address: 78 York Street, London W1H 1DP, United Kingdom.";
 
 function row(over: Partial<OutboxRow> = {}): OutboxRow {
   return {
@@ -21,6 +22,7 @@ function row(over: Partial<OutboxRow> = {}): OutboxRow {
     body_html: `<p>Try it at <a href="https://wigsmi.com/try-on">wigsmi.com/try-on</a></p><p>${small}</p>`,
     body_text: `Try it at https://wigsmi.com/try-on\n\n${small}`,
     thread_id: null,
+    country: "UK",
     ...over,
   };
 }
@@ -44,9 +46,24 @@ describe("rejectionReason", () => {
       rejectionReason(row({ body_html: "<p>company number 13972872</p>" }), "info@wigsmi.com"),
     ).toMatch(/opt-out/);
   });
-  it("requires the correspondence address", () => {
-    const noAddress = row({ body_text: row().body_text.replace(/Correspondence address.*$/, "") });
-    expect(rejectionReason(noAddress, "info@wigsmi.com")).toMatch(/address/);
+  it("puts the correspondence address on US and Canadian email only", () => {
+    const withAddress = {
+      body_text: row().body_text + address,
+      body_html: row().body_html + address,
+    };
+    expect(rejectionReason(row({ country: "USA" }), "info@wigsmi.com")).toMatch(
+      /missing the correspondence/,
+    );
+    expect(
+      rejectionReason(row({ country: "Canada", ...withAddress }), "info@wigsmi.com"),
+    ).toBeNull();
+    expect(
+      rejectionReason(row({ country: "United States", ...withAddress }), "info@wigsmi.com"),
+    ).toBeNull();
+    expect(rejectionReason(row({ country: "Nigeria", ...withAddress }), "info@wigsmi.com")).toMatch(
+      /only for the USA/,
+    );
+    expect(rejectionReason(row({ country: "" }), "info@wigsmi.com")).toMatch(/country/);
   });
   it("rejects several recipients, header injection and missing threads", () => {
     expect(

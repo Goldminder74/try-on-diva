@@ -14,16 +14,34 @@ export interface OutboxRow {
   body_html: string;
   body_text: string;
   thread_id: string | null;
+  country?: string | null;
 }
 
-// Every outreach email must carry the company line, the opt-out line and the
-// correspondence address
+// Every outreach email must carry the company line and the opt-out line; emails
+// to the USA and Canada also carry the correspondence address
 // (Rules v2 section 6); a row without them is rejected, never sent.
 export const REQUIRED_COMPANY_TEXT = "company number 13972872";
 export const REQUIRED_OPT_OUT_TEXT = "no thanks";
-// Correspondence address (Ayo, 26 November 2026), required on commercial email
-// to the USA (CAN-SPAM) and Canada (CASL); carried on every outreach email.
+// Correspondence address (Ayo, 26 November 2026): required on commercial email
+// to the USA (CAN-SPAM) and Canada (CASL), and used nowhere else.
 export const REQUIRED_ADDRESS_TEXT = "78 york street";
+
+const NORTH_AMERICA = new Set([
+  "us",
+  "usa",
+  "u.s.",
+  "u.s.a.",
+  "united states",
+  "united states of america",
+  "america",
+  "ca",
+  "canada",
+]);
+
+/** True when the recipient's country needs the postal address (USA or Canada). */
+export function needsPostalAddress(country: string | null | undefined): boolean {
+  return NORTH_AMERICA.has((country ?? "").trim().toLowerCase());
+}
 
 const EMAIL_RE = /^[^@\s<>,;"']+@[^@\s<>,;"']+\.[A-Za-z]{2,}$/;
 
@@ -40,6 +58,8 @@ export function rejectionReason(row: OutboxRow, sender: string): string | null {
     return "subject is empty or has line breaks";
   if (row.kind !== "first" && !row.thread_id) return "follow-ups and replies need thread_id";
   if (row.kind === "first" && row.thread_id) return "a first email cannot have thread_id";
+  if (!row.country?.trim()) return "country is required";
+  const addressNeeded = needsPostalAddress(row.country);
   for (const [name, body] of [
     ["body_text", row.body_text],
     ["body_html", row.body_html],
@@ -47,8 +67,12 @@ export function rejectionReason(row: OutboxRow, sender: string): string | null {
     const lower = body.toLowerCase();
     if (!lower.includes(REQUIRED_COMPANY_TEXT)) return `${name} is missing the company line`;
     if (!lower.includes(REQUIRED_OPT_OUT_TEXT)) return `${name} is missing the opt-out line`;
-    if (!lower.includes(REQUIRED_ADDRESS_TEXT)) {
-      return `${name} is missing the correspondence address`;
+    const hasAddress = lower.includes(REQUIRED_ADDRESS_TEXT);
+    if (addressNeeded && !hasAddress) {
+      return `${name} is missing the correspondence address (required for the USA and Canada)`;
+    }
+    if (!addressNeeded && hasAddress) {
+      return `${name} includes the correspondence address, which is only for the USA and Canada`;
     }
     if (lower.includes("google.com/url")) return `${name} contains a google.com redirect link`;
   }
